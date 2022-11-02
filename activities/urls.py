@@ -4,12 +4,12 @@ from . import views
 from django.conf.urls.i18n import i18n_patterns
 
 router = routers.DefaultRouter()
-router.register(r'task', views.taskViewSet,"activities/task")
-router.register(r'task_type', views.task_typeViewSet,"activities/task_type")
-router.register(r'event', views.eventViewSet,"activities/event")
-router.register(r'event_type', views.event_typeViewSet,"activities/event_type")
-router.register(r'hearing', views.hearingViewSet,"activities/hearing")
-router.register(r'hearing_type', views.hearing_typeViewSet,"activities/hearing_type")
+router.register(r'task', views.taskViewSet,"task")
+# router.register(r'task_type', views.task_typeViewSet,"task_type")
+# router.register(r'event', views.eventViewSet,"event")
+# router.register(r'event_type', views.event_typeViewSet,"event_type")
+router.register(r'hearing', views.hearingViewSet,"hearing")
+# router.register(r'hearing_type', views.hearing_typeViewSet,"hearing_type")
 
 
 urlpatterns = [

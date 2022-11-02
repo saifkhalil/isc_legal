@@ -1,3 +1,4 @@
+from ast import literal_eval
 from audioop import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
@@ -7,26 +8,81 @@ from rest_framework import viewsets,status
 from rest_framework import permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from core.models import comments,replies
-from .serializers import GroupSerializer, commentsSerializer,  repliesSerializer
+# from cases.views import get_cases_from_cache
+from core.models import comments,replies,priorities,contracts,documents
+from .serializers import GroupSerializer, commentsSerializer,  repliesSerializer,prioritiesSerializer,contractsSerializer,documentsSerializer
 from cases.models import LitigationCases
-from activities.models import event,task,hearing
+from activities.models import task,hearing
 from django.views.decorators.cache import cache_page
+from django.views.decorators.cache import never_cache
 from django.core.cache import cache
+from django.conf import settings
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from django.conf import settings
+from django.utils import translation
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
+from datetime import datetime, timedelta
+from cases.utils import Calendar
+from django.utils.safestring import mark_safe
+import calendar
+from datetime import date
+from .permissions import MyPermission
+import django_filters.rest_framework
+## CALENDAR VIEW
 
-# def com_all():
-#     comments = cache.get('comments')
-#     if comments is None:
-#         comments = comments.objects.all().order_by('-created_at')
-#         cache.set('comments', comments)
-#     return comments
+# def get_comments_from_cache():
+#     if 'all_comments' in cache:
+#         return cache.get('all_comments')
+#     else:
+#         all_comments = comments.objects.all().order_by('-created_at')
+#         cache.set('all_comments', all_comments)
+#     return all_comments
 
-@cache_page(60 * 15)
-def home(request):
-    context = {}
+# def get_replies_from_cache():
+#     if 'all_replies' in cache:
+#         return cache.get('all_replies')
+#     else:
+#         all_replies = replies.objects.all().order_by('-created_at')
+#         cache.set('all_replies', all_replies)
+#     return all_replies
+
+def prev_month(d):
+    first = d.replace(day=1)
+    prev_month = first - timedelta(days=1)
+    month = 'month=' + str(prev_month.year) + '-' + str(prev_month.month)
+    return month
+
+def next_month(d):
+    days_in_month = calendar.monthrange(d.year, d.month)[1]
+    last = d.replace(day=days_in_month)
+    next_month = last + timedelta(days=1)
+    month = 'month=' + str(next_month.year) + '-' + str(next_month.month)
+    return month
+
+def get_date(req_day):
+    if req_day:
+        year, month = (int(x) for x in req_day.split('-'))
+        return date(year, month, day=1)
+    return datetime.today()
+
+@never_cache
+def myhome(request):
+    d = get_date(request.GET.get('month', None))
+    pre_month = prev_month(d)
+    nex_month = next_month(d)
+    cal = Calendar(d.year, d.month)
+    html_cal = cal.formatmonth(withyear=True)
+    cases = LitigationCases.objects.all().order_by('-created_at')
+    context = {
+        'cases':cases,
+        'calendar':mark_safe(html_cal),
+        'prev_month':pre_month,
+        'next_month':nex_month
+        }
     return render(request, 'index.html', context=context)
 
-@cache_page(60 * 15)
+
+@never_cache
 def about(request):
     return render(request, 'about.html')
 
@@ -40,9 +96,10 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 class commentsViewSet(viewsets.ModelViewSet):
 
-    queryset = comments.objects.all().order_by('-created_at')
+    queryset = comments.objects.all().order_by('-id')
     serializer_class = commentsSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, MyPermission]
+    perm_slug = "core.comments"
 
     def create(self, request):
         if "comment" in request.data:
@@ -69,7 +126,8 @@ class repliesViewSet(viewsets.ModelViewSet):
 
     queryset = replies.objects.all().order_by('-created_at')
     serializer_class = repliesSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, MyPermission]
+    perm_slug = "core.replies"
 
     def create(self, request):
         if "reply" in request.data:
@@ -82,3 +140,55 @@ class repliesViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data,status=status.HTTP_201_CREATED)
             else:
                 return Response({'error':'no reply'},status=status.HTTP_201_CREATED)
+
+
+class prioritiesViewSet(viewsets.ModelViewSet):
+
+    queryset = priorities.objects.all().order_by('priority')
+    serializer_class = prioritiesSerializer
+    permission_classes = [permissions.IsAuthenticated, MyPermission]
+    perm_slug = "core.priorities"
+
+
+class contractsViewSet(viewsets.ModelViewSet):
+
+    queryset = contracts.objects.all().order_by('-created_by')
+    serializer_class = contractsSerializer
+    permission_classes = [permissions.IsAuthenticated, MyPermission]
+    perm_slug = "core.contracts"
+
+
+class documentsViewSet(viewsets.ModelViewSet):
+
+    queryset = documents.objects.all().order_by('-created_by')
+    serializer_class = documentsSerializer
+    permission_classes = [permissions.IsAuthenticated, MyPermission]
+    perm_slug = "core.documents"
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = ['id','name','case_id']
+
+    def create(self,request):
+        req_name = None
+        req_attachement = None
+        req_case_id = None
+        if "case_id" in request.data:
+            req_case_id = request.data['case_id']
+            req_name = request.data['name']
+            req_attachement = request.data['attachement']
+            case = get_object_or_404(LitigationCases,pk=req_case_id)
+            document = documents(id=None,name=req_name,case_id=req_case_id,attachement=req_attachement,created_by=request.user)
+            document.save()
+            serializer = self.get_serializer(document)    
+            case.documents.add(document)
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        else:
+            req_name = request.data['name']
+            req_attachement = request.data['attachement']
+            document = documents(id=None,name=req_name,attachement=req_attachement,created_by=request.user)
+            document.save()
+            serializer = self.get_serializer(document)    
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+
+        
+        
+            

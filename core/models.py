@@ -92,3 +92,39 @@ class comments(models.Model):
     #         self.modified_by = self.request.user
     #         self.modified_at = timezone.now()            
     #     return super(comments, self).save(*args, **kwargs)
+class court(models.Model):
+    id = models.AutoField(primary_key=True,)
+    name = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Name'))
+
+    def __str__(self):
+        return self.name
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = _('Court')
+        verbose_name_plural = _('Courts')
+
+class contracts(models.Model):
+    id = models.AutoField(primary_key=True,)
+    name = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Name'))
+    attachment = models.FileField(upload_to='contracts/%Y/%m/%d/',verbose_name=_('Attachment'))
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    modified_at = models.DateTimeField(auto_now=True, editable=False)
+    created_by = models.ForeignKey(
+        User, related_name='%(class)s_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
+    modified_by = models.ForeignKey(
+        User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False)
+
+class documents(models.Model):
+    id = models.AutoField(primary_key=True,)
+    name = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Name'))
+    attachment = models.FileField(upload_to='documents/%Y/%m/%d/',verbose_name=_('Attachment'))
+    case_id = models.IntegerField(blank=True,null=True, verbose_name=_('Litigation Case'))
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    modified_at = models.DateTimeField(auto_now=True, editable=False)
+    created_by = models.ForeignKey(
+        User, related_name='%(class)s_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
+    modified_by = models.ForeignKey(
+        User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False)

@@ -54,7 +54,8 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'drf_spectacular_sidecar',
     'rest_framework_simplejwt',
-    'parler',
+    'django_filters',
+    'corsheaders',
     'accounts',
     'core',
     'cases',
@@ -65,9 +66,10 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware', 
-    'django.middleware.cache.UpdateCacheMiddleware',
+    # 'django.middleware.cache.UpdateCacheMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -153,9 +155,8 @@ USE_TZ = True
 SITE_ID = 1
 
 LANGUAGES = (
-    ('ar', _('Arabic')),
     ('en', _('English')),
-
+    ('ar', _('Arabic')),
 )
 
 LOCALE_PATHS = [
@@ -190,12 +191,14 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.DjangoModelPermissions',
         
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10,
+
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     
 }
 
@@ -226,13 +229,25 @@ PARLER_LANGUAGES = {
 PARLER_DEFAULT_LANGUAGE_CODE = 'en'
 
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://' + os.environ.get('REDIS_HOST', 'localhost') + ':6379',
-    }
-}
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+#         'LOCATION': 'redis://' + os.environ.get('REDIS_HOST', 'localhost') + ':6379',
+#     }
+# }
 
-CACHE_MIDDLEWARE_ALIAS = 'default'  # The cache alias to use for storage and 'default' is **local-memory cache**.
-CACHE_MIDDLEWARE_SECONDS = '600'    # number of seconds before each page is cached
-CACHE_MIDDLEWARE_KEY_PREFIX = ''    # This is used when cache is shared across multiple sites that
+
+# CACHE_MIDDLEWARE_ALIAS = 'default'  # The cache alias to use for storage and 'default' is **local-memory cache**.
+# CACHE_MIDDLEWARE_SECONDS = 3600
+# CACHE_MIDDLEWARE_KEY_PREFIX = ''    # This is used when cache is shared across multiple sites that
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 99999
+
+
+CORS_ALLOW_ALL_ORIGINS = True # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+] # If this is used, then not need to use `CORS_ALLOW_ALL_ORIGINS = True`
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    'http://localhost:3000',
+]

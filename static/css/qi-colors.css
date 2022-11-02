@@ -6,6 +6,15 @@
     --qi-text: #fff;
 }
 
+.qi-border {
+    border-color: var(--qi-secondary) !important;
+}
+
+.calendar td:hover {
+    background-color: var(--qi-secondary);
+    color: var(--qi-text);
+}
+
 .qi-light {
     background-color: var(--qi-primary) !important;
     color: var(--qi-text) !important;
@@ -15,7 +24,25 @@
     color: var(--qi-text) !important;
 }
 
+.qi-primary-outline {
+    background-color: transparent !important;
+    color: var(--qi-text) !important;
+    border-color: var(--qi-secondary) !important;
+}
+
+.qi-primary-outline:hover {
+    background-color: var(--qi-secondary) !important;
+    color: var(--qi-primary) !important;
+    border-color: var(--qi-primary) !important;
+}
+
 .btn-primary {
+    background-color: var(--qi-secondary) !important;
+    color: var(--qi-primary) !important;
+    border-color: var(--qi-secondary) !important;
+}
+
+.qi-primary {
     background-color: var(--qi-secondary) !important;
     color: var(--qi-primary) !important;
     border-color: var(--qi-secondary) !important;

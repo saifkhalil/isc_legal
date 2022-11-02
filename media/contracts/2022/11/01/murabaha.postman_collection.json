@@ -1,0 +1,299 @@
+{
+	"info": {
+		"_postman_id": "73170e69-ace5-445d-b715-ed9394375508",
+		"name": "murabaha",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20543963"
+	},
+	"item": [
+		{
+			"name": "taqsim side",
+			"item": [
+				{
+					"name": "murabaha requesting approval",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"bank\":\"rafedain\",\r\n    \"plan\":\"3\",\r\n    \"cat\":\"gold\",\r\n    \"insurance\":\"true\",\r\n    \"totalInvested\":\"8377438\",\r\n    \"requestId\":\"dbf15ec2-30dd-4499-98b1-f35f1a04c951\",\r\n    \"mKey\":\"rafedain3goldtruef35f1a04c951\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://172.104.205.237:8844/murabaha_requesting_approval",
+							"protocol": "http",
+							"host": [
+								"172",
+								"104",
+								"205",
+								"237"
+							],
+							"port": "8844",
+							"path": [
+								"murabaha_requesting_approval"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "request bnpl items",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "items",
+							"type": "file",
+							"src": [
+								"/C:/Users/ammar/OneDrive/Pictures/adding_database_management.jpg",
+								"/C:/Users/ammar/OneDrive/Pictures/car1.jpg",
+								"/C:/Users/ammar/OneDrive/Pictures/fast_car.jpg"
+							]
+						}
+					]
+				},
+				"url": {
+					"raw": "http://192.168.0.104:8544/request_bnpl_items",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"0",
+						"104"
+					],
+					"port": "8544",
+					"path": [
+						"request_bnpl_items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bnpl fund approved",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requester\":\"clientA\",\r\n    \"aclmessage\":\"bnpl_fund_approved\",\r\n    \"cat\":\"gold\", \r\n    \"bank\":\"rafedain\",\r\n    \"insurance\":\"yes\",\r\n    \"price\":\"12748833\",\r\n    \"plan\": \"7\",\r\n    \"community\":\"default\",\r\n    \"requestId\":\"011e3d85-8e89-448c-9f4e-2485a18ee607\"\r\n\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://192.168.5.102:8844/bnpl_fund_approved",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"5",
+						"102"
+					],
+					"port": "8844",
+					"path": [
+						"bnpl_fund_approved"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bnpl fund activated",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requester\":\"clientA\",\r\n    \"aclmessage\":\"bnpl_fund_activated\",\r\n    \"cat\":\"gold\", \r\n    \"bank\":\"rafedain\",\r\n    \"insurance\":\"yes\",\r\n    \"price\":\"12748833\",\r\n    \"plan\": \"7\",\r\n    \"totalInvested\": \"5000000\",\r\n    \"paid\":\"0\",\r\n    \"deficit\":\"0\",\r\n    \"community\":\"default\",\r\n    \"requestId\":\"011e3d85-8e89-448c-9f4e-2485a18ee607\"\r\n\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://172.104.205.237:8844/bnpl_fund_activated",
+					"protocol": "http",
+					"host": [
+						"172",
+						"104",
+						"205",
+						"237"
+					],
+					"port": "8844",
+					"path": [
+						"bnpl_fund_activated"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bnpl fund rejected",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requester\":\"clientA\",\r\n    \"aclmessage\":\"bnpl_fund_rejected\",\r\n    \"cat\":\"gold\", \r\n    \"bank\":\"rafedain\",\r\n    \"insurance\":\"yes\",\r\n    \"price\":\"12748833\",\r\n    \"plan\": \"7\",\r\n    \"community\":\"default\",\r\n    \"requestId\":\"52c260e5-5e35-4019-bbf6-0feaa169c71e\"\r\n\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://172.104.205.237:8844/bnpl_fund_rejected",
+					"protocol": "http",
+					"host": [
+						"172",
+						"104",
+						"205",
+						"237"
+					],
+					"port": "8844",
+					"path": [
+						"bnpl_fund_rejected"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "request bnpl item",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"connection": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/ammar/OneDrive/Pictures/car1.jpg"
+						},
+						{
+							"key": "",
+							"value": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://172.104.205.237:8844/request_bnpl_item?cat=gold&aclmessage=request_bnpl_item&plan=7&profit=9&qty=11&community=default&requestId=9431ec2-7865-ef54-123456780003&bank=rafedain&insurance=yes&price=11000000&desc=specification of the product",
+					"protocol": "http",
+					"host": [
+						"172",
+						"104",
+						"205",
+						"237"
+					],
+					"port": "8844",
+					"path": [
+						"request_bnpl_item"
+					],
+					"query": [
+						{
+							"key": "cat",
+							"value": "gold"
+						},
+						{
+							"key": "aclmessage",
+							"value": "request_bnpl_item"
+						},
+						{
+							"key": "plan",
+							"value": "7"
+						},
+						{
+							"key": "profit",
+							"value": "9"
+						},
+						{
+							"key": "qty",
+							"value": "11"
+						},
+						{
+							"key": "community",
+							"value": "default"
+						},
+						{
+							"key": "requestId",
+							"value": "9431ec2-7865-ef54-123456780003"
+						},
+						{
+							"key": "bank",
+							"value": "rafedain"
+						},
+						{
+							"key": "insurance",
+							"value": "yes"
+						},
+						{
+							"key": "price",
+							"value": "11000000"
+						},
+						{
+							"key": "desc",
+							"value": "specification of the product"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bnpl fund active updated",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requester\":\"clientA\",\r\n    \"aclmessage\":\"bnpl_fund_active_updated\",\r\n    \"cat\":\"gold\", \r\n    \"bank\":\"rafedain\",\r\n    \"insurance\":\"yes\",\r\n    \"price\":\"12748833\",\r\n    \"plan\": \"7\",\r\n    \"totalInvested\": \"5000000\",\r\n    \"paid\":\"1200000\",\r\n    \"deficit\":\"150000\",\r\n    \"community\":\"default\",\r\n    \"requestId\":\"14719581-b8d1-4824-a392-d7a5dbd76635\"\r\n\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://172.104.205.237:8844/bnpl_fund_active_updated",
+					"protocol": "http",
+					"host": [
+						"172",
+						"104",
+						"205",
+						"237"
+					],
+					"port": "8844",
+					"path": [
+						"bnpl_fund_active_updated"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

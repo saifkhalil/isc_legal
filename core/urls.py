@@ -21,6 +21,8 @@ from django.shortcuts import render
 from pyrsistent import b
 from rest_framework import routers, permissions
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -48,12 +50,15 @@ router = routers.DefaultRouter()
 router.register(r'groups', views.GroupViewSet,basename='Groups')
 router.register(r'comments', views.commentsViewSet,basename='comments')
 router.register(r'replies', views.repliesViewSet,basename='replies')
+router.register(r'priorities', views.prioritiesViewSet,basename='priorities')
+router.register(r'contracts', views.contractsViewSet,basename='contracts')
+router.register(r'documents', views.documentsViewSet,basename='documents')
 
 
 urlpatterns = [
     path('api/', include(router.urls),name='core'),
-    path('api/', include('cases.urls'),name='cases'),
-    path('api/', include('activities.urls'),name='activities'),
+    path('api/cases/', include('cases.urls'),name='cases'),
+    path('api/activities/', include('activities.urls'),name='activities'),
     path('api/auth/', include('djoser.urls')),
     path('api/auth/', include('djoser.urls.authtoken')),
     path('api/jwt/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -62,13 +67,13 @@ urlpatterns = [
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += i18n_patterns(
     path('admin/', admin.site.urls),
     path('about/', views.about,name='about'),
     path('accounts/', include('accounts.urls')),
-    path('', views.home, name='home'),
-    path('language_setting', include('rosetta.urls')),
+    path('', views.myhome, name='home'),
+    path('lang', include('rosetta.urls')),
     path('i18n/', include('django.conf.urls.i18n')),
 )
 
