@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% get_current_language as CURRENT_LANGUAGE %}
+{% get_available_languages as AVAILABLE_LANGUAGES %}
+{% get_language_info_list for AVAILABLE_LANGUAGES as languages %}
+{% block content %}
+{% load static %}
+<div class="main">
+    <section class="">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <h2>{% trans 'About' %}</h2>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="ptb80">
+        <div class="container">
+            <div class="col-md-12">
+                <h4 class="ptb20">{% trans 'How we can help you' %}</h4>
+                <p>{% trans 'A' %}</p>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

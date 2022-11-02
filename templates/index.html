@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% get_current_language as CURRENT_LANGUAGE %}
+{% get_available_languages as AVAILABLE_LANGUAGES %}
+{% get_language_info_list for AVAILABLE_LANGUAGES as languages %}
+{% block content %}
+{% load static %}
+    <h1 class="text-center">
+      {% trans 'Welcome to ISC Legal App' %}
+    </h1>
+{% endblock %}

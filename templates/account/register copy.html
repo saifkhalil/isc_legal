@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+{% load i18n %}
+{% load widget_tweaks %}
+<!-- ===== Start of Login - Register Section ===== -->
+<section class="ptb150" id="login">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-md-offset-3 col-xs-12">
+
+      <!-- Start of Login Box -->
+      <div class="login-box">
+
+        <div class="login-title">
+          <h4>{% trans 'Register to ISC Legal App' %}</h4>
+        </div>
+
+        <form class="form-signin" method="post">{% csrf_token %}
+          {% csrf_token %}
+
+          {% for hidden_field in form.hidden_fields %}
+          {{ hidden_field }}
+          {% endfor %}
+
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger" role="alert">
+            {% for error in form.non_field_errors %}
+            {{ error }}
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% for field in form.visible_fields %}
+          <div class="form-floating  mb-3">
+
+            {% if form.is_bound %}
+            {% if field.errors %}
+            {% render_field field class="form-control is-invalid" %}
+            {% for error in field.errors %}
+            <div class="invalid-feedback">
+              {{ error }}
+            </div>
+            {% endfor %}
+            {% else %}
+            {% render_field field class="form-control is-valid" %}
+            {% endif %}
+            {% else %}
+            {% render_field field class="form-control" %}
+            {% endif %}
+            {{ field.label_tag }}
+            {% if field.help_text %}
+            <small class="form-text text-muted">{{ field.help_text }}</small>
+            {% endif %}
+
+          </div>
+          {% if field.type == 'checkbox' %}
+
+          {% endif %}
+          {% endfor %}
+          <button class="btn btn-primary" type="submit">Register</button>
+        </form>
+      </div>
+      <!-- End of Login Box -->
+
+    </div>
+  </div>
+</section>
+<!-- ===== End of Login - Register Section ===== -->
+<script type="text/javascript" src="{% static 'js/bootstrap-filestyle.min.js' %}"> </script>
+{% endblock content %}
