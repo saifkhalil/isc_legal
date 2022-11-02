@@ -1,0 +1,60 @@
+{% include "header.html" %}
+{% block content %}
+<style type="text/css">
+</style>
+{% if success_message %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <strong>PCI system </strong> Profile for {{account_form.initial.firstname}} {{account_form.initial.lastname}} has been
+  updated
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+{% for field in account_form %}
+{% for error in field.errors %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  <strong>PCI system errors: </strong>
+  <p> {{ error }}</p>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endfor %}
+{% if account_form.non_field_errors %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  {{account_form.non_field_errors}}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+<div class="card mb-3" style="max-width: 50rem;margin: 40px auto;">
+  <div class="card-header text-center user-select-none">{{user.firstname}} {{user.lastname}} Profile</div>
+  <div class="row no-gutters">
+    <div class="col-md-4">
+      <img src="{{user.thumbnail.url}}" class="card-img" alt="{{user.firstname}} {{user.lastname}}">
+    </div>
+    <div class="col-md-8">
+      <div class="card-body text-dark">
+        <div class="row">
+          <div class="col-3">
+            <p class="info-content">Full Name:</p>
+            <p class="info-content">Username:</p>
+            <p class="info-content">Email:</p>
+            <p class="info-content">Phone:</p>
+            <p class="info-content">Department:</p>
+          </div>
+          <div class="col-9">
+            <p class="info-content">{{user.firstname}} {{user.lastname}}</p>
+            <p class="info-content">{{user.username}}</p>
+            <p class="info-content">{{user.email}}</p>
+            <p class="info-content">{{user.phone}}</p>
+            <p class="info-content">{{user.Department}}</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="card-footer text-center text-muted"><a class="btn btn-danger text-white"
+      href="{% url 'password_change' %}">Change Password</a></div>
+</div>
+{% endblock content %}
+{% include "footer.html" %}

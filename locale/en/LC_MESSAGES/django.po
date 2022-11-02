@@ -1,0 +1,681 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-10-18 11:06+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\accounts\apps.py:8
+msgid "Accounts"
+msgstr ""
+
+#: .\accounts\forms.py:12
+msgid "Required. Add a valid email address."
+msgstr ""
+
+#: .\accounts\forms.py:15
+msgid "Enter a valid phone number (e.g. 7801000000)."
+msgstr ""
+
+#: .\accounts\forms.py:16
+msgid "Policy for terms of use"
+msgstr ""
+
+#: .\accounts\forms.py:16
+msgid "You must accept to policy for terms of use"
+msgstr ""
+
+#: .\accounts\models.py:19
+msgid "Users must have an email address"
+msgstr ""
+
+#: .\accounts\models.py:21
+msgid "Users must have a username"
+msgstr ""
+
+#: .\accounts\models.py:50 .\activities\models.py:32 .\activities\models.py:75
+#: .\cases\models.py:20 .\cases\models.py:52 .\cases\models.py:66
+#: .\cases\models.py:166 .\cases\models.py:221
+msgid "Name"
+msgstr ""
+
+#: .\accounts\models.py:51
+msgid "Description"
+msgstr ""
+
+#: .\accounts\models.py:60
+msgid "Department"
+msgstr ""
+
+#: .\accounts\models.py:61
+msgid "Departments"
+msgstr ""
+
+#: .\accounts\models.py:67
+msgid "first name"
+msgstr ""
+
+#: .\accounts\models.py:68
+msgid "last name"
+msgstr ""
+
+#: .\accounts\models.py:69
+msgid "email"
+msgstr ""
+
+#: .\accounts\models.py:70
+msgid "Photo"
+msgstr ""
+
+#: .\accounts\models.py:72
+msgid "Thumbnail image"
+msgstr ""
+
+#: .\accounts\models.py:74 .\templates\account\register.html:25
+msgid "Username"
+msgstr ""
+
+#: .\accounts\models.py:75
+msgid "Manager"
+msgstr ""
+
+#: .\accounts\models.py:76
+msgid "date joined"
+msgstr ""
+
+#: .\accounts\models.py:77
+msgid "last login"
+msgstr ""
+
+#: .\accounts\models.py:78
+msgid "Is admin"
+msgstr ""
+
+#: .\accounts\models.py:79
+msgid "Is Manager"
+msgstr ""
+
+#: .\accounts\models.py:80
+msgid "Is active"
+msgstr ""
+
+#: .\accounts\models.py:81
+msgid "Is staff"
+msgstr ""
+
+#: .\accounts\models.py:82
+msgid "Is superuser"
+msgstr ""
+
+#: .\accounts\models.py:83
+msgid "Is verified"
+msgstr ""
+
+#: .\accounts\models.py:84
+msgid "Is blocked"
+msgstr ""
+
+#: .\accounts\models.py:86
+msgid "Please confirm that you read and agree to our terms & conditions"
+msgstr ""
+
+#: .\accounts\models.py:87
+msgid "Created at"
+msgstr ""
+
+#: .\accounts\models.py:88
+msgid "Modified at"
+msgstr ""
+
+#: .\accounts\models.py:90
+msgid "Created by"
+msgstr ""
+
+#: .\accounts\models.py:92
+msgid "Modified by"
+msgstr ""
+
+#: .\accounts\models.py:102
+msgid "Could not create thumbnail - is the file type valid?"
+msgstr ""
+
+#: .\accounts\models.py:146
+msgid "User"
+msgstr ""
+
+#: .\accounts\models.py:147
+msgid "Users"
+msgstr ""
+
+#: .\accounts\views.py:83
+msgid ""
+"User registered successfully, verification email has been sent, please check "
+"it "
+msgstr ""
+
+#: .\accounts\views.py:118
+msgid "Email is not verified, please check your email inbox"
+msgstr ""
+
+#: .\accounts\views.py:122
+msgid ""
+"It looks like your account has been blocked Please contact system admin for "
+"more information."
+msgstr ""
+
+#: .\accounts\views.py:146
+msgid "Profile Updated"
+msgstr ""
+
+#: .\accounts\views.py:179
+msgid "Email Verified, you can now login"
+msgstr ""
+
+#: .\accounts\views.py:182
+msgid "Email Verification erorr, please try agin"
+msgstr ""
+
+#: .\activities\apps.py:6
+msgid "Activities"
+msgstr ""
+
+#: .\activities\models.py:17 .\activities\models.py:26
+#: .\activities\models.py:33
+msgid "Hearing Type"
+msgstr ""
+
+#: .\activities\models.py:27
+msgid "Hearing Types"
+msgstr ""
+
+#: .\activities\models.py:31
+msgid "Hearing ID"
+msgstr ""
+
+#: .\activities\models.py:34
+msgid "Hearing Date"
+msgstr ""
+
+#: .\activities\models.py:35 .\cases\models.py:256
+msgid "Assignee"
+msgstr ""
+
+#: .\activities\models.py:36
+msgid "Time Spent"
+msgstr ""
+
+#: .\activities\models.py:38
+msgid "Summary by lawyer"
+msgstr ""
+
+#: .\activities\models.py:48 .\cases\models.py:265
+msgid "Hearing"
+msgstr ""
+
+#: .\activities\models.py:49
+msgid "Hearings"
+msgstr ""
+
+#: .\activities\models.py:59 .\activities\models.py:68
+#: .\activities\models.py:76
+msgid "Task Type"
+msgstr ""
+
+#: .\activities\models.py:69
+msgid "Task Types"
+msgstr ""
+
+#: .\activities\models.py:74
+msgid "Task ID"
+msgstr ""
+
+#: .\activities\models.py:77
+msgid "Task Description"
+msgstr ""
+
+#: .\activities\models.py:78
+msgid "Assigned to"
+msgstr ""
+
+#: .\activities\models.py:79 .\cases\models.py:263
+msgid "Requested By"
+msgstr ""
+
+#: .\activities\models.py:80 .\cases\models.py:261
+msgid "Matter Priority"
+msgstr ""
+
+#: .\activities\models.py:81 .\cases\models.py:259
+msgid "Due date"
+msgstr ""
+
+#: .\activities\models.py:91 .\cases\models.py:266
+msgid "Task"
+msgstr ""
+
+#: .\activities\models.py:92
+msgid "Tasks"
+msgstr ""
+
+#: .\activities\models.py:103 .\activities\models.py:112
+#: .\activities\models.py:119
+msgid "Event Type"
+msgstr ""
+
+#: .\activities\models.py:113
+msgid "Event Types"
+msgstr ""
+
+#: .\activities\models.py:118
+msgid "Event ID"
+msgstr ""
+
+#: .\activities\models.py:120
+msgid "Created By"
+msgstr ""
+
+#: .\activities\models.py:121
+msgid "From"
+msgstr ""
+
+#: .\activities\models.py:122
+msgid "To"
+msgstr ""
+
+#: .\activities\models.py:123
+msgid "Attendees"
+msgstr ""
+
+#: .\activities\models.py:133 .\cases\models.py:267
+msgid "Event"
+msgstr ""
+
+#: .\activities\models.py:134
+msgid "Events"
+msgstr ""
+
+#: .\cases\apps.py:7
+msgid "Cases"
+msgstr ""
+
+#: .\cases\models.py:29
+msgid "Practice Area"
+msgstr ""
+
+#: .\cases\models.py:30
+msgid "Practice Areas"
+msgstr ""
+
+#: .\cases\models.py:34
+msgid "Status"
+msgstr ""
+
+#: .\cases\models.py:43 .\cases\models.py:264
+msgid "Case Status"
+msgstr ""
+
+#: .\cases\models.py:44
+msgid "Case Statuses"
+msgstr ""
+
+#: .\cases\models.py:61 .\cases\models.py:62 .\cases\models.py:262
+msgid "Stage"
+msgstr ""
+
+#: .\cases\models.py:75 .\cases\models.py:252
+msgid "Client Position"
+msgstr ""
+
+#: .\cases\models.py:76
+msgid "Client Positions"
+msgstr ""
+
+#: .\cases\models.py:80
+msgid "Client type"
+msgstr ""
+
+#: .\cases\models.py:89
+msgid "Client Type"
+msgstr ""
+
+#: .\cases\models.py:90
+msgid "Client Types"
+msgstr ""
+
+#: .\cases\models.py:94
+msgid "Position"
+msgstr ""
+
+#: .\cases\models.py:103 .\cases\models.py:254
+msgid "Opponent Position"
+msgstr ""
+
+#: .\cases\models.py:104
+msgid "Opponent Positions"
+msgstr ""
+
+#: .\cases\models.py:108 .\cases\models.py:168
+msgid "Category"
+msgstr ""
+
+#: .\cases\models.py:117
+msgid "Company category"
+msgstr ""
+
+#: .\cases\models.py:118
+msgid "Company categories"
+msgstr ""
+
+#: .\cases\models.py:122 .\cases\models.py:169
+msgid "Sub-category"
+msgstr ""
+
+#: .\cases\models.py:131
+msgid "Company sub-category"
+msgstr ""
+
+#: .\cases\models.py:132
+msgid "Company sub-categories"
+msgstr ""
+
+#: .\cases\models.py:136
+msgid "Group"
+msgstr ""
+
+#: .\cases\models.py:145 .\cases\models.py:171
+msgid "Company Group"
+msgstr ""
+
+#: .\cases\models.py:146
+msgid "Company Groups"
+msgstr ""
+
+#: .\cases\models.py:150
+msgid "Legal type"
+msgstr ""
+
+#: .\cases\models.py:159
+msgid "Company legal type"
+msgstr ""
+
+#: .\cases\models.py:160
+msgid "Company legal types"
+msgstr ""
+
+#: .\cases\models.py:165
+msgid "Full Name"
+msgstr ""
+
+#: .\cases\models.py:167
+msgid "Foreign Name"
+msgstr ""
+
+#: .\cases\models.py:170
+msgid "Company Legal Type"
+msgstr ""
+
+#: .\cases\models.py:173
+msgid "Reference"
+msgstr ""
+
+#: .\cases\models.py:182 .\cases\models.py:193 .\cases\models.py:250
+msgid "Company"
+msgstr ""
+
+#: .\cases\models.py:183
+msgid "Companies"
+msgstr ""
+
+#: .\cases\models.py:194
+msgid "Address"
+msgstr ""
+
+#: .\cases\models.py:195
+msgid "State"
+msgstr ""
+
+#: .\cases\models.py:196
+msgid "Zip"
+msgstr ""
+
+#: .\cases\models.py:197
+msgid "Street Name"
+msgstr ""
+
+#: .\cases\models.py:198
+msgid "Building Number"
+msgstr ""
+
+#: .\cases\models.py:199
+msgid "District/Neighborhood"
+msgstr ""
+
+#: .\cases\models.py:200
+msgid "Mobile"
+msgstr ""
+
+#: .\cases\models.py:201
+msgid "Fax"
+msgstr ""
+
+#: .\cases\models.py:202
+msgid "City"
+msgstr ""
+
+#: .\cases\models.py:203
+msgid "Website"
+msgstr ""
+
+#: .\cases\models.py:204
+msgid "Additional Street Name"
+msgstr ""
+
+#: .\cases\models.py:205
+msgid "Address Additional Number"
+msgstr ""
+
+#: .\cases\models.py:206 .\templates\account\register.html:40
+msgid "Phone"
+msgstr ""
+
+#: .\cases\models.py:207 .\templates\account\login.html:38
+#: .\templates\account\register.html:21
+msgid "Email"
+msgstr ""
+
+#: .\cases\models.py:208
+msgid "Country"
+msgstr ""
+
+#: .\cases\models.py:216 .\cases\models.py:217
+msgid "Company Address"
+msgstr ""
+
+#: .\cases\models.py:231 .\cases\models.py:251
+msgid "Person"
+msgstr ""
+
+#: .\cases\models.py:232
+msgid "Persons"
+msgstr ""
+
+#: .\cases\models.py:236
+msgid "Public"
+msgstr ""
+
+#: .\cases\models.py:237
+msgid "Private"
+msgstr ""
+
+#: .\cases\models.py:243
+msgid "Case ID"
+msgstr ""
+
+#: .\cases\models.py:244
+msgid "Title"
+msgstr ""
+
+#: .\cases\models.py:245
+msgid "Subject"
+msgstr ""
+
+#: .\cases\models.py:246
+msgid "Case Category"
+msgstr ""
+
+#: .\cases\models.py:247
+msgid "Practice area"
+msgstr ""
+
+#: .\cases\models.py:248
+msgid "Entry Date"
+msgstr ""
+
+#: .\cases\models.py:253
+msgid "Opponent"
+msgstr ""
+
+#: .\cases\models.py:255
+msgid "Assigned Team"
+msgstr ""
+
+#: .\cases\models.py:257
+msgid "Shared With"
+msgstr ""
+
+#: .\cases\models.py:258
+msgid "Filed on"
+msgstr ""
+
+#: .\cases\models.py:260
+msgid "Internal Ref Number"
+msgstr ""
+
+#: .\cases\models.py:284
+msgid "Litigation Case"
+msgstr ""
+
+#: .\cases\models.py:285
+msgid "Litigation Cases"
+msgstr ""
+
+#: .\core\apps.py:8
+msgid "Core"
+msgstr ""
+
+#: .\core\models.py:11 .\core\models.py:20
+msgid "Priority"
+msgstr ""
+
+#: .\core\models.py:21
+msgid "Priorities"
+msgstr ""
+
+#: .\core\models.py:25 .\core\models.py:41 .\core\models.py:61
+msgid "Reply"
+msgstr ""
+
+#: .\core\models.py:42
+msgid "Replies"
+msgstr ""
+
+#: .\core\models.py:60 .\core\models.py:81
+msgid "Comment"
+msgstr ""
+
+#: .\core\models.py:82
+msgid "Comments"
+msgstr ""
+
+#: .\core\settings.py:152
+msgid "Arabic"
+msgstr ""
+
+#: .\core\settings.py:153
+msgid "English"
+msgstr ""
+
+#: .\templates\about.html:13 .\templates\base.html:73
+msgid "About"
+msgstr ""
+
+#: .\templates\about.html:21
+msgid "How we can help you"
+msgstr ""
+
+#: .\templates\about.html:22
+msgid "A"
+msgstr ""
+
+#: .\templates\account\login.html:22
+msgid "Login to ISC Legal App"
+msgstr ""
+
+#: .\templates\account\login.html:44 .\templates\account\register.html:47
+msgid "Password"
+msgstr ""
+
+#: .\templates\account\login.html:59
+msgid "Login"
+msgstr ""
+
+#: .\templates\account\login.html:60
+msgid "Change Password"
+msgstr ""
+
+#: .\templates\account\login.html:61 .\templates\account\register.html:71
+msgid "Register"
+msgstr ""
+
+#: .\templates\account\register copy.html:15
+#: .\templates\account\register.html:13
+msgid "Register to ISC Legal App"
+msgstr ""
+
+#: .\templates\account\register.html:17
+msgid "User Registration"
+msgstr ""
+
+#: .\templates\account\register.html:30
+msgid "First Name"
+msgstr ""
+
+#: .\templates\account\register.html:34
+msgid "Last Name"
+msgstr ""
+
+#: .\templates\account\register.html:52
+msgid "Confirm Password"
+msgstr ""
+
+#: .\templates\account\register.html:56
+msgid "Please check the below:"
+msgstr ""
+
+#: .\templates\base.html:13 .\templates\base.html:15 .\templates\base.html:17
+#: .\templates\base.html:19 .\templates\base.html:28 .\templates\base.html:29
+#: .\templates\base.html:36 .\templates\base.html:37 .\templates\base.html:57
+#: .\templates\base.html:64
+msgid "ISC Legal App"
+msgstr ""
+
+#: .\templates\base.html:70
+msgid "Home"
+msgstr ""
+
+#: .\templates\index.html:9
+msgid "Welcome to ISC Legal App"
+msgstr ""

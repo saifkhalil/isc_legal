@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+{% load i18n %}
+<style type="text/css">
+  .h3 {
+    text-align: center;
+  }
+</style>
+
+
+
+<!-- ===== Start of Login - Register Section ===== -->
+<section class="ptb150" id="login">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-md-offset-3 col-xs-12">
+
+      <!-- Start of Login Box -->
+      <div class="login-box">
+
+        <div class="login-title">
+          <h4>{% trans 'Login to ISC Legal App' %}</h4>
+        </div>
+        {% for message in messages %}
+        <div
+          class="alert {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %} alert-danger {% else %} alert-success {% endif %} fade show"
+          role="alert">
+          <strong>{{ message }}</strong>
+        </div>
+        {% endfor %}
+        <!-- Start of Login Form -->
+        <form class="form-signin" method="post" autocomplete="off">
+          {% csrf_token %}
+          <div class="form-floating mb-3">
+
+            <input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email" required
+              autofocus>
+            <label for="inputEmail">{% trans 'Email' %}</label>
+          </div>
+          <div class="form-floating mb-3">
+
+            <input type="password" name="password" id="inputPassword" class="form-control" placeholder="password"
+              required autocomplete="one-time-code">
+            <label for="inputPassword">{% trans 'Password' %}</label>
+          </div>
+          {% for field in login_form %}
+          {% for error in field.errors %}
+          <div class="alert alert-danger" role="alert">{{ error }}</div>
+          {% endfor %}
+          {% endfor %}
+          {% if error_login %}
+          <div class="alert alert-danger" role="alert">{{ error_login }}</div>
+          {% endif %}
+          {% if login_form.non_field_errors %}
+          <div class="alert alert-danger" role="alert">
+            <p>{{login_form.non_field_errors}}</p>
+          </div>
+          {% endif %}
+          <button class="btn btn-primary" type="submit">{% trans 'Login' %}</button>
+          <a class="btn btn-primary" href="{% url 'password_reset' %}">{% trans 'Change Password' %}</a>
+          <a class="btn btn-primary" href="{% url 'register' %}">{% trans 'Register' %}</a>
+        </form>
+        <!-- End of Login Form -->
+
+      </div>
+      <!-- End of Login Box -->
+
+    </div>
+  </div>
+</section>
+<!-- ===== End of Login - Register Section ===== -->
+
+
+{% endblock content %}
