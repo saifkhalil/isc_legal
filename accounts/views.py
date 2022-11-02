@@ -17,6 +17,9 @@ from django.conf import settings
 from accounts.models import User
 from django.utils.translation import gettext_lazy as _
 
+
+
+
 class TokenGenerator(PasswordResetTokenGenerator):
     def _make_hash_value(self, user, timestamp):
         return (

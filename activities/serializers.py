@@ -1,37 +1,46 @@
 from rest_framework import serializers
 from drf_dynamic_fields import DynamicFieldsMixin
-from .models import task,event,hearing_type,hearing,task_type,event_type
+from .models import task,hearing
+from core.models import court
+from accounts.models import User
 
 
-class task_typeSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
-    class Meta:
-        model = task_type
-        fields = ['id', 'type']
 
-class event_typeSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
-    class Meta:
-        model = event_type
-        fields = ['id', 'type']
+# class task_typeSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
+#     class Meta:
+#         model = task_type
+#         fields = ['id', 'type']
 
-class hearing_typeSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
-    class Meta:
-        model = hearing_type
-        fields = ['id', 'type']
+# class event_typeSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
+#     class Meta:
+#         model = event_type
+#         fields = ['id', 'type']
+
+# class hearing_typeSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
+#     class Meta:
+#         model = hearing_type
+#         fields = ['id', 'type']
 
 class taskSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
-    task_type = task_typeSerializer()
+    
     class Meta:
         model = task
-        fields = ['id', 'name','task_type','description','assigned_to','requested_by','priority','due_date','comments']
+        fields = ['id', 'title','description','assigned_to','due_date','comments']
 
-class eventSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
-    event_type = event_typeSerializer()
-    class Meta:
-        model = event
-        fields = ['id', 'event_type','created_by','from_date','to_date','attendees','comments']
+# class eventSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
+#     event_type = event_typeSerializer()
+#     class Meta:
+#         model = event
+#         fields = ['id', 'event_type','created_by','from_date','to_date','attendees','comments']
 
 class hearingSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
+    name = serializers.CharField(max_length=200,required=False, allow_null=True)
+    hearing_date = serializers.DateTimeField(required=False, allow_null=True)
+    assignee = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),many=True,required=False, allow_null=True)
+    # court = serializers.PrimaryKeyRelatedField(queryset=court.objects.all(),required=False, allow_null=True)
+    comments_by_lawyer = serializers.CharField(max_length=200,required=False, allow_null=True)
+    case_id = serializers.IntegerField(required=False, allow_null=True)
     class Meta:
         model = hearing
-        fields = ['id', 'name','hearing_type','hearing_date','assignee','time_spent','comments','summary_by_lawyer','attachment']
+        fields = ['id', 'name','hearing_date','assignee','court','comments_by_lawyer','case_id']
 
