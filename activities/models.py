@@ -34,7 +34,7 @@ class hearing(models.Model):
     name = models.CharField(max_length=250, blank=True, null=True,verbose_name=_('Name'))
     case_id = models.IntegerField(blank=True,null=True, verbose_name=_('Litigation Case'))
     hearing_date = models.DateTimeField(verbose_name=_('Hearing Date'))
-    assignee = models.ManyToManyField(User, blank=False, verbose_name=_('Assignee'))
+    assignee = models.ForeignKey(User, on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Assignee'))
     # time_spent = models.TimeField(verbose_name=_('Time Spent'))
     # comments = models.ManyToManyField(comments,verbose_name="Comments", blank=True)
     court = models.ForeignKey(court, on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Court name'))
@@ -80,7 +80,7 @@ class task(models.Model):
     title = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('title'))
     # task_type = models.ForeignKey('task_type', on_delete=models.CASCADE, blank=False,null=False, verbose_name=_('Task Type'))
     description = models.CharField(max_length=250,default='', blank=False, null=False, verbose_name=_('Task Description'))
-    assigned_to = models.ForeignKey(User, related_name='%(class)s_assigned_to', on_delete=models.CASCADE, null=False, blank=False,verbose_name=_('Assigned to'))
+    assignee = models.ForeignKey(User, related_name='%(class)s_assigned_to', on_delete=models.CASCADE, null=False, blank=False,verbose_name=_('Assigned to'))
     # requested_by = models.ForeignKey(User, related_name='%(class)s_requested_by', on_delete=models.CASCADE, null=False, blank=False,verbose_name=_('Requested By'))
     # priority = models.ForeignKey(priorities,  on_delete=models.CASCADE, null=False, blank=False,verbose_name=_('Matter Priority'))
     due_date = models.DateField(verbose_name=_('Due date'))
@@ -94,10 +94,10 @@ class task(models.Model):
 
 
     def __str__(self):
-        return self.name
+        return self.title
 
     def __unicode__(self):
-        return self.name
+        return self.title
 
     class Meta:
         verbose_name = _('Task')

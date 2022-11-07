@@ -130,7 +130,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return True
 
     def __str__(self):
-        return self.firstname + ' ' + self.lastname
+        return str(self.username)
 
     # For checking permissions. to keep it simple all admin have ALL permissons
 

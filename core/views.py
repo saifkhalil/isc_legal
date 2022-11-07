@@ -100,27 +100,31 @@ class commentsViewSet(viewsets.ModelViewSet):
     serializer_class = commentsSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "core.comments"
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = ['id','case_id','task_id','hearing_id']
 
     def create(self, request):
-        if "comment" in request.data:
-            comment = comments(id=None,comment=request.data['comment'],created_by=request.user)
+
+        if "case_id" in request.data:
+            req_case_id = request.data['case_id']
+            comment = comments(id=None,case_id=req_case_id,comment=request.data['comment'],created_by=request.user)
             comment.save()
-            serializer = self.get_serializer(comment)
-            if "case_id" in request.data:
-                case_id = request.data['case_id']
-                LitigationCases.objects.get(id=case_id).comments.add(comment)
-            if "event_id" in request.data:
-                event_id = request.data['event_id']
-                event.objects.get(id=event_id).comments.add(comment)
-            if "task_id" in request.data:
-                task_id = request.data['task_id']
-                task.objects.get(id=task_id).comments.add(comment)
-            if "hearing_id" in request.data:
-                hearing_id = request.data['hearing_id']
-                hearing.objects.get(id=hearing_id).comments.add(comment)
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
-        else:
-            return Response({'error':'no comment'},status=status.HTTP_201_CREATED)
+            LitigationCases.objects.get(id=req_case_id).comments.add(comment)
+        # if "event_id" in request.data:
+        #     event_id = request.data['event_id']
+        #     event.objects.get(id=event_id).comments.add(comment)
+        if "task_id" in request.data:
+            req_task_id = request.data['task_id']
+            comment = comments(id=None,task_id=req_task_id,comment=request.data['comment'],created_by=request.user)
+            comment.save()
+            task.objects.get(id=req_task_id).comments.add(comment)
+        if "hearing_id" in request.data:
+            req_hearing_id = request.data['hearing_id']
+            comment = comments(id=None,hearing_id=req_hearing_id,comment=request.data['comment'],created_by=request.user)
+            comment.save()
+            hearing.objects.get(id=req_hearing_id).comments.add(comment)
+        serializer = self.get_serializer(comment)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
 
 class repliesViewSet(viewsets.ModelViewSet):
 
@@ -139,7 +143,9 @@ class repliesViewSet(viewsets.ModelViewSet):
                 comments.objects.get(id=comment_id).replies.add(reply)
                 return Response(serializer.data,status=status.HTTP_201_CREATED)
             else:
-                return Response({'error':'no reply'},status=status.HTTP_201_CREATED)
+                return Response({'error':'no comment id'},status=status.HTTP_201_CREATED)
+        else:
+            return Response({'error':'no reply'},status=status.HTTP_201_CREATED)
 
 
 class prioritiesViewSet(viewsets.ModelViewSet):
@@ -171,23 +177,24 @@ class documentsViewSet(viewsets.ModelViewSet):
         req_name = None
         req_attachement = None
         req_case_id = None
+        req_name = request.data['name']
+        req_attachement = request.FILES.get('attachment')
         if "case_id" in request.data:
             req_case_id = request.data['case_id']
-            req_name = request.data['name']
-            req_attachement = request.data['attachement']
-            case = get_object_or_404(LitigationCases,pk=req_case_id)
-            document = documents(id=None,name=req_name,case_id=req_case_id,attachement=req_attachement,created_by=request.user)
-            document.save()
-            serializer = self.get_serializer(document)    
-            case.documents.add(document)
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
+            if req_case_id != "":
+                document = documents(id=None,name=req_name,case_id=req_case_id,attachment=req_attachement,created_by=request.user)
+                document.save()
+                case = get_object_or_404(LitigationCases,pk=req_case_id)
+                case.documents.add(document)
+            else:
+                document = documents(id=None,name=req_name,attachment=req_attachement,created_by=request.user)
+                document.save()
         else:
-            req_name = request.data['name']
-            req_attachement = request.data['attachement']
-            document = documents(id=None,name=req_name,attachement=req_attachement,created_by=request.user)
+            document = documents(id=None,name=req_name,attachment=req_attachement,created_by=request.user)
             document.save()
-            serializer = self.get_serializer(document)    
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        serializer = self.get_serializer(document)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+
 
         
         

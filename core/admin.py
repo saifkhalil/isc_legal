@@ -4,7 +4,7 @@ from import_export.admin import ImportExportModelAdmin
 
 
 class commentsAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    list_display = ('id', 'comment')
+    list_display = ('id', 'comment','case_id','task_id','hearing_id')
 
 class courtAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'name')
