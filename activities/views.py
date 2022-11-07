@@ -117,7 +117,8 @@ class hearingViewSet(viewsets.ModelViewSet):
             req_name = request.data['name']
         if "court" in request.data:
             req_court = request.data['court']
-            req_court = get_object_or_404(court,pk=req_court)
+            court_query = court.objects.filter(name=req_court)
+            court_id = get_object_or_404(court_query)
         if "hearing_date" in request.data:
             req_hearing_date = request.data['hearing_date']
         if "assignee" in request.data:
@@ -127,13 +128,13 @@ class hearingViewSet(viewsets.ModelViewSet):
         if "case_id" in request.data:
             req_case_id = request.data["case_id"]
             case = get_object_or_404(LitigationCases,pk=req_case_id)
-            hearings = hearing(id=None,court=req_court,name=req_name,case_id=req_case_id,hearing_date=req_hearing_date,comments_by_lawyer=req_comments_by_lawyer,created_by=request.user)
+            hearings = hearing(id=None,court=court_id,name=req_name,case_id=req_case_id,hearing_date=req_hearing_date,comments_by_lawyer=req_comments_by_lawyer,created_by=request.user)
             hearings.save()
             serializer = self.get_serializer(hearings)    
             case.hearing.add(hearings)
             return rest_response(serializer.data,status=status.HTTP_201_CREATED)
         else:
-            hearings = hearing(id=None,court=req_court,name=req_name,hearing_date=req_hearing_date,comments_by_lawyer=req_comments_by_lawyer,created_by=request.user)
+            hearings = hearing(id=None,court=court_id,name=req_name,hearing_date=req_hearing_date,comments_by_lawyer=req_comments_by_lawyer,created_by=request.user)
             hearings.save()
             serializer = self.get_serializer(hearings)
             return rest_response(serializer.data,status=status.HTTP_201_CREATED)

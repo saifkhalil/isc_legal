@@ -22,10 +22,11 @@ from accounts.models import User
 #         fields = ['id', 'type']
 
 class taskSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
-    
+    assignee = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
+
     class Meta:
         model = task
-        fields = ['id', 'title','description','assigned_to','due_date','comments']
+        fields = ['id', 'title','description','assignee','due_date','comments']
 
 # class eventSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
 #     event_type = event_typeSerializer()
@@ -36,8 +37,8 @@ class taskSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
 class hearingSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     name = serializers.CharField(max_length=200,required=False, allow_null=True)
     hearing_date = serializers.DateTimeField(required=False, allow_null=True)
-    assignee = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),many=True,required=False, allow_null=True)
-    # court = serializers.PrimaryKeyRelatedField(queryset=court.objects.all(),required=False, allow_null=True)
+    assignee = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
+    court = serializers.SlugRelatedField(slug_field='name',queryset=court.objects.all())
     comments_by_lawyer = serializers.CharField(max_length=200,required=False, allow_null=True)
     case_id = serializers.IntegerField(required=False, allow_null=True)
     class Meta:

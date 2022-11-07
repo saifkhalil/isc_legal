@@ -19,6 +19,9 @@ from .forms import CaseForm
 # CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 from .utils import Calendar
 from core.permissions import MyPermission
+from accounts.models import User
+import django_filters.rest_framework
+from datetime import datetime
 # def get_cases_from_cache():
 #     if 'all_cases' in cache:
 #         return cache.get('all_cases')
@@ -83,18 +86,24 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         internal_ref_number = self.request.query_params.get('internal_ref_number')
+        start_time = self.request.query_params.get('start_time')
         Stage = self.request.query_params.get('stage')
         queryset = LitigationCases.objects.all().order_by('-created_by')
         current_user_id = self.request.user.id
-        is_manager = self.request.user.is_manager
+        cuser = User.objects.get(id=current_user_id)
+        is_manager = cuser.is_manager
         if internal_ref_number is not None:
             queryset = queryset.filter(internal_ref_number=internal_ref_number)
-        if internal_ref_number is not None:
+        if start_time is not None:
+            req_date = datetime.strptime(start_time, '%Y-%m').date()
+            queryset = queryset.filter(start_time__year=req_date.year,start_time__month=req_date.month)
+        if Stage is not None:
             queryset = queryset.filter(Stage__id=Stage)
         if is_manager:
             queryset = queryset
         else:
-            queryset = queryset.filter(Q(shared_with__id__exact=current_user_id) | Q(shared_with__isnull=True))
+            filter_query = Q(shared_with__id__exact=current_user_id) | Q(created_by__id__exact=current_user_id) | Q(assignee__id__exact=current_user_id)
+            queryset = queryset.filter(filter_query).distinct()
         return queryset
 
 # class companyViewSet(viewsets.ModelViewSet):

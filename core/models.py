@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from ckeditor.fields import RichTextField
 from pytz import timezone
 from accounts.models import User
+from django.core.validators import FileExtensionValidator
 
 class priorities(models.Model):
     id = models.AutoField(primary_key=True,)
@@ -72,10 +73,10 @@ class comments(models.Model):
 
 
     def __str__(self):
-        return self.comment
+        return str(self.id)
 
     def __unicode__(self):
-        return self.comment
+        return str(self.id)
 
     class Meta:
         verbose_name = _('Comment')
@@ -109,7 +110,7 @@ class court(models.Model):
 class contracts(models.Model):
     id = models.AutoField(primary_key=True,)
     name = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Name'))
-    attachment = models.FileField(upload_to='contracts/%Y/%m/%d/',verbose_name=_('Attachment'))
+    attachment = models.FileField(upload_to='contracts/%Y/%m/%d/',verbose_name=_('Attachment'),validators=[FileExtensionValidator(['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'git'])])
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
     created_by = models.ForeignKey(
@@ -120,7 +121,7 @@ class contracts(models.Model):
 class documents(models.Model):
     id = models.AutoField(primary_key=True,)
     name = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Name'))
-    attachment = models.FileField(upload_to='documents/%Y/%m/%d/',verbose_name=_('Attachment'))
+    attachment = models.FileField(upload_to='documents/%Y/%m/%d/',verbose_name=_('Attachment'),validators=[FileExtensionValidator(['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'git'])])
     case_id = models.IntegerField(blank=True,null=True, verbose_name=_('Litigation Case'))
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)

@@ -13,7 +13,7 @@ from .models import *
 #     list_display = ('id', 'type')
 
 class taskAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title','description','assigned_to','due_date')
+    list_display = ('id', 'title','description','assignee','due_date')
 
 class hearingAdmin(admin.ModelAdmin):
     list_display = ('id', 'name','hearing_date','case_id')

@@ -5,6 +5,8 @@ from .models import *
 # Register your models here.
 class LitigationCasesAdmin(admin.ModelAdmin):
     list_display = ('id', 'name','description')
+    fields = ( 'name','description','case_category','judge','detective','case_type','court','documents','client_position','opponent_position','assignee','shared_with','priority','created_by','created_at','modified_by','modified_at')
+    readonly_fields = ('created_by','created_at','modified_by','modified_at')
 
     def save(self, *args, **kwargs):
         if self.cid is None:
