@@ -22,6 +22,9 @@ from core.permissions import MyPermission
 from accounts.models import User
 import django_filters.rest_framework
 from datetime import datetime
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+# from rest_framework_word_filter import FullWordSearchFilter
 # def get_cases_from_cache():
 #     if 'all_cases' in cache:
 #         return cache.get('all_cases')
@@ -74,7 +77,18 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
     serializer_class = LitigationCasesSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated, MyPermission]
+    filter_backends = [
+        DjangoFilterBackend,
+         SearchFilter,
+          OrderingFilter
+        #   FullWordSearchFilter,
+          ]
     perm_slug = "cases.LitigationCases"
+    filterset_fields = ['id', 'name']
+    # word_fields = ('name','description')
+    search_fields = ['@name','@description']
+    ordering_fields = ['created_at', 'id','modified_at']
+    ordering = ['-id']
 
     # def list(self):
     #     queryset = queryset
@@ -83,6 +97,13 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
     # def retrieve(self,pk=None):
     #     queryset = queryset.get(id=pk).values('id','name')
     #     return queryset
+
+    @action(detail=True)
+    def get_comments(self, request,pk=None):
+        req_id =self.request.query_params.get('id')
+        commments = LitigationCases.objects.get(id=req_id).comments.all()
+        serializer = self.get_serializer(commments)
+        return Response(serializer.data)
 
     def get_queryset(self):
         internal_ref_number = self.request.query_params.get('internal_ref_number')

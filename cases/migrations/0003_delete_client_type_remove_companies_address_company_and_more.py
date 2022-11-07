@@ -57,10 +57,10 @@ class Migration(migrations.Migration):
             model_name='litigationcases',
             name='due_date',
         ),
-        migrations.RemoveField(
-            model_name='litigationcases',
-            name='event',
-        ),
+        # migrations.RemoveField(
+        #     model_name='litigationcases',
+        #     name='event',
+        # ),
         migrations.RemoveField(
             model_name='litigationcases',
             name='filed_on',

@@ -11,6 +11,8 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'name']
 
 class repliesSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
+    created_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all())
+    modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all())
     class Meta:
         model = replies
         fields = ['id', 'reply','comment_id','created_by','created_at','modified_by','modified_at']
@@ -31,6 +33,8 @@ class documentsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
         fields = ['id', 'name','attachment','case_id']
 
 class commentsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
+    created_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all())
+    modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all())
     replies = repliesSerializer(many=True)
     class Meta:
         ref_name = 'Comments'
