@@ -39,9 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     'rest_framework_swagger',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_word_filter',
     'djoser',
     'phonenumber_field',
     'import_export',
@@ -108,18 +110,27 @@ WSGI_APPLICATION = 'core.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.environ.get('MYSQL_DATABASE', 'isc_legal'),
+#         'USER': os.environ.get('MYSQL_USER', 'isc_legal'),
+#         'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'Isc@L3gal'),
+#         'HOST': os.environ.get('MYSQL_DATABASE_HOST', 'localhost'),
+#         'PORT': os.environ.get('MYSQL_DATABASE_PORT', 3306),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('MYSQL_DATABASE', 'isc_legal'),
         'USER': os.environ.get('MYSQL_USER', 'isc_legal'),
         'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'Isc@L3gal'),
         'HOST': os.environ.get('MYSQL_DATABASE_HOST', 'localhost'),
-        'PORT': os.environ.get('MYSQL_DATABASE_PORT', 3306),
+        'PORT': os.environ.get('MYSQL_DATABASE_PORT', 5432),
     }
 }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -195,8 +206,8 @@ REST_FRAMEWORK = {
         
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],

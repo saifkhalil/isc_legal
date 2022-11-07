@@ -179,7 +179,7 @@ class Migration(migrations.Migration):
                 ('comments', models.ManyToManyField(blank=True, to='core.comments', verbose_name='Comments')),
                 ('company', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='cases.company', verbose_name='Company')),
                 ('created_by', models.ForeignKey(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='%(class)s_createdby', to=settings.AUTH_USER_MODEL)),
-                ('event', models.ManyToManyField(blank=True, related_name='%(class)s_event', to='activities.event', verbose_name='Event')),
+                # ('event', models.ManyToManyField(blank=True, related_name='%(class)s_event', to='activities.event', verbose_name='Event')),
                 ('hearing', models.ManyToManyField(blank=True, to='activities.hearing', verbose_name='Hearing')),
                 ('modified_by', models.ForeignKey(blank=True, editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='%(class)s_modifiedby', to=settings.AUTH_USER_MODEL)),
                 ('opponent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='%(class)s_opponent', to='cases.persons', verbose_name='Opponent')),

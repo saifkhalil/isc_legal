@@ -18,6 +18,7 @@ from core.permissions import MyPermission
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 import django_filters.rest_framework
+from rest_framework.filters import SearchFilter, OrderingFilter
 # CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 # def get_all_task_types_from_cache():
@@ -106,6 +107,7 @@ class hearingViewSet(viewsets.ModelViewSet):
     perm_slug = "activities.hearing" 
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filterset_fields = '__all__'
+    
 
     def create(self,request):
         req_hearing_date = None
