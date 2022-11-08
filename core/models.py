@@ -82,9 +82,6 @@ class comments(models.Model):
         verbose_name = _('Comment')
         verbose_name_plural = _('Comments')
 
-
-
-
     # def save(self, *args, **kwargs):
     #     if self.id is None:
     #         self.created_by = self.request.user
@@ -93,6 +90,7 @@ class comments(models.Model):
     #         self.modified_by = self.request.user
     #         self.modified_at = timezone.now()            
     #     return super(comments, self).save(*args, **kwargs)
+
 class court(models.Model):
     id = models.AutoField(primary_key=True,)
     name = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Name'))
