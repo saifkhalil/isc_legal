@@ -1,6 +1,7 @@
 from core.models import priorities
 from .models import LitigationCases
-from rest_framework import serializers
+from rest_framework import serializers,status
+from rest_framework.response import Response
 from drf_dynamic_fields import DynamicFieldsMixin
 from .models import LitigationCases,stages,client_position,opponent_position,Group,case_type,court
 from core.serializers import commentsSerializer,documentsSerializer
@@ -77,8 +78,9 @@ class LitigationCasesSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     # opponent_position = opponent_positionSerializer()
     # assigned_team = assigned_teamSerializer()
     # Stage = stagesSerializer()
+
     class Meta:
         model = LitigationCases
-        fields = [ 'id', 'name','description','case_category','priority','shared_with','court','case_type','judge','detective','client_position','opponent_position','assignee','Stage','internal_ref_number','comments','documents','start_time','end_time']
+        fields = [ 'id', 'name','description','case_category','priority','shared_with','court','case_type','judge','detective','client_position','opponent_position','assignee','Stage','internal_ref_number','comments','documents','start_time','end_time','created_by','created_at']
         http_method_names = ['get', 'post', 'head','put']
 

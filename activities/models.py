@@ -83,6 +83,7 @@ class task(models.Model):
     assignee = models.ForeignKey(User, related_name='%(class)s_assigned_to', on_delete=models.CASCADE, null=False, blank=False,verbose_name=_('Assigned to'))
     # requested_by = models.ForeignKey(User, related_name='%(class)s_requested_by', on_delete=models.CASCADE, null=False, blank=False,verbose_name=_('Requested By'))
     # priority = models.ForeignKey(priorities,  on_delete=models.CASCADE, null=False, blank=False,verbose_name=_('Matter Priority'))
+    case_id = models.IntegerField(blank=True,null=True, verbose_name=_('Litigation Case'))
     due_date = models.DateField(verbose_name=_('Due date'))
     comments = models.ManyToManyField(comments,verbose_name="Comments", blank=True)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)

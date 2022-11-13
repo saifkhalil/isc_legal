@@ -26,7 +26,7 @@ class taskSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
 
     class Meta:
         model = task
-        fields = ['id', 'title','description','assignee','due_date','comments']
+        fields = ['id', 'title','description','assignee','due_date','comments','case_id']
 
 # class eventSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
 #     event_type = event_typeSerializer()

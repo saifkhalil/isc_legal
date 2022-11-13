@@ -99,6 +99,34 @@ class taskViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "activities.task"
 
+    def create(self,request):
+        req_title = None
+        req_description = None
+        req_case_id = None
+        req_due_date = None
+        req_comments = None
+        if "title" in request.data:
+            req_title = request.data['title']
+        if "description" in request.data:
+            req_description = request.data['description']
+        if "due_date" in request.data:
+            req_due_date = request.data['due_date']
+        if "comments" in request.data:
+            req_comments = request.data["comments"]
+        if "case_id" in request.data:
+            req_case_id = request.data["case_id"]
+            case = get_object_or_404(LitigationCases,pk=req_case_id)
+            tasks = task(id=None,title=req_title,description=req_description,due_date=req_due_date,comments=req_comments,case_id=req_case_id,created_by=request.user)
+            tasks.save()
+            serializer = self.get_serializer(tasks)    
+            case.tasks.add(tasks)
+            return rest_response(serializer.data,status=status.HTTP_201_CREATED)
+        else:
+            tasks = task(id=None,title=req_title,description=req_description,due_date=req_due_date,comments=req_comments,created_by=request.user)
+            tasks.save()
+            serializer = self.get_serializer(tasks)
+            return rest_response(serializer.data,status=status.HTTP_201_CREATED)
+
 class hearingViewSet(viewsets.ModelViewSet):
     queryset = hearing.objects.all().order_by('-id')
     serializer_class = hearingSerializer
