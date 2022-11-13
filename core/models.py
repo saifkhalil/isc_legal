@@ -59,7 +59,7 @@ class replies(models.Model):
 
 class comments(models.Model):
     id = models.AutoField(primary_key=True,)
-    comment = RichTextField( blank=False, null=False,verbose_name=_('Comment'))
+    comment = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Comment'))
     replies = models.ManyToManyField(replies, related_name='%(class)s_replies', blank=True,verbose_name=_('Reply'))
     case_id = models.BigIntegerField(blank=True, null=True)
     event_id = models.BigIntegerField(blank=True, null=True)

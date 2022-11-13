@@ -79,6 +79,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False,verbose_name=_('Is superuser'))
     is_verified = models.BooleanField(default=False,verbose_name=_('Is verified'))
     is_blocked = models.BooleanField(default=False,verbose_name=_('Is blocked'))
+    email_notification = models.BooleanField(default=True,verbose_name=_('Email Notification'))
     i_agree = models.BooleanField(
         verbose_name=_("Please confirm that you read and agree to our terms & conditions"), default=False, blank=False, null=False)
     created_at = models.DateTimeField(auto_now_add=True,editable=False,verbose_name=_('Created at'))

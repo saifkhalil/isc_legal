@@ -80,6 +80,7 @@ MIDDLEWARE = [
     # 'django.middleware.cache.FetchFromCacheMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'core.current_user.RequestMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
@@ -297,3 +298,13 @@ TABULAR_PERMISSIONS_CONFIG = {
 }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
+#### SMTP CONFIGURATION ####
+
+EMAIL_HOST = 'smtp.office365.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'legal.app@qi.iq'
+EMAIL_HOST_PASSWORD = 'Bog91158'
+DEFAULT_FROM_EMAIL = 'Legal Application <legal.app@qi.iq>'
