@@ -18,12 +18,18 @@ from django.urls import reverse
 from .forms import CaseForm
 # CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 from .utils import Calendar
-from core.permissions import MyPermission
+from .permissions import MyPermission
 from accounts.models import User
 import django_filters.rest_framework
 from datetime import datetime
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from django.db.models import Count
+from slick_reporting.views import SlickReportView
+from slick_reporting.fields import SlickReportField
+from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+# from rest_framework_tracking.mixins import LoggingMixin
 # from rest_framework_word_filter import FullWordSearchFilter
 # def get_cases_from_cache():
 #     if 'all_cases' in cache:
@@ -57,6 +63,23 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 #         cache.set('all_practice_areas', all_practice_areas)
 #     return all_practice_areas
 
+class TotalProductSales(SlickReportView):
+
+    report_model = LitigationCases
+    date_field = 'created_at'
+    group_by = 'case_type__type'
+    columns = ['case_type__type',
+                SlickReportField.create(Count, 'id', name='sum__id') ]
+
+    chart_settings = [{
+        'type': 'pie',
+        'data_source': ['sum__id'],
+        'plot_total': True,
+        'title_source': 'case_type',
+        'title': _('Detailed Columns'),
+
+    }, ]
+
 
 def case(request, case_id=None):
     instance = LitigationCases()
@@ -73,17 +96,21 @@ def case(request, case_id=None):
 
 class LitigationCasesViewSet(viewsets.ModelViewSet):
     
-    queryset = LitigationCases.objects.all().order_by('-created_by')
+    queryset = LitigationCases.objects.all().order_by('-created_by').filter(is_deleted=False)
     serializer_class = LitigationCasesSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
-    permission_classes = [permissions.IsAuthenticated, MyPermission]
+    permission_classes = [
+        permissions.IsAuthenticated,
+        #  MyPermission
+         ]
+
     filter_backends = [
         DjangoFilterBackend,
          SearchFilter,
           OrderingFilter
         #   FullWordSearchFilter,
           ]
-    perm_slug = "cases.LitigationCases"
+    # perm_slug = "cases.LitigationCases"
     filterset_fields = ['id', 'name']
     # word_fields = ('name','description')
     search_fields = ['@name','@description']
@@ -98,19 +125,26 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
     #     queryset = queryset.get(id=pk).values('id','name')
     #     return queryset
 
-    def create(self, request):
-        user = request.user
-        serializer = self.serializer_class(data=request.data,context={'created_by': user})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # def create(self, request):
+    #     user = request.user
+    #     serializer = self.serializer_class(data=request.data,context={'created_by': user})
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+    def destroy(self, request, pk=None):
+        case = LitigationCases.objects.filter(id=pk)
+        case.update(is_deleted=True)
+        case.update(modified_by=request.user)
+        case.update(modified_at=timezone.now())
+        return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
 
     @action(detail=True)
     def get_comments(self, request,pk=None):
         req_id =self.request.query_params.get('id')
-        commments = LitigationCases.objects.get(id=pk).comments.all()
+        commments = LitigationCases.objects.filter(id=pk).comments.all()
         serializer = self.get_serializer(commments)
         return Response(commments, status=status.HTTP_200_OK)
 
@@ -118,7 +152,7 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
         internal_ref_number = self.request.query_params.get('internal_ref_number')
         start_time = self.request.query_params.get('start_time')
         Stage = self.request.query_params.get('stage')
-        queryset = LitigationCases.objects.all().order_by('-created_by')
+        queryset = LitigationCases.objects.all().order_by('-created_by').filter(is_deleted=False)
         current_user_id = self.request.user.id
         cuser = User.objects.get(id=current_user_id)
         is_manager = cuser.is_manager

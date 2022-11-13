@@ -264,6 +264,7 @@ class LitigationCases(models.Model):
     comments = models.ManyToManyField(comments,verbose_name="Comments", blank=True)
     start_time = models.DateTimeField(default=timezone.now)
     end_time = models.DateTimeField(default=timezone.now)
+    is_deleted = models.BooleanField(default=False,verbose_name=_("Is Deleted"))
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
     created_by = models.ForeignKey(

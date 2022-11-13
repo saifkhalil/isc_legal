@@ -1,11 +1,11 @@
 from django.contrib import admin
 from .models import *
-
+from import_export.admin import ImportExportModelAdmin
 
 # Register your models here.
-class LitigationCasesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name','description')
-    fields = ( 'name','description','case_category','judge','comments','detective','case_type','court','documents','client_position','opponent_position','assignee','shared_with','priority','end_time','start_time','created_by','created_at','modified_by','modified_at')
+class LitigationCasesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    list_display = ('id', 'name','description','is_deleted')
+    fields = ( 'name','description','case_category','judge','comments','detective','case_type','court','documents','client_position','opponent_position','assignee','shared_with','priority','end_time','start_time','is_deleted','created_by','created_at','modified_by','modified_at')
     readonly_fields = ('created_by','created_at','modified_by','modified_at')
 
     def save(self, *args, **kwargs):
@@ -13,29 +13,29 @@ class LitigationCasesAdmin(admin.ModelAdmin):
             self.cid = 'C-' + str(self.id)
         return super(LitigationCases, self).save(*args, **kwargs)
 
-class case_typeAdmin(admin.ModelAdmin):
+class case_typeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'type')
 
-class stagesAdmin(admin.ModelAdmin):
+class stagesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'name')
     
 class prioritiesAdmin(admin.ModelAdmin):
     list_display = ('id', 'priority')
 
-class case_statusAdmin(admin.ModelAdmin):
+class case_statusAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'status')
     
-class client_positionAdmin(admin.ModelAdmin):
+class client_positionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'name')
 
 # class client_typeAdmin(admin.ModelAdmin):
 #     list_display = ('id', 'type')
 
-class opponent_positionAdmin(admin.ModelAdmin):
+class opponent_positionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'position')
 
 
-class case_typeAdmin(admin.ModelAdmin):
+class case_typeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'type')
 
 # class CompaniesAdmin(admin.ModelAdmin):

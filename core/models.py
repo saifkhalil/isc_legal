@@ -25,6 +25,7 @@ class replies(models.Model):
     id = models.AutoField(primary_key=True,)
     reply = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Reply'))
     comment_id = models.BigIntegerField(blank=True, null=True)
+    is_deleted = models.BooleanField(default=False,verbose_name=_("Is Deleted"))
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
     created_by = models.ForeignKey(
@@ -64,8 +65,9 @@ class comments(models.Model):
     event_id = models.BigIntegerField(blank=True, null=True)
     task_id = models.BigIntegerField(blank=True, null=True)
     hearing_id = models.BigIntegerField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    modified_at = models.DateTimeField(auto_now=True, editable=False)
+    is_deleted = models.BooleanField(default=False,verbose_name=_("Is Deleted"))
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True, editable=False)
+    modified_at = models.DateTimeField(auto_now=True,blank=True, null=True, editable=False)
     created_by = models.ForeignKey(
         User, related_name='%(class)s_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
     modified_by = models.ForeignKey(
@@ -93,7 +95,7 @@ class comments(models.Model):
 
 class court(models.Model):
     id = models.AutoField(primary_key=True,)
-    name = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Name'))
+    name = models.CharField(max_length=250,unique=True, blank=False, null=False,verbose_name=_('Name'))
 
     def __str__(self):
         return self.name
@@ -109,6 +111,7 @@ class contracts(models.Model):
     id = models.AutoField(primary_key=True,)
     name = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Name'))
     attachment = models.FileField(upload_to='contracts/%Y/%m/%d/',verbose_name=_('Attachment'),validators=[FileExtensionValidator(['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'git'])])
+    is_deleted = models.BooleanField(default=False,verbose_name=_("Is Deleted"))
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
     created_by = models.ForeignKey(
@@ -121,6 +124,7 @@ class documents(models.Model):
     name = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Name'))
     attachment = models.FileField(upload_to='documents/%Y/%m/%d/',verbose_name=_('Attachment'),validators=[FileExtensionValidator(['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'git'])])
     case_id = models.IntegerField(blank=True,null=True, verbose_name=_('Litigation Case'))
+    is_deleted = models.BooleanField(default=False,verbose_name=_("Is Deleted"))
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
     created_by = models.ForeignKey(

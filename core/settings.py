@@ -32,7 +32,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    # 'jazzmin',
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_word_filter',
+
     'djoser',
     'phonenumber_field',
     'import_export',
@@ -62,6 +63,11 @@ INSTALLED_APPS = [
     'core',
     'cases',
     'activities',
+    'tabular_permissions',
+    'crispy_forms',
+    'slick_reporting',
+    'logentry_admin',
+    # 'rest_framework_tracking',
 ]
 
 MIDDLEWARE = [
@@ -205,6 +211,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissions',
         
     ],
+    # 'DEFAULT_CONTENT_NEGOTIATION_CLASS': 'core.negotiation.IgnoreClientContentNegotiation',
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -263,3 +270,30 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOWED_ORIGIN_REGEXES = [
     'http://localhost:3000',
 ]
+
+
+JAZZMIN_SETTINGS = {
+    "show_ui_builder" : True
+}
+JAZZMIN_UI_TWEAKS = {
+    "theme": "flatly",
+    "dark_mode_theme": "darkly",
+}
+
+
+TABULAR_PERMISSIONS_CONFIG = {
+    'template': 'tabular_permissions/admin/tabular_permissions.html',
+    'exclude': {
+        'override': False,
+        'apps': [],
+        'models': [],
+        'function':'tabular_permissions.helpers.dummy_permissions_exclude'
+    },
+    'auto_implement': True,
+    'use_for_concrete': False,
+    'custom_permission_translation': 'tabular_permissions.helpers.custom_permissions_translator',
+    'apps_customization_func': 'tabular_permissions.helpers.apps_customization_func',
+    'custom_permissions_customization_func': 'tabular_permissions.helpers.custom_permissions_customization_func',
+}
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

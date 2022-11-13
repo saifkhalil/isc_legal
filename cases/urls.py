@@ -20,5 +20,6 @@ urlpatterns = [
     path('', include(router.urls)),
     path(r'case/new/', views.case, name='case_new'),
     path(r'case/edit/<case_id>/', views.case, name='case_edit'),
+    path('report', views.TotalProductSales.as_view())
     # path(r'^calendar/$', views.CalendarView.as_view(), name='calendar'), # here
 ]

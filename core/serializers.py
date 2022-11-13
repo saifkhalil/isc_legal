@@ -23,11 +23,13 @@ class prioritiesSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
         fields = ['id', 'priority']
 
 class contractsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
+    attachment = serializers.FileField()
     class Meta:
         model = contracts
         fields = ['id', 'name','attachment']
 
 class documentsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
+    attachment = serializers.FileField()
     class Meta:
         model = documents
         fields = ['id', 'name','attachment','case_id']

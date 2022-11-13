@@ -4,22 +4,22 @@ from import_export.admin import ImportExportModelAdmin
 
 
 class commentsAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    list_display = ('id', 'comment','case_id','task_id','hearing_id')
+    list_display = ('id', 'comment','case_id','task_id','hearing_id','is_deleted')
 
 class courtAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'name')
 
 class repliesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'reply')
+    list_display = ('id', 'reply','is_deleted')
 
-class prioritiesAdmin(admin.ModelAdmin):
+class prioritiesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'priority')
 
 class contractsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name','attachment')
+    list_display = ('id', 'name','attachment','is_deleted')
 
 class documentsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name','attachment')
+    list_display = ('id', 'name','attachment','is_deleted')
 
 admin.site.register(priorities, prioritiesAdmin)
 admin.site.register(contracts, contractsAdmin)
