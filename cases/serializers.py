@@ -71,6 +71,8 @@ class LitigationCasesSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     assignee = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all())
     comments = commentsSerializer(many=True,required=False, allow_null=True)
     documents = documentsSerializer(many=True,required=False, allow_null=True)
+    start_time = serializers.DateTimeField(format="%Y-%m-%d", required=False)
+    end_time = serializers.DateTimeField(format="%Y-%m-%d", required=False)
     # company = companySerializer()
     # person = personsSerializer()
     # client_position = client_positionSerializer()

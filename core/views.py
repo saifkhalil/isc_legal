@@ -28,6 +28,8 @@ import calendar
 from datetime import date
 from .permissions import MyPermission
 import django_filters.rest_framework
+from django.utils import timezone
+# from rest_framework_tracking.mixins import LoggingMixin
 ## CALENDAR VIEW
 
 # def get_comments_from_cache():
@@ -67,6 +69,7 @@ def get_date(req_day):
 
 @never_cache
 def myhome(request):
+    
     d = get_date(request.GET.get('month', None))
     pre_month = prev_month(d)
     nex_month = next_month(d)
@@ -96,7 +99,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 class commentsViewSet(viewsets.ModelViewSet):
 
-    queryset = comments.objects.all().order_by('-id')
+    queryset = comments.objects.all().order_by('-id').filter(is_deleted=False)
     serializer_class = commentsSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "core.comments"
@@ -104,12 +107,14 @@ class commentsViewSet(viewsets.ModelViewSet):
     filterset_fields = ['id','case_id','task_id','hearing_id']
 
     def create(self, request):
-
+        comment = []
+        serializer = []
         if "case_id" in request.data:
             req_case_id = request.data['case_id']
             comment = comments(id=None,case_id=req_case_id,comment=request.data['comment'],created_by=request.user)
             comment.save()
             LitigationCases.objects.get(id=req_case_id).comments.add(comment)
+            serializer = self.get_serializer(comment)
         # if "event_id" in request.data:
         #     event_id = request.data['event_id']
         #     event.objects.get(id=event_id).comments.add(comment)
@@ -118,17 +123,25 @@ class commentsViewSet(viewsets.ModelViewSet):
             comment = comments(id=None,task_id=req_task_id,comment=request.data['comment'],created_by=request.user)
             comment.save()
             task.objects.get(id=req_task_id).comments.add(comment)
+            serializer = self.get_serializer(comment)
         if "hearing_id" in request.data:
             req_hearing_id = request.data['hearing_id']
             comment = comments(id=None,hearing_id=req_hearing_id,comment=request.data['comment'],created_by=request.user)
             comment.save()
             hearing.objects.get(id=req_hearing_id).comments.add(comment)
-        serializer = self.get_serializer(comment)
+            serializer = self.get_serializer(comment)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, pk=None):
+        case = comments.objects.filter(id=pk)
+        case.update(is_deleted=True)
+        case.update(modified_by=request.user)
+        case.update(modified_at=timezone.now())
+        return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
 
 class repliesViewSet(viewsets.ModelViewSet):
 
-    queryset = replies.objects.all().order_by('-created_at')
+    queryset = replies.objects.all().order_by('-created_at').filter(is_deleted=False)
     serializer_class = repliesSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "core.replies"
@@ -147,6 +160,12 @@ class repliesViewSet(viewsets.ModelViewSet):
         else:
             return Response({'error':'no reply'},status=status.HTTP_201_CREATED)
 
+    def destroy(self, request, pk=None):
+        case = replies.objects.filter(id=pk)
+        case.update(is_deleted=True)
+        case.update(modified_by=request.user)
+        case.update(modified_at=timezone.now())
+        return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
 
 class prioritiesViewSet(viewsets.ModelViewSet):
 
@@ -158,15 +177,49 @@ class prioritiesViewSet(viewsets.ModelViewSet):
 
 class contractsViewSet(viewsets.ModelViewSet):
 
-    queryset = contracts.objects.all().order_by('-created_by')
+    queryset = contracts.objects.all().order_by('-created_by').filter(is_deleted=False)
     serializer_class = contractsSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "core.contracts"
 
+    def create(self,request):
+            req_name = request.data['name']
+            req_attachement = request.FILES.get('attachment')
+            contract = contracts(id=None,name=req_name,attachment=req_attachement,created_by=request.user)
+            contract.save()
+            serializer = self.get_serializer(contract)
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, pk=None):
+        case = contracts.objects.filter(id=pk)
+        case.update(is_deleted=True)
+        case.update(modified_by=request.user)
+        case.update(modified_at=timezone.now())
+        return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
+
+
+    # def initial(self, request, *args, **kwargs):
+    #     """
+    #     Runs anything that needs to occur prior to calling the method handler.
+    #     """
+    #     self.format_kwarg = self.get_format_suffix(**kwargs)
+
+    #     # Perform content negotiation and store the accepted info on the request
+    #     neg = self.perform_content_negotiation(request)
+    #     request.accepted_renderer, request.accepted_media_type = neg
+
+    #     # Determine the API version, if versioning is in use.
+    #     version, scheme = self.determine_version(request, *args, **kwargs)
+    #     request.version, request.versioning_scheme = version, scheme
+
+    #     # Ensure that the incoming request is permitted
+    #     self.perform_authentication(request)
+    #     self.check_permissions(request)
+    #     self.check_throttles(request)
 
 class documentsViewSet(viewsets.ModelViewSet):
 
-    queryset = documents.objects.all().order_by('-created_by')
+    queryset = documents.objects.all().order_by('-created_by').filter(is_deleted=False)
     serializer_class = documentsSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "core.documents"
@@ -195,7 +248,31 @@ class documentsViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(document)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
 
+    def destroy(self, request, pk=None):
+        case = documents.objects.filter(id=pk)
+        case.update(is_deleted=True)
+        case.update(modified_by=request.user)
+        case.update(modified_at=timezone.now())
+        return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
 
+    # def initial(self, request, *args, **kwargs):
+    #     """
+    #     Runs anything that needs to occur prior to calling the method handler.
+    #     """
+    #     self.format_kwarg = self.get_format_suffix(**kwargs)
+
+    #     # Perform content negotiation and store the accepted info on the request
+    #     neg = self.perform_content_negotiation(request)
+    #     request.accepted_renderer, request.accepted_media_type = neg
+
+    #     # Determine the API version, if versioning is in use.
+    #     version, scheme = self.determine_version(request, *args, **kwargs)
+    #     request.version, request.versioning_scheme = version, scheme
+
+    #     # Ensure that the incoming request is permitted
+    #     self.perform_authentication(request)
+    #     self.check_permissions(request)
+    #     self.check_throttles(request)
         
         
             

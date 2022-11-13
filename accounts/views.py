@@ -16,6 +16,7 @@ from django.core.mail import EmailMessage, send_mail
 from django.conf import settings
 from accounts.models import User
 from django.utils.translation import gettext_lazy as _
+from .permissions import MyPermission
 
 
 

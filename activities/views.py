@@ -14,11 +14,13 @@ from rest_framework.authentication import TokenAuthentication ,SessionAuthentica
 from django.core.cache import cache
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
-from core.permissions import MyPermission
+from .permissions import MyPermission
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 import django_filters.rest_framework
 from rest_framework.filters import SearchFilter, OrderingFilter
+# from rest_framework_tracking.mixins import LoggingMixin
+from accounts.models import User
 # CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 # def get_all_task_types_from_cache():
@@ -93,7 +95,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 
 class taskViewSet(viewsets.ModelViewSet):
     
-    queryset = task.objects.all().order_by('-id')
+    queryset = task.objects.all().order_by('-id').filter(is_deleted=False)
     serializer_class = taskSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated, MyPermission]
@@ -104,31 +106,43 @@ class taskViewSet(viewsets.ModelViewSet):
         req_description = None
         req_case_id = None
         req_due_date = None
-        req_comments = None
+        req_assignee = None
+        # req_comments = None
         if "title" in request.data:
             req_title = request.data['title']
+        if "assignee" in request.data:
+            req_assignee = request.data['assignee']
+            req_assignee_user = User.objects.get(username=req_assignee)
         if "description" in request.data:
             req_description = request.data['description']
         if "due_date" in request.data:
             req_due_date = request.data['due_date']
-        if "comments" in request.data:
-            req_comments = request.data["comments"]
+        # if "comments" in request.data:
+        #     req_comments = request.data["comments"]
         if "case_id" in request.data:
             req_case_id = request.data["case_id"]
             case = get_object_or_404(LitigationCases,pk=req_case_id)
-            tasks = task(id=None,title=req_title,description=req_description,due_date=req_due_date,comments=req_comments,case_id=req_case_id,created_by=request.user)
+            tasks = task(id=None,title=req_title,description=req_description,due_date=req_due_date,case_id=req_case_id,created_by=request.user,assignee=req_assignee_user)
             tasks.save()
             serializer = self.get_serializer(tasks)    
             case.tasks.add(tasks)
             return rest_response(serializer.data,status=status.HTTP_201_CREATED)
         else:
-            tasks = task(id=None,title=req_title,description=req_description,due_date=req_due_date,comments=req_comments,created_by=request.user)
+            tasks = task(id=None,title=req_title,description=req_description,due_date=req_due_date,created_by=request.user,assignee=req_assignee_user)
             tasks.save()
             serializer = self.get_serializer(tasks)
             return rest_response(serializer.data,status=status.HTTP_201_CREATED)
 
+    def destroy(self, request, pk=None):
+        case = task.objects.filter(id=pk)
+        case.update(is_deleted=True)
+        case.update(modified_by=request.user)
+        case.update(modified_at=timezone.now())
+        return rest_response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
+
+
 class hearingViewSet(viewsets.ModelViewSet):
-    queryset = hearing.objects.all().order_by('-id')
+    queryset = hearing.objects.all().order_by('-id').filter(is_deleted=False)
     serializer_class = hearingSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated, MyPermission]
@@ -168,6 +182,13 @@ class hearingViewSet(viewsets.ModelViewSet):
             hearings.save()
             serializer = self.get_serializer(hearings)
             return rest_response(serializer.data,status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, pk=None):
+        case = hearing.objects.filter(id=pk)
+        case.update(is_deleted=True)
+        case.update(modified_by=request.user)
+        case.update(modified_at=timezone.now())
+        return rest_response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
 
 # class eventViewSet(viewsets.ModelViewSet):  
 #     queryset = event.objects.all().order_by('id')
