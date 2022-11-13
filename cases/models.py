@@ -16,8 +16,12 @@ from django_countries.fields import CountryField
 from phonenumber_field.modelfields import PhoneNumberField
 from django.urls import reverse
 from django.utils import timezone
-
-
+from django.core.mail import EmailMessage, send_mail
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.db.models.signals import pre_save,post_save
+from django.dispatch import receiver
+from core.current_user import current_request
 
 class case_type(models.Model):
     id = models.AutoField(primary_key=True,)
@@ -281,14 +285,23 @@ class LitigationCases(models.Model):
     class Meta:
         verbose_name = _('Litigation Case')
         verbose_name_plural = _('Litigation Cases')
-
-    # def save(self,request, *args, **kwargs):
-    #     if self.id is None:
-    #         self.created_by = request.user
-    #     return super(LitigationCases, self).save(*args, **kwargs)  
-
-
     @property
     def get_html_url(self):
         url = reverse('cases:case_edit', args=(self.id,))
         return f'<a class="btn qi-primary-outline btn-sm" href="{url}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="<em>Tooltip</em> <u>with</u> <b>HTML</b>"> {self.name} </a>'
+
+@receiver(post_save, sender=LitigationCases)
+def send_email(sender, instance,created, **kwargs):
+    request = current_request()
+    if created:
+        if request.user.email_notification:
+            current_case = instance
+            case = LitigationCases.objects.get(id=current_case.id)
+            message = 'text version of HTML message'
+            email_subject = 'New Case #' + str(case.id)
+            email_body = render_to_string('cases/email.html', {
+            'user': request.user,
+            'case':case
+            })
+            send_mail(email_subject, message, settings.DEFAULT_FROM_EMAIL, [
+                    request.user.email,case.assignee], fail_silently=True, html_message=email_body)
