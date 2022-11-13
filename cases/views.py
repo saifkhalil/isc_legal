@@ -98,12 +98,21 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
     #     queryset = queryset.get(id=pk).values('id','name')
     #     return queryset
 
+    def create(self, request):
+        user = request.user
+        serializer = self.serializer_class(data=request.data,context={'created_by': user})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
     @action(detail=True)
     def get_comments(self, request,pk=None):
         req_id =self.request.query_params.get('id')
-        commments = LitigationCases.objects.get(id=req_id).comments.all()
+        commments = LitigationCases.objects.get(id=pk).comments.all()
         serializer = self.get_serializer(commments)
-        return Response(serializer.data)
+        return Response(commments, status=status.HTTP_200_OK)
 
     def get_queryset(self):
         internal_ref_number = self.request.query_params.get('internal_ref_number')

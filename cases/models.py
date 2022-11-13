@@ -15,6 +15,7 @@ from core.models import priorities,comments,documents,court
 from django_countries.fields import CountryField
 from phonenumber_field.modelfields import PhoneNumberField
 from django.urls import reverse
+from django.utils import timezone
 
 
 
@@ -261,8 +262,8 @@ class LitigationCases(models.Model):
     tasks = models.ManyToManyField(task, related_name='%(class)s_task', blank=True,verbose_name=_('Task'))
     # event = models.ManyToManyField(event, related_name='%(class)s_event', blank=True,verbose_name=_('Event'))
     comments = models.ManyToManyField(comments,verbose_name="Comments", blank=True)
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
+    start_time = models.DateTimeField(default=timezone.now)
+    end_time = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
     created_by = models.ForeignKey(
@@ -279,6 +280,12 @@ class LitigationCases(models.Model):
     class Meta:
         verbose_name = _('Litigation Case')
         verbose_name_plural = _('Litigation Cases')
+
+    # def save(self,request, *args, **kwargs):
+    #     if self.id is None:
+    #         self.created_by = request.user
+    #     return super(LitigationCases, self).save(*args, **kwargs)  
+
 
     @property
     def get_html_url(self):
