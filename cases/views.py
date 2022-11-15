@@ -111,7 +111,7 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
         #   FullWordSearchFilter,
           ]
     # perm_slug = "cases.LitigationCases"
-    filterset_fields = ['id', 'name']
+    filterset_fields = ['id', 'Stage','case_type','case_category','assignee','court']
     # word_fields = ('name','description')
     search_fields = ['@name','@description']
     ordering_fields = ['created_at', 'id','modified_at']

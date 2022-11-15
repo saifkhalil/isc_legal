@@ -258,7 +258,7 @@
                                   <td class="v-text-align" style="padding-right: 0px;padding-left: 0px;" align="center">
 
                                     <img align="center" border="0"
-                                      src="http://172.18.254.28/static/media/image-5.jpeg" alt="Banner"
+                                      src="http://172.18.254.28/static/media/image-5.jpg" alt="Banner"
                                       title="Banner"
                                       style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 52%;max-width: 301.6px;"
                                       width="301.6" class="v-src-width v-src-max-width" />
@@ -334,13 +334,14 @@
                                         style="line-height: 32.4px; font-size: 18px;">Dear {{user.username}},
                                       </span></strong></span></p>
                                 <p style="font-size: 14px; line-height: 180%;">&nbsp;</p>
-                                <p style="font-size: 14px; line-height: 180%;"><strong>New case '{{ case.name }}' has been added to Legal app</strong></p>
-                                <p style="font-size: 14px; line-height: 180%;"><strong>Created By: {{ case.created_by }}</strong></p>
+                                <p style="font-size: 14px; line-height: 180%;"><strong>{{ msgtype }}</strong></p>
+                                <p style="font-size: 14px; line-height: 180%;"><strong></strong></p>
                                 <p style="font-size: 14px; line-height: 180%;"><strong>Case Category: {{ case.case_category }}</strong></p>
                                 <p style="font-size: 14px; line-height: 180%;"><strong>Judge: {{ case.judge }}</strong></p>
                                 <p style="font-size: 14px; line-height: 180%;"><strong>Detective: {{ case.detective }}</strong></p>
                                 <p style="font-size: 14px; line-height: 180%;"><strong>Case Type: {{ case.case_type }}</strong></p>
                                 <p style="font-size: 14px; line-height: 180%;"><strong>Court: {{ case.court }}</strong></p>
+                                <p style="font-size: 14px; line-height: 180%;"><strong>Shared With:{{ case.shared_with.all|join:", " }}</strong></p>
                                 <p style="font-size: 14px; line-height: 180%;"><strong>Internal refrence number: {{ case.internal_ref_number }}</strong></p>
 
                               </div>
@@ -359,8 +360,8 @@
                               align="left">
 
                               <div class="v-text-align" align="center">
-                                <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-spacing: 0; border-collapse: collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;font-family:arial,helvetica,sans-serif;"><tr><td class="v-text-align" style="font-family:arial,helvetica,sans-serif;" align="center"><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="http://172.18.254.28/case/{{ case.id }}" style="height:57px; v-text-anchor:middle; width:260px;" arcsize="77%" stroke="f" fillcolor="#33428d"><w:anchorlock/><center style="color:#FFFFFF;font-family:arial,helvetica,sans-serif;"><![endif]-->
-                                <a href="http://172.18.254.28/case/{{ case.id }}" target="_blank"
+                                <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-spacing: 0; border-collapse: collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;font-family:arial,helvetica,sans-serif;"><tr><td class="v-text-align" style="font-family:arial,helvetica,sans-serif;" align="center"><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="http://172.18.254.28/case/view/{{ case.id }}" style="height:57px; v-text-anchor:middle; width:260px;" arcsize="77%" stroke="f" fillcolor="#33428d"><w:anchorlock/><center style="color:#FFFFFF;font-family:arial,helvetica,sans-serif;"><![endif]-->
+                                <a href="http://172.18.254.28/case/view/{{ case.id }}" target="_blank"
                                   style="box-sizing: border-box;display: inline-block;font-family:arial,helvetica,sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #FFFFFF; background-color: #33428d; border-radius: 44px;-webkit-border-radius: 44px; -moz-border-radius: 44px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;">
                                   <span style="display:block;padding:20px 70px;line-height:120%;"><strong><span
                                         style="font-family: 'Open Sans', sans-serif; font-size: 14px; line-height: 16.8px;">V I E W&nbsp; &nbsp;IT N O W</span></strong></span>
