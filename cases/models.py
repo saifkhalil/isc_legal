@@ -23,7 +23,7 @@ from django.db.models.signals import pre_save,post_save,m2m_changed
 from django.db.models import Count
 from django.dispatch import receiver
 from core.current_user import current_request
-from .tasks import send_email_celery
+
 
 class case_type(models.Model):
     id = models.AutoField(primary_key=True,)
@@ -293,25 +293,6 @@ class LitigationCases(models.Model):
         return f'<a class="btn qi-primary-outline btn-sm" href="{url}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="<em>Tooltip</em> <u>with</u> <b>HTML</b>"> {self.name} </a>'
 
 
-import threading
-from threading import Thread
-
-class EmailThread(threading.Thread):
-    def __init__(self, subject, html_content, recipient_list):
-        self.subject = subject
-        self.recipient_list = recipient_list
-        self.html_content = html_content
-        threading.Thread.__init__(self)
-
-    def run (self):
-        msg = EmailMessage(self.subject, self.html_content, EMAIL_HOST_USER, self.recipient_list)
-        msg.content_subtype = "html"
-        msg.send()
-
-def send_html_mail(subject, html_content, recipient_list):
-    EmailThread(subject, html_content, recipient_list).start()
-
-
 @receiver(post_save, sender=LitigationCases)
 def LitigationCases_send_email(sender, instance,action, reverse, **kwargs):
     # request = current_request()
@@ -326,7 +307,7 @@ def LitigationCases_send_email(sender, instance,action, reverse, **kwargs):
             'case':case,
             'msgtype':'You have been assigned with you below case details'
             })
-            send_email_celery(email_subject, message, settings.DEFAULT_FROM_EMAIL, [case.assignee.email], fail_silently=False, html_message=email_body)
+            send_mail(email_subject, message, settings.DEFAULT_FROM_EMAIL, [case.assignee.email], fail_silently=False, html_message=email_body)
         print(case.shared_with.all().count())
         if case.shared_with.exists():
             for shuser in case.shared_with.all():
@@ -339,6 +320,6 @@ def LitigationCases_send_email(sender, instance,action, reverse, **kwargs):
                         'case':case,
                         'msgtype':'You have been shared with you below case details'
                         })
-                     send_email_celery(email_subject, message, settings.DEFAULT_FROM_EMAIL, [shuser.email], fail_silently=False, html_message=email_body)
+                    send_mail(email_subject, message, settings.DEFAULT_FROM_EMAIL, [shuser.email], fail_silently=False, html_message=email_body)
 
 m2m_changed.connect(LitigationCases_send_email, sender=LitigationCases.shared_with.through)
