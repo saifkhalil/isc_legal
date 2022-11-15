@@ -30,7 +30,7 @@ from slick_reporting.fields import SlickReportField
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 # from rest_framework_tracking.mixins import LoggingMixin
-# from rest_framework_word_filter import FullWordSearchFilter
+from rest_framework_word_filter import FullWordSearchFilter
 # def get_cases_from_cache():
 #     if 'all_cases' in cache:
 #         return cache.get('all_cases')
@@ -96,6 +96,7 @@ def case(request, case_id=None):
 
 class LitigationCasesViewSet(viewsets.ModelViewSet):
     
+    model = LitigationCases
     queryset = LitigationCases.objects.all().order_by('-created_by').filter(is_deleted=False)
     serializer_class = LitigationCasesSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
@@ -107,7 +108,7 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
     filter_backends = [
         DjangoFilterBackend,
          SearchFilter,
-          OrderingFilter
+          OrderingFilter,
         #   FullWordSearchFilter,
           ]
     # perm_slug = "cases.LitigationCases"
