@@ -67,6 +67,9 @@ INSTALLED_APPS = [
     'crispy_forms',
     'slick_reporting',
     'logentry_admin',
+    'celery',
+    'django_celery_beat',   
+    'django_celery_results',
     # 'rest_framework_tracking',
 ]
 
@@ -308,3 +311,10 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'legal.app@qi.iq'
 EMAIL_HOST_PASSWORD = 'Bog91158'
 DEFAULT_FROM_EMAIL = 'Legal Application <legal.app@qi.iq>'
+
+
+CELERY_TIMEZONE = 'Asia/Baghdad'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_RESULT_BACKEND = 'django-db'
