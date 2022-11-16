@@ -288,6 +288,7 @@ class LitigationCases(models.Model):
     class Meta:
         verbose_name = _('Litigation Case')
         verbose_name_plural = _('Litigation Cases')
+        indexes = [ models.Index(fields=['id','name','Stage','case_type','case_category','assignee','court','description']),]
     @property
     def get_html_url(self):
         url = reverse('cases:case_edit', args=(self.id,))
