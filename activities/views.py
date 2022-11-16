@@ -18,6 +18,7 @@ from .permissions import MyPermission
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 import django_filters.rest_framework
+from datetime import datetime
 from rest_framework.filters import SearchFilter, OrderingFilter
 # from rest_framework_tracking.mixins import LoggingMixin
 from accounts.models import User
@@ -100,6 +101,13 @@ class taskViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication,SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "activities.task"
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = [
+        'title',
+        'description',
+        'case_id',
+        'assignee'
+    ]
 
     def create(self,request):
         req_title = None
@@ -107,6 +115,7 @@ class taskViewSet(viewsets.ModelViewSet):
         req_case_id = None
         req_due_date = None
         req_assignee = None
+        req_assignee_user = None
         # req_comments = None
         if "title" in request.data:
             req_title = request.data['title']
@@ -140,6 +149,14 @@ class taskViewSet(viewsets.ModelViewSet):
         case.update(modified_at=timezone.now())
         return rest_response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
 
+    def get_queryset(self):
+        req_due_date = self.request.query_params.get('due_date')
+        queryset = task.objects.all().order_by('-id').filter(is_deleted=False)
+        if req_due_date is not None:
+            req_date = datetime.strptime(req_due_date, '%Y-%m').date()
+            queryset = queryset.filter(due_date__year=req_date.year,due_date__month=req_date.month)
+        return queryset
+
 
 class hearingViewSet(viewsets.ModelViewSet):
     queryset = hearing.objects.all().order_by('-id').filter(is_deleted=False)
@@ -148,7 +165,11 @@ class hearingViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "activities.hearing" 
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
-    filterset_fields = '__all__'
+    filterset_fields = [
+        'name',
+        'court',
+        'assignee'
+    ]
     
 
     def create(self,request):
@@ -189,6 +210,14 @@ class hearingViewSet(viewsets.ModelViewSet):
         case.update(modified_by=request.user)
         case.update(modified_at=timezone.now())
         return rest_response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
+
+    def get_queryset(self):
+        req_hearing_date = self.request.query_params.get('hearing_date')
+        queryset = hearing.objects.all().order_by('-id').filter(is_deleted=False)
+        if req_hearing_date is not None:
+            req_date = datetime.strptime(req_hearing_date, '%Y-%m').date()
+            queryset = queryset.filter(hearing_date__year=req_date.year,hearing_date__month=req_date.month)
+        return queryset
 
 # class eventViewSet(viewsets.ModelViewSet):  
 #     queryset = event.objects.all().order_by('id')
