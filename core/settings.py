@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_word_filter',
-
+    # 'channels',
     'djoser',
     'phonenumber_field',
     'import_export',
@@ -109,6 +109,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+# ASGI_APPLICATION = 'core.wsgi.application' #routing.py will handle the ASGI
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': "channels.layers.InMemoryChannelLayer"
+#         }
+#     }
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases

@@ -8,15 +8,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-20 13:49+0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2022-11-16 00:36+0300\n"
+"PO-Revision-Date: 2022-11-16 00:38+0300\n"
+"Last-Translator: Anonymous User <saif.ibrahim@qi.iq>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Translated-Using: django-rosetta 0.9.8\n"
 
 #: .\accounts\apps.py:8
 msgid "Accounts"
@@ -46,9 +47,9 @@ msgstr ""
 msgid "Users must have a username"
 msgstr ""
 
-#: .\accounts\models.py:47 .\activities\models.py:32 .\activities\models.py:75
-#: .\cases\models.py:21 .\cases\models.py:53 .\cases\models.py:67
-#: .\cases\models.py:167 .\cases\models.py:222
+#: .\accounts\models.py:47 .\activities\models.py:34 .\cases\models.py:31
+#: .\cases\models.py:63 .\cases\models.py:77 .\core\models.py:98
+#: .\core\models.py:112 .\core\models.py:124
 msgid "Name"
 msgstr ""
 
@@ -128,63 +129,67 @@ msgstr ""
 msgid "Is blocked"
 msgstr ""
 
-#: .\accounts\models.py:83
-msgid "Please confirm that you read and agree to our terms & conditions"
+#: .\accounts\models.py:82
+msgid "Email Notification"
 msgstr ""
 
 #: .\accounts\models.py:84
-msgid "Created at"
+msgid "Please confirm that you read and agree to our terms & conditions"
 msgstr ""
 
 #: .\accounts\models.py:85
+msgid "Created at"
+msgstr ""
+
+#: .\accounts\models.py:86
 msgid "Modified at"
 msgstr ""
 
-#: .\accounts\models.py:87
+#: .\accounts\models.py:88
 msgid "Created by"
 msgstr ""
 
-#: .\accounts\models.py:89
+#: .\accounts\models.py:90
 msgid "Modified by"
 msgstr ""
 
-#: .\accounts\models.py:99
+#: .\accounts\models.py:100
 msgid "Could not create thumbnail - is the file type valid?"
 msgstr ""
 
-#: .\accounts\models.py:143
+#: .\accounts\models.py:144
 msgid "User"
 msgstr ""
 
-#: .\accounts\models.py:144
+#: .\accounts\models.py:145
 msgid "Users"
 msgstr ""
 
-#: .\accounts\views.py:86
+#: .\accounts\views.py:87
 msgid ""
-"User registered successfully, verification email has been sent, please check "
-"it "
+"User registered successfully, verification email has been sent, please check"
+" it "
 msgstr ""
 
-#: .\accounts\views.py:121
+#: .\accounts\views.py:122
 msgid "Email is not verified, please check your email inbox"
 msgstr ""
 
-#: .\accounts\views.py:125
+#: .\accounts\views.py:126
 msgid ""
 "It looks like your account has been blocked Please contact system admin for "
 "more information."
 msgstr ""
 
-#: .\accounts\views.py:149
+#: .\accounts\views.py:150
 msgid "Profile Updated"
 msgstr ""
 
-#: .\accounts\views.py:182
+#: .\accounts\views.py:183
 msgid "Email Verified, you can now login"
 msgstr ""
 
-#: .\accounts\views.py:185
+#: .\accounts\views.py:186
 msgid "Email Verification erorr, please try agin"
 msgstr ""
 
@@ -192,419 +197,210 @@ msgstr ""
 msgid "Activities"
 msgstr ""
 
-#: .\activities\models.py:17 .\activities\models.py:26
-#: .\activities\models.py:33
-msgid "Hearing Type"
-msgstr ""
-
-#: .\activities\models.py:27
-msgid "Hearing Types"
-msgstr ""
-
-#: .\activities\models.py:31
-msgid "Hearing ID"
-msgstr ""
-
-#: .\activities\models.py:34
-msgid "Hearing Date"
-msgstr ""
-
-#: .\activities\models.py:35 .\cases\models.py:257
-msgid "Assignee"
+#: .\activities\models.py:35 .\activities\models.py:87 .\cases\models.py:289
+#: .\core\models.py:126
+msgid "Litigation Case"
 msgstr ""
 
 #: .\activities\models.py:36
-msgid "Time Spent"
+msgid "Hearing Date"
 msgstr ""
 
-#: .\activities\models.py:38
+#: .\activities\models.py:37 .\cases\models.py:259
+msgid "Assignee"
+msgstr ""
+
+#: .\activities\models.py:40 .\cases\models.py:249
+msgid "Court name"
+msgstr ""
+
+#: .\activities\models.py:41
 msgid "Summary by lawyer"
 msgstr ""
 
-#: .\activities\models.py:48 .\cases\models.py:266
+#: .\activities\models.py:42 .\activities\models.py:90 .\cases\models.py:274
+#: .\core\models.py:28 .\core\models.py:68 .\core\models.py:114
+#: .\core\models.py:127
+msgid "Is Deleted"
+msgstr ""
+
+#: .\activities\models.py:58 .\cases\models.py:250 .\cases\models.py:268
 msgid "Hearing"
 msgstr ""
 
-#: .\activities\models.py:49
+#: .\activities\models.py:59
 msgid "Hearings"
 msgstr ""
 
-#: .\activities\models.py:59 .\activities\models.py:68
-#: .\activities\models.py:76
-msgid "Task Type"
+#: .\activities\models.py:81
+msgid "title"
 msgstr ""
 
-#: .\activities\models.py:69
-msgid "Task Types"
-msgstr ""
-
-#: .\activities\models.py:74
-msgid "Task ID"
-msgstr ""
-
-#: .\activities\models.py:77
+#: .\activities\models.py:83
 msgid "Task Description"
 msgstr ""
 
-#: .\activities\models.py:78
+#: .\activities\models.py:84
 msgid "Assigned to"
 msgstr ""
 
-#: .\activities\models.py:79 .\cases\models.py:264
-msgid "Requested By"
-msgstr ""
-
-#: .\activities\models.py:80 .\cases\models.py:262
-msgid "Matter Priority"
-msgstr ""
-
-#: .\activities\models.py:81 .\cases\models.py:260
+#: .\activities\models.py:88
 msgid "Due date"
 msgstr ""
 
-#: .\activities\models.py:91 .\cases\models.py:267
+#: .\activities\models.py:106 .\cases\models.py:269
 msgid "Task"
 msgstr ""
 
-#: .\activities\models.py:92
+#: .\activities\models.py:107
 msgid "Tasks"
-msgstr ""
-
-#: .\activities\models.py:103 .\activities\models.py:112
-#: .\activities\models.py:119
-msgid "Event Type"
-msgstr ""
-
-#: .\activities\models.py:113
-msgid "Event Types"
-msgstr ""
-
-#: .\activities\models.py:118
-msgid "Event ID"
-msgstr ""
-
-#: .\activities\models.py:120
-msgid "Created By"
-msgstr ""
-
-#: .\activities\models.py:121
-msgid "From"
-msgstr ""
-
-#: .\activities\models.py:122
-msgid "To"
-msgstr ""
-
-#: .\activities\models.py:123
-msgid "Attendees"
-msgstr ""
-
-#: .\activities\models.py:133 .\cases\models.py:268
-msgid "Event"
-msgstr ""
-
-#: .\activities\models.py:134
-msgid "Events"
 msgstr ""
 
 #: .\cases\apps.py:7
 msgid "Cases"
 msgstr ""
 
-#: .\cases\models.py:30
-msgid "Practice Area"
+#: .\cases\models.py:40
+msgid "Case Type"
 msgstr ""
 
-#: .\cases\models.py:31
-msgid "Practice Areas"
+#: .\cases\models.py:41
+msgid "Case Types"
 msgstr ""
 
-#: .\cases\models.py:35
-msgid "Status"
-msgstr ""
-
-#: .\cases\models.py:44 .\cases\models.py:265
-msgid "Case Status"
-msgstr ""
-
-#: .\cases\models.py:45
-msgid "Case Statuses"
-msgstr ""
-
-#: .\cases\models.py:62 .\cases\models.py:63 .\cases\models.py:263
+#: .\cases\models.py:72 .\cases\models.py:73 .\cases\models.py:265
 msgid "Stage"
 msgstr ""
 
-#: .\cases\models.py:76 .\cases\models.py:253
+#: .\cases\models.py:86 .\cases\models.py:255
 msgid "Client Position"
 msgstr ""
 
-#: .\cases\models.py:77
+#: .\cases\models.py:87
 msgid "Client Positions"
 msgstr ""
 
-#: .\cases\models.py:81
-msgid "Client type"
-msgstr ""
-
-#: .\cases\models.py:90
-msgid "Client Type"
-msgstr ""
-
-#: .\cases\models.py:91
-msgid "Client Types"
-msgstr ""
-
-#: .\cases\models.py:95
+#: .\cases\models.py:105
 msgid "Position"
 msgstr ""
 
-#: .\cases\models.py:104 .\cases\models.py:255
+#: .\cases\models.py:114 .\cases\models.py:257
 msgid "Opponent Position"
 msgstr ""
 
-#: .\cases\models.py:105
+#: .\cases\models.py:115
 msgid "Opponent Positions"
 msgstr ""
 
-#: .\cases\models.py:109 .\cases\models.py:169
-msgid "Category"
-msgstr ""
-
-#: .\cases\models.py:118
-msgid "Company category"
-msgstr ""
-
-#: .\cases\models.py:119
-msgid "Company categories"
-msgstr ""
-
-#: .\cases\models.py:123 .\cases\models.py:170
-msgid "Sub-category"
-msgstr ""
-
-#: .\cases\models.py:132
-msgid "Company sub-category"
-msgstr ""
-
-#: .\cases\models.py:133
-msgid "Company sub-categories"
-msgstr ""
-
-#: .\cases\models.py:137
-msgid "Group"
-msgstr ""
-
-#: .\cases\models.py:146 .\cases\models.py:172
-msgid "Company Group"
-msgstr ""
-
-#: .\cases\models.py:147
-msgid "Company Groups"
-msgstr ""
-
-#: .\cases\models.py:151
-msgid "Legal type"
-msgstr ""
-
-#: .\cases\models.py:160
-msgid "Company legal type"
-msgstr ""
-
-#: .\cases\models.py:161
-msgid "Company legal types"
-msgstr ""
-
-#: .\cases\models.py:166
-msgid "Full Name"
-msgstr ""
-
-#: .\cases\models.py:168
-msgid "Foreign Name"
-msgstr ""
-
-#: .\cases\models.py:171
-msgid "Company Legal Type"
-msgstr ""
-
-#: .\cases\models.py:174
-msgid "Reference"
-msgstr ""
-
-#: .\cases\models.py:183 .\cases\models.py:194 .\cases\models.py:251
-msgid "Company"
-msgstr ""
-
-#: .\cases\models.py:184
-msgid "Companies"
-msgstr ""
-
-#: .\cases\models.py:195
-msgid "Address"
-msgstr ""
-
-#: .\cases\models.py:196
-msgid "State"
-msgstr ""
-
-#: .\cases\models.py:197
-msgid "Zip"
-msgstr ""
-
-#: .\cases\models.py:198
-msgid "Street Name"
-msgstr ""
-
-#: .\cases\models.py:199
-msgid "Building Number"
-msgstr ""
-
-#: .\cases\models.py:200
-msgid "District/Neighborhood"
-msgstr ""
-
-#: .\cases\models.py:201
-msgid "Mobile"
-msgstr ""
-
-#: .\cases\models.py:202
-msgid "Fax"
-msgstr ""
-
-#: .\cases\models.py:203
-msgid "City"
-msgstr ""
-
-#: .\cases\models.py:204
-msgid "Website"
-msgstr ""
-
-#: .\cases\models.py:205
-msgid "Additional Street Name"
-msgstr ""
-
-#: .\cases\models.py:206
-msgid "Address Additional Number"
-msgstr ""
-
-#: .\cases\models.py:207 .\templates\account\register.html:40
-msgid "Phone"
-msgstr ""
-
-#: .\cases\models.py:208 .\templates\account\login.html:38
-#: .\templates\account\register.html:21
-msgid "Email"
-msgstr ""
-
-#: .\cases\models.py:209
-msgid "Country"
-msgstr ""
-
-#: .\cases\models.py:217 .\cases\models.py:218
-msgid "Company Address"
-msgstr ""
-
-#: .\cases\models.py:232 .\cases\models.py:252
-msgid "Person"
-msgstr ""
-
-#: .\cases\models.py:233
-msgid "Persons"
-msgstr ""
-
-#: .\cases\models.py:237
+#: .\cases\models.py:235
 msgid "Public"
 msgstr ""
 
-#: .\cases\models.py:238
+#: .\cases\models.py:236
 msgid "Private"
 msgstr ""
 
-#: .\cases\models.py:244
-msgid "Case ID"
-msgstr ""
-
-#: .\cases\models.py:245
+#: .\cases\models.py:243
 msgid "Title"
 msgstr ""
 
-#: .\cases\models.py:246
+#: .\cases\models.py:244
 msgid "Subject"
 msgstr ""
 
-#: .\cases\models.py:247
+#: .\cases\models.py:245
 msgid "Case Category"
 msgstr ""
 
+#: .\cases\models.py:246
+msgid "Judge Name"
+msgstr ""
+
+#: .\cases\models.py:247
+msgid "Detective"
+msgstr ""
+
 #: .\cases\models.py:248
-msgid "Practice area"
+msgid "Case type"
 msgstr ""
 
-#: .\cases\models.py:249
-msgid "Entry Date"
-msgstr ""
-
-#: .\cases\models.py:254
-msgid "Opponent"
-msgstr ""
-
-#: .\cases\models.py:256
-msgid "Assigned Team"
-msgstr ""
-
-#: .\cases\models.py:258
+#: .\cases\models.py:260
 msgid "Shared With"
 msgstr ""
 
-#: .\cases\models.py:259
-msgid "Filed on"
-msgstr ""
-
-#: .\cases\models.py:261
+#: .\cases\models.py:263
 msgid "Internal Ref Number"
 msgstr ""
 
-#: .\cases\models.py:285
-msgid "Litigation Case"
+#: .\cases\models.py:264
+msgid "Matter Priority"
 msgstr ""
 
-#: .\cases\models.py:286
+#: .\cases\models.py:290
 msgid "Litigation Cases"
+msgstr ""
+
+#: .\cases\models.py:305 .\cases\models.py:318
+msgid "New Case #"
+msgstr ""
+
+#: .\cases\models.py:309
+msgid "You have been assigned with you below case details"
+msgstr "لقد تم تعيينك كمحامي للدعوى ادناه"
+
+#: .\cases\models.py:322
+msgid "You have been shared with you below case details"
+msgstr "لقد تمت مشاركة الدعوى ادناه معك"
+
+#: .\cases\views.py:79
+msgid "Detailed Columns"
 msgstr ""
 
 #: .\core\apps.py:8
 msgid "Core"
 msgstr ""
 
-#: .\core\models.py:11 .\core\models.py:20
+#: .\core\models.py:12 .\core\models.py:21
 msgid "Priority"
 msgstr ""
 
-#: .\core\models.py:21
+#: .\core\models.py:22
 msgid "Priorities"
 msgstr ""
 
-#: .\core\models.py:25 .\core\models.py:41 .\core\models.py:61
+#: .\core\models.py:26 .\core\models.py:43 .\core\models.py:63
 msgid "Reply"
 msgstr ""
 
-#: .\core\models.py:42
+#: .\core\models.py:44
 msgid "Replies"
 msgstr ""
 
-#: .\core\models.py:60 .\core\models.py:81
+#: .\core\models.py:62 .\core\models.py:84
 msgid "Comment"
 msgstr ""
 
-#: .\core\models.py:82
+#: .\core\models.py:85
 msgid "Comments"
 msgstr ""
 
-#: .\core\settings.py:155
+#: .\core\models.py:107
+msgid "Court"
+msgstr ""
+
+#: .\core\models.py:108
+msgid "Courts"
+msgstr ""
+
+#: .\core\models.py:113 .\core\models.py:125
+msgid "Attachment"
+msgstr ""
+
+#: .\core\settings.py:185
 msgid "English"
 msgstr ""
 
-#: .\core\settings.py:156
+#: .\core\settings.py:186
 msgid "Arabic"
 msgstr ""
 
@@ -617,11 +413,15 @@ msgid "How we can help you"
 msgstr ""
 
 #: .\templates\about.html:22
-msgid "ddvvvvvvvvvTest"
+msgid "ddvTest"
 msgstr ""
 
 #: .\templates\account\login.html:22
 msgid "Login to ISC Legal App"
+msgstr ""
+
+#: .\templates\account\login.html:38 .\templates\account\register.html:21
+msgid "Email"
 msgstr ""
 
 #: .\templates\account\login.html:44 .\templates\account\register.html:47
@@ -657,6 +457,10 @@ msgstr ""
 msgid "Last Name"
 msgstr ""
 
+#: .\templates\account\register.html:40
+msgid "Phone"
+msgstr ""
+
 #: .\templates\account\register.html:52
 msgid "Confirm Password"
 msgstr ""
@@ -676,6 +480,50 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
-#: .\templates\index.html:10
+#: .\templates\cases\email.html:287
+msgid "Legal App New Case #"
+msgstr "رقم الدعوى الجديدة"
+
+#: .\templates\cases\email.html:336
+msgid "Dear"
+msgstr ""
+
+#: .\templates\cases\email.html:341
+msgid "Case Category:"
+msgstr "فئة الدعوى:"
+
+#: .\templates\cases\email.html:342
+msgid "Judge:"
+msgstr "اسم القاضي:"
+
+#: .\templates\cases\email.html:343
+msgid "Detective:"
+msgstr "اسم المحقق:"
+
+#: .\templates\cases\email.html:344
+msgid "Case Type:"
+msgstr "نوع الدعوى:"
+
+#: .\templates\cases\email.html:345
+msgid "Court:"
+msgstr "اسم المحكمة:"
+
+#: .\templates\cases\email.html:346
+msgid "Shared With:"
+msgstr "مشاركة مع:"
+
+#: .\templates\cases\email.html:347
+msgid "Internal refrence number:"
+msgstr "رقم الدعوى المرجعي:"
+
+#: .\templates\cases\email.html:369
+msgid "V I E W IT N O W"
+msgstr "مشاهدة تفاصيل الدعوى"
+
+#: .\templates\cases\email.html:497
+msgid "You are receiving this because you registered on Legal app"
+msgstr "أنت تتلقى هذا البريد الالكتروني لأنك سجلت في التطبيق القانوني"
+
+#: .\templates\index.html:11
 msgid "Welcome to ISC Legal App"
 msgstr ""
