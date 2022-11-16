@@ -23,6 +23,7 @@ from django.db.models.signals import pre_save,post_save,m2m_changed
 from django.db.models import Count
 from django.dispatch import receiver
 from core.current_user import current_request
+from core.threading import send_html_mail
 
 
 class case_type(models.Model):
@@ -294,32 +295,32 @@ class LitigationCases(models.Model):
 
 
 @receiver(post_save, sender=LitigationCases)
-def LitigationCases_send_email(sender, instance,action, reverse, **kwargs):
+def LitigationCases_send_email(sender, instance, created, *args, **kwargs):
     # request = current_request()
     current_case = instance
     case = LitigationCases.objects.get(id=current_case.id)
-    if action == 'post_add' and not reverse:
+    if created:
         if case.assignee.email_notification:
             message = 'text version of HTML message'
-            email_subject = 'New Case #' + str(case.id)
+            email_subject = _('New Case #') + str(case.id)
             email_body = render_to_string('cases/email.html', {
             'user': case.assignee,
             'case':case,
-            'msgtype':'You have been assigned with you below case details'
+            'msgtype':_('You have been assigned with you below case details')
             })
-            send_mail(email_subject, message, settings.DEFAULT_FROM_EMAIL, [case.assignee.email], fail_silently=False, html_message=email_body)
-        print(case.shared_with.all().count())
+            send_html_mail(email_subject, email_body,  [case.assignee.email])
+        print(instance.shared_with)
         if case.shared_with.exists():
             for shuser in case.shared_with.all():
                 print(shuser)
                 if shuser.email_notification:
                     message = 'text version of HTML message'
-                    email_subject = 'New Case #' + str(case.id)
+                    email_subject = _('New Case #') + str(case.id)
                     email_body = render_to_string('cases/email.html', {
                         'user': shuser,
                         'case':case,
-                        'msgtype':'You have been shared with you below case details'
+                        'msgtype':_('You have been shared with you below case details')
                         })
-                    send_mail(email_subject, message, settings.DEFAULT_FROM_EMAIL, [shuser.email], fail_silently=False, html_message=email_body)
+                    send_html_mail(email_subject, email_body,  [case.assignee.email])
 
-m2m_changed.connect(LitigationCases_send_email, sender=LitigationCases.shared_with.through)
+# m2m_changed.connect(LitigationCases_send_email, sender=LitigationCases.shared_with.through)
