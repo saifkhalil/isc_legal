@@ -132,12 +132,24 @@ class commentsViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(comment)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
 
+    # def list(self, request):
+    #     queryset = comments.objects.all().order_by('-id').filter(is_deleted=False)
+    #     serializer = self.get_serializer(queryset)
+    #     return Response(serializer.data,status=status.HTTP_200_OK)
+
     def destroy(self, request, pk=None):
-        case = comments.objects.filter(id=pk)
-        case.update(is_deleted=True)
-        case.update(modified_by=request.user)
-        case.update(modified_at=timezone.now())
+        comment = comments.objects.filter(id=pk)
+        comment.update(is_deleted=True)
+        comment.update(modified_by=request.user)
+        comment.update(modified_at=timezone.now())
         return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
+
+    # def retrieve(self, request, pk=None):
+        
+    #     comment_queryset = comments.objects.filter(id=pk,replies__is_deleted=False,is_deleted=False).
+    #     serializer = self.get_serializer(comment_queryset)
+    #     return Response(serializer.data,status=status.HTTP_200_OK)
+
 
 class repliesViewSet(viewsets.ModelViewSet):
     # pagination_class = None
@@ -160,11 +172,17 @@ class repliesViewSet(viewsets.ModelViewSet):
         else:
             return Response({'error':'no reply'},status=status.HTTP_201_CREATED)
 
+
+
     def destroy(self, request, pk=None):
-        case = replies.objects.filter(id=pk)
-        case.update(is_deleted=True)
-        case.update(modified_by=request.user)
-        case.update(modified_at=timezone.now())
+        reply = replies.objects.filter(id=pk)
+        # commentList = replies.comments_set.get(id=pk)
+        # for comm in commentList:
+        #     print(comm.id)
+        #     comm.replies.remove(reply)
+        reply.update(is_deleted=True)
+        reply.update(modified_by=request.user)
+        reply.update(modified_at=timezone.now())
         return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
 
 class prioritiesViewSet(viewsets.ModelViewSet):
@@ -191,10 +209,10 @@ class contractsViewSet(viewsets.ModelViewSet):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
-        case = contracts.objects.filter(id=pk)
-        case.update(is_deleted=True)
-        case.update(modified_by=request.user)
-        case.update(modified_at=timezone.now())
+        contract = contracts.objects.filter(id=pk)
+        contract.update(is_deleted=True)
+        contract.update(modified_by=request.user)
+        contract.update(modified_at=timezone.now())
         return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
 
 

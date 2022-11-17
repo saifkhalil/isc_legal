@@ -97,7 +97,7 @@ def case(request, case_id=None):
 class LitigationCasesViewSet(viewsets.ModelViewSet):
     
     model = LitigationCases
-    queryset = LitigationCases.objects.all().order_by('-created_by').filter(is_deleted=False)
+    queryset = LitigationCases.objects.all().order_by('-created_by')
     serializer_class = LitigationCasesSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
     permission_classes = [
@@ -153,7 +153,7 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
         internal_ref_number = self.request.query_params.get('internal_ref_number')
         start_time = self.request.query_params.get('start_time')
         Stage = self.request.query_params.get('stage')
-        queryset = LitigationCases.objects.all().order_by('-created_by').filter(is_deleted=False)
+        queryset = LitigationCases.objects.all().order_by('-created_by')
         current_user_id = self.request.user.id
         cuser = User.objects.get(id=current_user_id)
         is_manager = cuser.is_manager
