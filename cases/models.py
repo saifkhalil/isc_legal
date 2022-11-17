@@ -303,8 +303,8 @@ def LitigationCases_send_email(sender, instance, created, *args, **kwargs):
     if created:
         if case.assignee.email_notification:
             message = 'text version of HTML message'
-            email_subject = _('New Case #') + str(case.id)
-            email_body = render_to_string('cases/email.html', {
+            email_subject = _('رقم الدعوى ') + str(case.id)
+            email_body = render_to_string('cases/emailnew.html', {
             'user': case.assignee,
             'case':case,
             'msgtype':_('You have been assigned with you below case details')
@@ -317,7 +317,7 @@ def LitigationCases_send_email(sender, instance, created, *args, **kwargs):
                 if shuser.email_notification:
                     message = 'text version of HTML message'
                     email_subject = _('New Case #') + str(case.id)
-                    email_body = render_to_string('cases/email.html', {
+                    email_body = render_to_string('cases/emailnew.html', {
                         'user': shuser,
                         'case':case,
                         'msgtype':_('You have been shared with you below case details')

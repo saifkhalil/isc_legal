@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-16 00:36+0300\n"
+"POT-Creation-Date: 2022-11-17 10:31+0300\n"
 "PO-Revision-Date: 2022-11-16 00:38+0300\n"
 "Last-Translator: Anonymous User <saif.ibrahim@qi.iq>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -167,8 +167,8 @@ msgstr ""
 
 #: .\accounts\views.py:87
 msgid ""
-"User registered successfully, verification email has been sent, please check"
-" it "
+"User registered successfully, verification email has been sent, please check "
+"it "
 msgstr ""
 
 #: .\accounts\views.py:122
@@ -340,15 +340,19 @@ msgstr ""
 msgid "Litigation Cases"
 msgstr ""
 
-#: .\cases\models.py:305 .\cases\models.py:318
-msgid "New Case #"
+#: .\cases\models.py:306
+msgid "رقم الدعوى "
 msgstr ""
 
-#: .\cases\models.py:309
+#: .\cases\models.py:310
 msgid "You have been assigned with you below case details"
 msgstr "لقد تم تعيينك كمحامي للدعوى ادناه"
 
-#: .\cases\models.py:322
+#: .\cases\models.py:319
+msgid "New Case #"
+msgstr ""
+
+#: .\cases\models.py:323
 msgid "You have been shared with you below case details"
 msgstr "لقد تمت مشاركة الدعوى ادناه معك"
 
@@ -488,31 +492,31 @@ msgstr "رقم الدعوى الجديدة"
 msgid "Dear"
 msgstr ""
 
-#: .\templates\cases\email.html:341
+#: .\templates\cases\email.html:341 .\templates\cases\emailnew.html:190
 msgid "Case Category:"
 msgstr "فئة الدعوى:"
 
-#: .\templates\cases\email.html:342
+#: .\templates\cases\email.html:342 .\templates\cases\emailnew.html:191
 msgid "Judge:"
 msgstr "اسم القاضي:"
 
-#: .\templates\cases\email.html:343
+#: .\templates\cases\email.html:343 .\templates\cases\emailnew.html:192
 msgid "Detective:"
 msgstr "اسم المحقق:"
 
-#: .\templates\cases\email.html:344
+#: .\templates\cases\email.html:344 .\templates\cases\emailnew.html:193
 msgid "Case Type:"
 msgstr "نوع الدعوى:"
 
-#: .\templates\cases\email.html:345
+#: .\templates\cases\email.html:345 .\templates\cases\emailnew.html:194
 msgid "Court:"
 msgstr "اسم المحكمة:"
 
-#: .\templates\cases\email.html:346
+#: .\templates\cases\email.html:346 .\templates\cases\emailnew.html:195
 msgid "Shared With:"
 msgstr "مشاركة مع:"
 
-#: .\templates\cases\email.html:347
+#: .\templates\cases\email.html:347 .\templates\cases\emailnew.html:196
 msgid "Internal refrence number:"
 msgstr "رقم الدعوى المرجعي:"
 
@@ -523,6 +527,12 @@ msgstr "مشاهدة تفاصيل الدعوى"
 #: .\templates\cases\email.html:497
 msgid "You are receiving this because you registered on Legal app"
 msgstr "أنت تتلقى هذا البريد الالكتروني لأنك سجلت في التطبيق القانوني"
+
+#: .\templates\cases\emailnew.html:189
+#, fuzzy
+#| msgid "Case Type:"
+msgid "Case Number:"
+msgstr "نوع الدعوى:"
 
 #: .\templates\index.html:11
 msgid "Welcome to ISC Legal App"

@@ -6,6 +6,9 @@ from .models import LitigationCases,stages,client_position,opponent_position,Gro
 from core.serializers import commentsSerializer,documentsSerializer
 from accounts.models import User
 from activities.serializers import hearingSerializer
+# from core.serializers import FilteredListSerializer
+
+
 class case_typeSerializer(serializers.ModelSerializer):
     class Meta:
         model = case_type
@@ -84,6 +87,7 @@ class LitigationCasesSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
 
     class Meta:
         model = LitigationCases
+#        list_serializer_class = FilteredListSerializer
         fields = [ 'id', 'name','description','case_category','priority','shared_with','court','case_type','judge','detective','client_position','opponent_position','assignee','Stage','internal_ref_number','comments','documents','hearing','start_time','end_time','created_by','created_at']
         http_method_names = ['get', 'post', 'head','put']
 

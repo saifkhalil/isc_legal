@@ -168,7 +168,8 @@ class hearingViewSet(viewsets.ModelViewSet):
     filterset_fields = [
         'name',
         'court',
-        'assignee'
+        'assignee',
+        'case_id'
     ]
     
 
