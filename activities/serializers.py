@@ -3,7 +3,7 @@ from drf_dynamic_fields import DynamicFieldsMixin
 from .models import task,hearing
 from core.models import court
 from accounts.models import User
-
+from cases.models import LitigationCases
 
 
 # class task_typeSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
@@ -34,6 +34,7 @@ class taskSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
 #         model = event
 #         fields = ['id', 'event_type','created_by','from_date','to_date','attendees','comments']
 
+
 class hearingSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     name = serializers.CharField(max_length=200,required=False, allow_null=True)
     hearing_date = serializers.DateTimeField(required=False, allow_null=True)
@@ -41,7 +42,19 @@ class hearingSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     court = serializers.SlugRelatedField(slug_field='name',queryset=court.objects.all())
     comments_by_lawyer = serializers.CharField(max_length=200,required=False, allow_null=True)
     case_id = serializers.IntegerField(required=False, allow_null=True)
+    case_name = serializers.SerializerMethodField('get_case_name')
+
+    def get_case_name(self, obj):
+        if obj.case_id:
+            try:
+                case =  LitigationCases.objects.get(id=obj.case_id).name
+            except LitigationCases.DoesNotExist:
+                case = None
+            return case
+        else:
+            return None
+
     class Meta:
         model = hearing
-        fields = ['id', 'name','hearing_date','assignee','court','comments_by_lawyer','case_id']
+        fields = ['id', 'name','hearing_date','assignee','court','comments_by_lawyer','case_id','case_name']
 

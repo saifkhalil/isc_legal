@@ -179,7 +179,7 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
 #     perm_slug = "cases.company"
 
 class courtViewSet(viewsets.ModelViewSet):
-
+    # pagination_class = None
     queryset = court.objects.all().order_by('-id')
     serializer_class = courtSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
@@ -188,7 +188,7 @@ class courtViewSet(viewsets.ModelViewSet):
 
 
 class client_positionViewSet(viewsets.ModelViewSet):
-
+    # pagination_class = None
     queryset = client_position.objects.all().order_by('-id')
     serializer_class = client_positionSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
@@ -197,7 +197,7 @@ class client_positionViewSet(viewsets.ModelViewSet):
 
 
 class opponent_positionViewSet(viewsets.ModelViewSet):
-
+    # pagination_class = None
     queryset = opponent_position.objects.all().order_by('-id')
     serializer_class = opponent_positionSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
@@ -205,7 +205,7 @@ class opponent_positionViewSet(viewsets.ModelViewSet):
     perm_slug = "cases.opponent_position"
 
 class stagesViewSet(viewsets.ModelViewSet):
-
+    # pagination_class = None
     queryset = stages.objects.all().order_by('-id')
     serializer_class = stagesSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
@@ -213,7 +213,7 @@ class stagesViewSet(viewsets.ModelViewSet):
     perm_slug = "cases.stages"
 
 class case_typeViewSet(viewsets.ModelViewSet):
-  
+    # pagination_class = None
     queryset = case_type.objects.all().order_by('-id')
     serializer_class = case_typeSerializer
     authentication_classes = [TokenAuthentication,]
