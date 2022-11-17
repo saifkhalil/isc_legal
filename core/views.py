@@ -91,14 +91,14 @@ def about(request):
 
 
 class GroupViewSet(viewsets.ModelViewSet):
-
+    # pagination_class = None
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 class commentsViewSet(viewsets.ModelViewSet):
-
+    # pagination_class = None
     queryset = comments.objects.all().order_by('-id').filter(is_deleted=False)
     serializer_class = commentsSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
@@ -140,7 +140,7 @@ class commentsViewSet(viewsets.ModelViewSet):
         return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
 
 class repliesViewSet(viewsets.ModelViewSet):
-
+    # pagination_class = None
     queryset = replies.objects.all().order_by('-created_at').filter(is_deleted=False)
     serializer_class = repliesSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
@@ -168,7 +168,7 @@ class repliesViewSet(viewsets.ModelViewSet):
         return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
 
 class prioritiesViewSet(viewsets.ModelViewSet):
-
+    # pagination_class = None
     queryset = priorities.objects.all().order_by('priority')
     serializer_class = prioritiesSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
@@ -176,7 +176,7 @@ class prioritiesViewSet(viewsets.ModelViewSet):
 
 
 class contractsViewSet(viewsets.ModelViewSet):
-
+    
     queryset = contracts.objects.all().order_by('-created_by').filter(is_deleted=False)
     serializer_class = contractsSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
