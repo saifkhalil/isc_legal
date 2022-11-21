@@ -10,7 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 # from cases.views import get_cases_from_cache
 from core.models import comments,replies,priorities,contracts,documents
-from .serializers import GroupSerializer, commentsSerializer,  repliesSerializer,prioritiesSerializer,contractsSerializer,documentsSerializer
+from .serializers import EventsSerializer, GroupSerializer, commentsSerializer,  repliesSerializer,prioritiesSerializer,contractsSerializer,documentsSerializer
 from cases.models import LitigationCases
 from activities.models import task,hearing
 from django.views.decorators.cache import cache_page
@@ -29,6 +29,8 @@ from datetime import date
 from .permissions import MyPermission
 import django_filters.rest_framework
 from django.utils import timezone
+from pghistory.models import Events
+
 # from rest_framework_tracking.mixins import LoggingMixin
 ## CALENDAR VIEW
 
@@ -293,4 +295,20 @@ class documentsViewSet(viewsets.ModelViewSet):
     #     self.check_throttles(request)
         
         
-            
+
+class eventsViewSet(viewsets.ReadOnlyModelViewSet):
+
+    queryset = Events.objects.all().exclude(pgh_diff='')
+    serializer_class = EventsSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = ['pgh_obj_model','pgh_obj_id',]    
+
+
+class caseseventsViewSet(viewsets.ReadOnlyModelViewSet):
+
+    queryset = Events.objects.all().exclude(pgh_diff='').filter(pgh_obj_model='cases.LitigationCases')
+    serializer_class = EventsSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = ['pgh_obj_model','pgh_obj_id',]           

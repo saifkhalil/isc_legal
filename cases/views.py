@@ -3,8 +3,8 @@ from django.shortcuts import render
 from rest_framework import viewsets,status
 from rest_framework import permissions
 from rest_framework.response import Response
-from .serializers import LitigationCasesSerializer,stagesSerializer,case_typeSerializer,courtSerializer,client_positionSerializer,opponent_positionSerializer
-from .models import LitigationCases,stages,case_type,court,client_position,opponent_position
+from .serializers import LitigationCasesSerializer,stagesSerializer,case_typeSerializer,courtSerializer,client_positionSerializer,opponent_positionSerializer,LitigationCasesEventSerializer
+from .models import LitigationCases,stages,case_type,court,client_position,opponent_position,LitigationCasesEvent
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication
 from rest_framework.decorators import action
 from activities.models import task
@@ -93,6 +93,24 @@ def case(request, case_id=None):
         form.save()
         return HttpResponseRedirect(reverse('cal:calendar'))
     return render(request, 'cases/case.html', {'form': form})
+
+class LitigationCasesEventViewSet(viewsets.ReadOnlyModelViewSet):
+    
+    model = LitigationCasesEvent
+    queryset = LitigationCasesEvent.objects.all().order_by('-created_by')
+    serializer_class = LitigationCasesEventSerializer
+    authentication_classes = [TokenAuthentication,SessionAuthentication]
+    permission_classes = [
+        permissions.IsAuthenticated,
+        #  MyPermission
+         ]
+    filter_backends = [
+        DjangoFilterBackend,
+         SearchFilter,
+          OrderingFilter,
+        #   FullWordSearchFilter,
+          ]
+    filterset_fields = ['id', ]
 
 class LitigationCasesViewSet(viewsets.ModelViewSet):
     

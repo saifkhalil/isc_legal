@@ -53,6 +53,8 @@ router.register(r'replies', views.repliesViewSet,basename='replies')
 router.register(r'priorities', views.prioritiesViewSet,basename='priorities')
 router.register(r'contracts', views.contractsViewSet,basename='contracts')
 router.register(r'documents', views.documentsViewSet,basename='documents')
+router.register(r'events', views.eventsViewSet,basename='events')
+router.register(r'cases_events', views.caseseventsViewSet,basename='cases_events')
 
 
 urlpatterns = [
