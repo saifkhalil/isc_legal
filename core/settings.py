@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'jazzmin',
+    'pghistory.admin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -71,6 +72,9 @@ INSTALLED_APPS = [
     'django_celery_beat',   
     'django_celery_results',
     # 'rest_framework_tracking',
+    'django_extensions',
+    'pghistory',
+    'pgtrigger',
 ]
 
 MIDDLEWARE = [
@@ -324,5 +328,7 @@ DEFAULT_FROM_EMAIL = 'Legal Application <legal.app@qi.iq>'
 CELERY_TIMEZONE = 'Asia/Baghdad'
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
-
 CELERY_RESULT_BACKEND = 'django-db'
+
+
+# PGHISTORY_ADMIN_LIST_DISPLAY = ['user',]

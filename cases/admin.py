@@ -3,6 +3,10 @@ from .models import *
 from import_export.admin import ImportExportModelAdmin
 
 # Register your models here.
+
+
+
+
 class LitigationCasesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'name','description','is_deleted')
     fields = ( 'name','description','case_category','judge','comments','detective','case_type','court','documents','client_position','opponent_position','assignee','shared_with','priority','end_time','start_time','is_deleted','created_by','created_at','modified_by','modified_at')
@@ -12,6 +16,11 @@ class LitigationCasesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
         if self.cid is None:
             self.cid = 'C-' + str(self.id)
         return super(LitigationCases, self).save(*args, **kwargs)
+
+class LitigationCasesEventAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    list_display = ('id',)
+
+
 
 class case_typeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'type')
@@ -61,6 +70,7 @@ class case_typeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 admin.site.register(LitigationCases, LitigationCasesAdmin)
+admin.site.register(LitigationCasesEvent, LitigationCasesEventAdmin)
 admin.site.register(stages, stagesAdmin)
 admin.site.register(case_type, case_typeAdmin)
 admin.site.register(client_position, client_positionAdmin)

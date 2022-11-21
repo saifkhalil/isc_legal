@@ -11,7 +11,7 @@ from django.core.validators import FileExtensionValidator
 from django.utils import timezone
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-
+import pghistory
 # Create your models here.
 
 # class hearing_type(models.Model):
@@ -27,7 +27,7 @@ from django.db.models.signals import post_save
 #     class Meta:
 #         verbose_name = _('Hearing Type')
 #         verbose_name_plural = _('Hearing Types')
-
+@pghistory.track(pghistory.Snapshot())
 class hearing(models.Model):
     id = models.AutoField(primary_key=True,)
     # hid = models.CharField(max_length=20, blank=False, null=False, verbose_name=_('Hearing ID'))
@@ -74,7 +74,7 @@ class hearing(models.Model):
 #         verbose_name = _('Task Type')
 #         verbose_name_plural = _('Task Types')
 
-
+@pghistory.track(pghistory.Snapshot())
 class task(models.Model):
     id = models.AutoField(primary_key=True,)
     # tid = models.CharField(max_length=20, blank=False, null=False, verbose_name=_('Task ID'))

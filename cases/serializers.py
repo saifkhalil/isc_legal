@@ -2,7 +2,7 @@ from core.models import priorities
 from rest_framework import serializers,status
 from rest_framework.response import Response
 from drf_dynamic_fields import DynamicFieldsMixin
-from .models import LitigationCases,stages,client_position,opponent_position,Group,case_type,court
+from .models import LitigationCases,stages,client_position,opponent_position,Group,case_type,court,LitigationCasesEvent
 from core.serializers import commentsSerializer,documentsSerializer
 from accounts.models import User
 from activities.serializers import hearingSerializer
@@ -63,6 +63,12 @@ class stagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = stages
         fields = ['id', 'name']
+
+class LitigationCasesEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LitigationCasesEvent
+        fields = '__all__'
+        http_method_names = ['get',]
 
 class LitigationCasesSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     court = serializers.SlugRelatedField(slug_field='name',queryset=court.objects.all())

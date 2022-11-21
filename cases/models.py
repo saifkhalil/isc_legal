@@ -24,8 +24,10 @@ from django.db.models import Count
 from django.dispatch import receiver
 from core.current_user import current_request
 from core.threading import send_html_mail
+import pghistory
 
 
+@pghistory.track(pghistory.Snapshot())
 class case_type(models.Model):
     id = models.AutoField(primary_key=True,)
     type = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Name'))
@@ -57,7 +59,7 @@ class case_type(models.Model):
 #     def get_default():
 #         return case_status.objects.first().id
 
-
+@pghistory.track(pghistory.Snapshot())
 class stages(models.Model):
     id = models.AutoField(primary_key=True,)
     name = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Name'))
@@ -72,6 +74,7 @@ class stages(models.Model):
         verbose_name = _('Stage')
         verbose_name_plural = _('Stage')
 
+@pghistory.track(pghistory.Snapshot())
 class client_position(models.Model):
     id = models.AutoField(primary_key=True,)
     name = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Name'))
@@ -99,7 +102,7 @@ class client_position(models.Model):
 #     class Meta:
 #         verbose_name = _('Client Type')
 #         verbose_name_plural = _('Client Types')
-
+@pghistory.track(pghistory.Snapshot())
 class opponent_position(models.Model):
     id = models.AutoField(primary_key=True,)
     position = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Position'))
@@ -236,7 +239,7 @@ case_categories = (
     ("Private", _("Private")),
 )
   
-
+@pghistory.track(pghistory.Snapshot())
 class LitigationCases(models.Model):
     id = models.AutoField(primary_key=True,)
     # cid = models.CharField(max_length=20, blank=True, null=True, verbose_name=_('Case ID'),editable=False)
@@ -324,4 +327,22 @@ def LitigationCases_send_email(sender, instance, created, *args, **kwargs):
                         })
                     send_html_mail(email_subject, email_body,  [case.assignee.email])
 
-# m2m_changed.connect(LitigationCases_send_email, sender=LitigationCases.shared_with.through)
+@receiver(m2m_changed, sender=LitigationCases.shared_with.through)
+def LitigationCases_sharedwith_send_email(sender, instance, action,reverse,pk_set, *args, **kwargs):
+    # request = current_request()
+    current_case = instance
+    case = LitigationCases.objects.get(id=current_case.id)
+    if action == 'post_add':
+        for shuser in pk_set:
+            cuser = User.objects.get(id=shuser)
+            if cuser.email_notification:
+                message = 'text version of HTML message'
+                email_subject = _('New Case #') + str(case.id)
+                email_body = render_to_string('cases/emailnew.html', {
+                    'user': cuser,
+                    'case':case,
+                    'msgtype':_('You have been shared with you below case details')
+                    })
+                send_html_mail(email_subject, email_body,  [case.assignee.email])
+
+

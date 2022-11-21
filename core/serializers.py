@@ -4,7 +4,7 @@ from rest_framework import serializers
 from cases.models import Group
 from core.models import comments,replies,priorities,contracts,documents
 from drf_dynamic_fields import DynamicFieldsMixin
-
+from pghistory.models import Events
 
 # class FilteredListSerializer(serializers.ListSerializer):
 
@@ -66,3 +66,10 @@ class commentsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
         # list_serializer_class = FilteredListSerializer
         model = comments
         fields = ['id', 'comment','replies','case_id','event_id','task_id','hearing_id','created_by','created_at','modified_by','modified_at']
+
+
+class EventsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
+    class Meta:
+        model = Events
+        # list_serializer_class = FilteredListSerializer
+        fields = ['pgh_diff',]

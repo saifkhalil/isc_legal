@@ -6,7 +6,10 @@ from ckeditor.fields import RichTextField
 from pytz import timezone
 from accounts.models import User
 from django.core.validators import FileExtensionValidator
+import pghistory
 
+
+@pghistory.track(pghistory.Snapshot())
 class priorities(models.Model):
     id = models.AutoField(primary_key=True,)
     priority = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Priority'))
@@ -21,6 +24,7 @@ class priorities(models.Model):
         verbose_name = _('Priority')
         verbose_name_plural = _('Priorities')
 
+@pghistory.track(pghistory.Snapshot())
 class replies(models.Model):
     id = models.AutoField(primary_key=True,)
     reply = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Reply'))
@@ -56,7 +60,7 @@ class replies(models.Model):
     #     comments.objects.get(id=self.comment_id).replies.add(self.id)      
     #     return super(comments, self).save(*args, **kwargs)
 
-
+@pghistory.track(pghistory.Snapshot())
 class comments(models.Model):
     id = models.AutoField(primary_key=True,)
     comment = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Comment'))
@@ -92,7 +96,7 @@ class comments(models.Model):
     #         self.modified_by = self.request.user
     #         self.modified_at = timezone.now()            
     #     return super(comments, self).save(*args, **kwargs)
-
+@pghistory.track(pghistory.Snapshot())
 class court(models.Model):
     id = models.AutoField(primary_key=True,)
     name = models.CharField(max_length=250,unique=True, blank=False, null=False,verbose_name=_('Name'))
@@ -107,6 +111,7 @@ class court(models.Model):
         verbose_name = _('Court')
         verbose_name_plural = _('Courts')
 
+@pghistory.track(pghistory.Snapshot())
 class contracts(models.Model):
     id = models.AutoField(primary_key=True,)
     name = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Name'))
@@ -119,6 +124,7 @@ class contracts(models.Model):
     modified_by = models.ForeignKey(
         User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False)
 
+@pghistory.track(pghistory.Snapshot())
 class documents(models.Model):
     id = models.AutoField(primary_key=True,)
     name = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Name'))
