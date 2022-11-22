@@ -219,6 +219,18 @@ class hearingViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(hearing_date__year=req_date.year,hearing_date__month=req_date.month)
         return queryset
 
+
+
+    # def to_representation(self, instance):
+    #         my_fields = {'id', 'name','hearing_date','assignee','court','comments_by_lawyer','case_id','case_name'}
+    #         data = super().to_representation(instance)
+    #         for field in my_fields:
+    #             try:
+    #                 if not data[field] or data[field] is None:
+    #                     data[field] = "Saif"
+    #             except KeyError:
+    #                 pass
+    #         return data
 # class eventViewSet(viewsets.ModelViewSet):  
 #     queryset = event.objects.all().order_by('id')
 #     serializer_class = eventSerializer

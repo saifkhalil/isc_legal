@@ -36,6 +36,7 @@ class taskSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
 
 
 class hearingSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
+
     name = serializers.CharField(max_length=200,required=False, allow_null=True)
     hearing_date = serializers.DateTimeField(required=False, allow_null=True)
     assignee = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
