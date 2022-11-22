@@ -71,10 +71,10 @@ urlpatterns = [
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += i18n_patterns(
-    path('admin/', admin.site.urls),
-    path('about/', views.about,name='about'),
-    path('accounts/', include('accounts.urls')),
-    path('', views.myhome, name='home'),
+    path('', admin.site.urls),
+    # path('about/', views.about,name='about'),
+    # path('accounts/', include('accounts.urls')),
+    # path('', views.myhome, name='home'),
     path('lang', include('rosetta.urls')),
     path('i18n/', include('django.conf.urls.i18n')),
 )

@@ -332,3 +332,58 @@ CELERY_RESULT_BACKEND = 'django-db'
 
 
 # PGHISTORY_ADMIN_LIST_DISPLAY = ['user',]
+
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Legal Software Admin",
+    "site_header": "Legal Software Admin",
+    "site_brand": "Legal Software Admin",
+    "welcome_sign": "Welcome to the Legal Software",
+    "copyright": "ISC",
+    "site_icon": None,
+        "icons": {
+        "accounts": "fas fa-users-cog",
+        "accounts.user": "fas fa-user",
+        "accounts.department": "fa fa-building",
+        "auth.group": "fa fa-users",
+        "activities.hearing": "fa fa-university",
+        "activities.task": "fa fa-tasks",
+        "authtoken.tokenproxy": "fa fa-magic",
+        "cases.case_type": "fa fa-trello",
+        "cases.client_position": "fa fa-user",
+        "auth.group": "fa fa-users",
+        "admin.logentry": "fa fa-file-text",
+        
+    },
+}
+
+JAZZMIN_UI_TWEAKS = {
+
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "accent": "accent-navy",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-warning",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-outline-primary",
+        "secondary": "btn-outline-secondary",
+        "info": "btn-outline-info",
+        "warning": "btn-outline-warning",
+        "danger": "btn-outline-danger",
+        "success": "btn-outline-success"
+    }
+}
