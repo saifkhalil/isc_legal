@@ -343,6 +343,6 @@ def LitigationCases_sharedwith_send_email(sender, instance, action,reverse,pk_se
                     'case':case,
                     'msgtype':_('You have been shared with you below case details')
                     })
-                send_html_mail(email_subject, email_body,  [case.assignee.email])
+                send_html_mail(email_subject, email_body,  [cuser.email])
 
 
