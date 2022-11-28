@@ -21,13 +21,14 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'name']
 
 class repliesSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
-    created_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all())
-    modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all())
+    created_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
+    modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     
     class Meta:
         # list_serializer_class = FilteredListSerializer
         model = replies
         fields = ['id', 'reply','comment_id','created_by','created_at','modified_by','modified_at']
+        extra_kwargs = {'created_by': {'required': False},'modified_by': {'required': False}}
 
 class prioritiesSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     class Meta:
@@ -36,37 +37,40 @@ class prioritiesSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
 
 class contractsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     attachment = serializers.FileField()
+    created_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
+    modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
+    name = serializers.CharField()
     class Meta:
         model = contracts
         # list_serializer_class = FilteredListSerializer
-        fields = ['id', 'name','attachment']
+        fields = ['id', 'name','attachment','created_by','created_at','modified_by','modified_at']
+        extra_kwargs = {'created_by': {'required': False},'modified_by': {'required': False}}
 
 class documentsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     attachment = serializers.FileField()
+    created_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
+    modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     class Meta:
         model = documents
         # list_serializer_class = FilteredListSerializer
-        fields = ['id', 'name','attachment','case_id']
+        fields = ['id', 'name','attachment','case_id','created_by','created_at','modified_by','modified_at']
+        extra_kwargs = {'created_by': {'required': False},'modified_by': {'required': False}}
 
-class commentsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
-    
-
-    created_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all())
-    modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all())
+class commentsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):    
+    created_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
+    modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     replies = serializers.SerializerMethodField('get_replis')
 
     def get_replis(self, obj):
         # You can do more complex filtering stuff here.
         return repliesSerializer(obj.replies.filter(is_deleted=False), many=True, read_only=True).data
 
-
-
     class Meta:
         ref_name = 'Comments'
         # list_serializer_class = FilteredListSerializer
         model = comments
         fields = ['id', 'comment','replies','case_id','event_id','task_id','hearing_id','created_by','created_at','modified_by','modified_at']
-
+        extra_kwargs = {'created_by': {'required': False},'modified_by': {'required': False}}
 
 class EventsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     class Meta:

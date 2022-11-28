@@ -23,11 +23,12 @@ from cases.models import LitigationCases
 
 class taskSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     assignee = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
-
+    created_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
+    modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     class Meta:
         model = task
-        fields = ['id', 'title','description','assignee','due_date','comments','case_id']
-
+        fields = ['id', 'title','description','assignee','due_date','comments','case_id','created_by','created_at','modified_by','modified_at']
+        extra_kwargs = {'created_by': {'required': False},'modified_by': {'required': False}}
 # class eventSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
 #     event_type = event_typeSerializer()
 #     class Meta:
@@ -44,7 +45,8 @@ class hearingSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     comments_by_lawyer = serializers.CharField(max_length=200,required=False, allow_null=True)
     case_id = serializers.IntegerField(required=False, allow_null=True)
     case_name = serializers.SerializerMethodField('get_case_name')
-
+    created_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
+    modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     def get_case_name(self, obj):
         if obj.case_id:
             try:
@@ -57,5 +59,5 @@ class hearingSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
 
     class Meta:
         model = hearing
-        fields = ['id', 'name','hearing_date','assignee','court','comments_by_lawyer','case_id','case_name']
-
+        fields = ['id', 'name','hearing_date','assignee','court','comments_by_lawyer','case_id','case_name','created_by','created_at','modified_by','modified_at']
+        extra_kwargs = {'created_by': {'required': False},'modified_by': {'required': False}}

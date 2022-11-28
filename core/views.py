@@ -18,7 +18,6 @@ from django.views.decorators.cache import never_cache
 from django.core.cache import cache
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
-from django.conf import settings
 from django.utils import translation
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 from datetime import datetime, timedelta
@@ -217,7 +216,25 @@ class contractsViewSet(viewsets.ModelViewSet):
         contract.update(modified_at=timezone.now())
         return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
 
+    def list(self, request):
+        queryset = contracts.objects.all().filter(is_deleted=False).order_by('-created_by')
+        if request.user.is_manager == False:
+            queryset = queryset.filter(created_by=request.user)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(page,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
+
+    def retrieve(self, request, pk=None):
+        queryset = contracts.objects.filter(is_deleted=False).order_by('-created_by')
+        if request.user.is_manager == False:
+            queryset = queryset.filter(created_by=request.user)
+        contract = get_object_or_404(queryset, pk=pk)
+        serializer = self.get_serializer(contract)
+        return Response(serializer.data,status=status.HTTP_200_OK)
     # def initial(self, request, *args, **kwargs):
     #     """
     #     Runs anything that needs to occur prior to calling the method handler.
@@ -274,6 +291,27 @@ class documentsViewSet(viewsets.ModelViewSet):
         case.update(modified_by=request.user)
         case.update(modified_at=timezone.now())
         return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
+
+    
+    def list(self, request):
+        queryset = documents.objects.all().filter(is_deleted=False).order_by('-created_by')
+        if request.user.is_manager == False:
+            queryset = queryset.filter(created_by=request.user)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(page,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+    def retrieve(self, request, pk=None):
+        queryset = documents.objects.filter(is_deleted=False).order_by('-created_by')
+        if request.user.is_manager == False:
+            queryset = queryset.filter(created_by=request.user)
+        document = get_object_or_404(queryset, pk=pk)
+        serializer = self.get_serializer(document)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
     # def initial(self, request, *args, **kwargs):
     #     """

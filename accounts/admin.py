@@ -6,7 +6,7 @@ from django.utils import timezone
 
 
 class UserAdmin(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('id', 'email', 'firstname', 'lastname','Manager', 'is_verified', 'is_blocked','created_by','created_at','modified_by','modified_at')
+    list_display = ('id', 'email',  'full_name','Manager','is_manager', 'is_blocked','created_by','created_at','modified_by','modified_at')
     # fields = ('email', 'firstname', 'lastname','Manager','is_manager','is_verified', 'is_blocked','created_by','created_at','modified_by','modified_at')
     readonly_fields = ('created_by','created_at','modified_by','modified_at')
     list_filter = ( 'is_verified', 'is_blocked','Manager',)
