@@ -135,6 +135,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return str(self.username)
 
+    def full_name(self):
+        return str(self.firstname + " " + self.lastname)
+
     # For checking permissions. to keep it simple all admin have ALL permissons
 
     # Does this user have permission to view this app? (ALWAYS YES FOR SIMPLICITY)
