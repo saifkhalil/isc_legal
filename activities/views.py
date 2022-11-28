@@ -20,6 +20,7 @@ from django.shortcuts import get_object_or_404
 import django_filters.rest_framework
 from datetime import datetime
 from rest_framework.filters import SearchFilter, OrderingFilter
+from django.db.models import Q
 # from rest_framework_tracking.mixins import LoggingMixin
 from accounts.models import User
 # CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
@@ -157,6 +158,29 @@ class taskViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(due_date__year=req_date.year,due_date__month=req_date.month)
         return queryset
 
+    def list(self, request):
+        queryset = task.objects.all().filter(is_deleted=False).order_by('-created_by')
+        current_user_id = request.user.id
+        if request.user.is_manager == False:
+            filter_query = Q(assignee__id__exact=current_user_id) | Q(created_by__id__exact=current_user_id)
+            queryset = queryset.filter(filter_query).distinct()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(page,many=True)
+        return rest_response(serializer.data,status=status.HTTP_200_OK)
+
+
+    def retrieve(self, request, pk=None):
+        queryset = task.objects.filter(is_deleted=False).order_by('-created_by')
+        current_user_id = request.user.id
+        if request.user.is_manager == False:
+            filter_query = Q(assignee__id__exact=current_user_id) | Q(created_by__id__exact=current_user_id)
+            queryset = queryset.filter(filter_query).distinct()
+        document = get_object_or_404(queryset, pk=pk)
+        serializer = self.get_serializer(document)
+        return rest_response(serializer.data,status=status.HTTP_200_OK)
 
 class hearingViewSet(viewsets.ModelViewSet):
     queryset = hearing.objects.all().order_by('-id').filter(is_deleted=False)
@@ -219,7 +243,25 @@ class hearingViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(hearing_date__year=req_date.year,hearing_date__month=req_date.month)
         return queryset
 
+    def list(self, request):
+        queryset = hearing.objects.all().filter(is_deleted=False).order_by('-created_by')
+        if request.user.is_manager == False:
+            queryset = queryset.filter(created_by=request.user)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(page,many=True)
+        return rest_response(serializer.data,status=status.HTTP_200_OK)
 
+
+    def retrieve(self, request, pk=None):
+        queryset = hearing.objects.filter(is_deleted=False).order_by('-created_by')
+        if request.user.is_manager == False:
+            queryset = queryset.filter(created_by=request.user)
+        document = get_object_or_404(queryset, pk=pk)
+        serializer = self.get_serializer(document)
+        return rest_response(serializer.data,status=status.HTTP_200_OK)
 
     # def to_representation(self, instance):
     #         my_fields = {'id', 'name','hearing_date','assignee','court','comments_by_lawyer','case_id','case_name'}
