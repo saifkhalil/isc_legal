@@ -3,8 +3,8 @@ from django.shortcuts import render
 from rest_framework import viewsets,status
 from rest_framework import permissions
 from rest_framework.response import Response
-from .serializers import LitigationCasesSerializer,stagesSerializer,case_typeSerializer,courtSerializer,client_positionSerializer,opponent_positionSerializer,LitigationCasesEventSerializer
-from .models import LitigationCases,stages,case_type,court,client_position,opponent_position,LitigationCasesEvent
+from .serializers import LitigationCasesSerializer,stagesSerializer,case_typeSerializer,courtSerializer,client_positionSerializer,opponent_positionSerializer,LitigationCasesEventSerializer,FoldersSerializer
+from .models import LitigationCases,stages,case_type,court,client_position,opponent_position,LitigationCasesEvent,Folder
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication
 from rest_framework.decorators import action
 from activities.models import task
@@ -136,23 +136,6 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
     ordering_fields = ['created_at', 'id','modified_at']
     ordering = ['-id']
 
-    # def list(self):
-    #     queryset = queryset
-    #     return queryset
-
-    # def retrieve(self,pk=None):
-    #     queryset = queryset.get(id=pk).values('id','name')
-    #     return queryset
-
-    # def create(self, request):
-    #     user = request.user
-    #     serializer = self.serializer_class(data=request.data,context={'created_by': user})
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
     def destroy(self, request, pk=None):
         case = LitigationCases.objects.filter(id=pk)
         case.update(is_deleted=True)
@@ -188,6 +171,68 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
             filter_query = Q(shared_with__id__exact=current_user_id) | Q(created_by__id__exact=current_user_id) | Q(assignee__id__exact=current_user_id)
             queryset = queryset.filter(filter_query).distinct()
         return queryset
+
+
+class FoldersViewSet(viewsets.ModelViewSet):
+    
+    model = Folder
+    queryset = Folder.objects.all().order_by('-created_by')
+    serializer_class = FoldersSerializer
+    authentication_classes = [TokenAuthentication,SessionAuthentication]
+    permission_classes = [
+        permissions.IsAuthenticated,
+        #  MyPermission
+         ]
+
+    filter_backends = [
+        DjangoFilterBackend,
+         SearchFilter,
+          OrderingFilter,
+        #   FullWordSearchFilter,
+          ]
+    # perm_slug = "folders.Folder"
+    filterset_fields = ['id', 'Stage','folder_type','folder_category','assignee','court']
+    # word_fields = ('name','description')
+    search_fields = ['@name','@internal_ref_number','=id']
+    ordering_fields = ['created_at', 'id','modified_at']
+    ordering = ['-id']
+    
+    def destroy(self, request, pk=None):
+        folder = Folder.objects.filter(id=pk)
+        folder.update(is_deleted=True)
+        folder.update(modified_by=request.user)
+        folder.update(modified_at=timezone.now())
+        return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
+
+    @action(detail=True)
+    def get_comments(self, request,pk=None):
+        req_id =self.request.query_params.get('id')
+        commments = Folder.objects.filter(id=pk).comments.all()
+        serializer = self.get_serializer(commments)
+        return Response(commments, status=status.HTTP_200_OK)
+
+    def get_queryset(self):
+        internal_ref_number = self.request.query_params.get('internal_ref_number')
+        start_time = self.request.query_params.get('start_time')
+        Stage = self.request.query_params.get('stage')
+        queryset = Folder.objects.all().order_by('-created_by')
+        current_user_id = self.request.user.id
+        cuser = User.objects.get(id=current_user_id)
+        is_manager = cuser.is_manager
+        if internal_ref_number is not None:
+            queryset = queryset.filter(internal_ref_number=internal_ref_number)
+        if start_time is not None:
+            req_date = datetime.strptime(start_time, '%Y-%m').date()
+            queryset = queryset.filter(start_time__year=req_date.year,start_time__month=req_date.month)
+        if Stage is not None:
+            queryset = queryset.filter(Stage__id=Stage)
+        if is_manager:
+            queryset = queryset
+        else:
+            filter_query = Q(shared_with__id__exact=current_user_id) | Q(created_by__id__exact=current_user_id) | Q(assignee__id__exact=current_user_id)
+            queryset = queryset.filter(filter_query).distinct()
+        return queryset
+
 
 # class companyViewSet(viewsets.ModelViewSet):
 

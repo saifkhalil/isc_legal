@@ -346,3 +346,110 @@ def LitigationCases_sharedwith_send_email(sender, instance, action,reverse,pk_se
                 send_html_mail(email_subject, email_body,  [cuser.email])
 
 
+@pghistory.track(pghistory.Snapshot())
+class Folder(models.Model):
+    id = models.AutoField(primary_key=True,)
+    # cid = models.CharField(max_length=20, blank=True, null=True, verbose_name=_('Folder ID'),editable=False)
+    name = models.CharField(max_length=500, blank=False, null=False, verbose_name=_('Title'))
+    description   = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Subject'))
+    folder_category = models.CharField(max_length=500,choices=case_categories,default='Public', blank=False, null=False, verbose_name=_('Folder Category'))
+    judge = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Judge Name'))
+    detective = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Detective'))
+    folder_type = models.ForeignKey('case_type', on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Folder type'))
+    court = models.ForeignKey(court, on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Court name'))
+    documents = models.ManyToManyField(documents, blank=True, verbose_name=_('Hearing'))
+    # arrival_date = models.DateTimeField(verbose_name=_('Entry Date'))
+    # client_type = models.ForeignKey('client_type', on_delete=models.CASCADE, blank=False,null=False, verbose_name=_('Client type'))
+    # company = models.ForeignKey('company', on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Company'))
+    # person = models.ForeignKey('persons',related_name='%(class)s_person', on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Person'))
+    client_position = models.ForeignKey('client_position', on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Client Position'))
+    # opponent = models.ForeignKey('persons',related_name='%(class)s_opponent', on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Opponent'))
+    opponent_position = models.ForeignKey('opponent_position', on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Opponent Position'))
+    # assigned_team = models.ForeignKey(Group, on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Assigned Team'))
+    assignee = models.ForeignKey(User, related_name='%(class)s_assignee', on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Assignee'))
+    shared_with = models.ManyToManyField(User, related_name='%(class)s_shared_with', blank=True,verbose_name=_('Shared With'))
+    # filed_on = models.DateField(verbose_name=_('Filed on'), null=True, blank=True)
+    # due_date = models.DateField(verbose_name=_('Due date'), null=True, blank=True)
+    internal_ref_number = models.CharField(max_length=50, blank=True,null=True, verbose_name=_('Internal Ref Number'))    
+    priority = models.ForeignKey(priorities,  on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Matter Priority'))
+    Stage = models.ForeignKey('stages',  on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Stage'))
+    # requested_by = models.ForeignKey(User, related_name='%(class)s_requested_by', on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Requested By'))
+    # case_status = models.ForeignKey('case_status', related_name='%(class)s_case_status', on_delete=models.CASCADE, null=False, blank=False,verbose_name=_('Case Status'),default=case_status.get_default)
+    hearing = models.ManyToManyField(hearing, blank=True, verbose_name=_('Hearing'))
+    tasks = models.ManyToManyField(task, related_name='%(class)s_task', blank=True,verbose_name=_('Task'))
+    # event = models.ManyToManyField(event, related_name='%(class)s_event', blank=True,verbose_name=_('Event'))
+    comments = models.ManyToManyField(comments,verbose_name="Comments", blank=True)
+    start_time = models.DateTimeField(default=timezone.now)
+    end_time = models.DateTimeField(default=timezone.now)
+    is_deleted = models.BooleanField(default=False,verbose_name=_("Is Deleted"))
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    modified_at = models.DateTimeField(auto_now=True, editable=False)
+    created_by = models.ForeignKey(
+        User, related_name='%(class)s_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
+    modified_by = models.ForeignKey(
+        User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False)
+
+    def __str__(self):
+        return self.name
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = _('Folder')
+        verbose_name_plural = _('Folders')
+        indexes = [ models.Index(fields=['id','name','Stage','folder_type','folder_category','assignee','court','description']),]
+    @property
+    def get_html_url(self):
+        url = reverse('folders:folder_edit', args=(self.id,))
+        return f'<a class="btn qi-primary-outline btn-sm" href="{url}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="<em>Tooltip</em> <u>with</u> <b>HTML</b>"> {self.name} </a>'
+
+
+@receiver(post_save, sender=LitigationCases)
+def LitigationCases_send_email(sender, instance, created, *args, **kwargs):
+    # request = current_request()
+    current_case = instance
+    case = LitigationCases.objects.get(id=current_case.id)
+    if created:
+        if case.assignee.email_notification:
+            message = 'text version of HTML message'
+            email_subject = _('رقم الدعوى ') + str(case.id)
+            email_body = render_to_string('cases/emailnew.html', {
+            'user': case.assignee,
+            'case':case,
+            'msgtype':_('You have been assigned with you below case details')
+            })
+            send_html_mail(email_subject, email_body,  [case.assignee.email])
+        print(instance.shared_with)
+        if case.shared_with.exists():
+            for shuser in case.shared_with.all():
+                print(shuser)
+                if shuser.email_notification:
+                    message = 'text version of HTML message'
+                    email_subject = _('New Case #') + str(case.id)
+                    email_body = render_to_string('cases/emailnew.html', {
+                        'user': shuser,
+                        'case':case,
+                        'msgtype':_('You have been shared with you below case details')
+                        })
+                    send_html_mail(email_subject, email_body,  [case.assignee.email])
+
+@receiver(m2m_changed, sender=LitigationCases.shared_with.through)
+def LitigationCases_sharedwith_send_email(sender, instance, action,reverse,pk_set, *args, **kwargs):
+    # request = current_request()
+    current_case = instance
+    case = LitigationCases.objects.get(id=current_case.id)
+    if action == 'post_add':
+        for shuser in pk_set:
+            cuser = User.objects.get(id=shuser)
+            if cuser.email_notification:
+                message = 'text version of HTML message'
+                email_subject = _('New Case #') + str(case.id)
+                email_body = render_to_string('cases/emailnew.html', {
+                    'user': cuser,
+                    'case':case,
+                    'msgtype':_('You have been shared with you below case details')
+                    })
+                send_html_mail(email_subject, email_body,  [cuser.email])
+
+
