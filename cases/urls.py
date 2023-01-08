@@ -8,6 +8,7 @@ app_name = 'cases'
 
 router = routers.DefaultRouter()
 router.register(r'litigationcases', views.LitigationCasesViewSet,"Litigation cases")
+router.register(r'Folders', views.FoldersViewSet,"Folders")
 router.register(r'litigationcasesEvent', views.LitigationCasesEventViewSet,"Litigation cases Events")
 router.register(r'case_type', views.case_typeViewSet,"case_type")
 router.register(r'stages', views.stagesViewSet,"stages")

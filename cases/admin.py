@@ -17,6 +17,16 @@ class LitigationCasesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
             self.cid = 'C-' + str(self.id)
         return super(LitigationCases, self).save(*args, **kwargs)
 
+class FoldersAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    list_display = ('id', 'name','description','is_deleted')
+    fields = ( 'name','description','folder_category','judge','comments','detective','folder_type','court','documents','client_position','opponent_position','assignee','shared_with','priority','end_time','start_time','is_deleted','created_by','created_at','modified_by','modified_at')
+    readonly_fields = ('created_by','created_at','modified_by','modified_at')
+
+    def save(self, *args, **kwargs):
+        if self.cid is None:
+            self.cid = 'F-' + str(self.id)
+        return super(Folder, self).save(*args, **kwargs)
+
 class LitigationCasesEventAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id',)
 
@@ -70,6 +80,7 @@ class case_typeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 admin.site.register(LitigationCases, LitigationCasesAdmin)
+admin.site.register(Folder, FoldersAdmin)
 admin.site.register(LitigationCasesEvent, LitigationCasesEventAdmin)
 admin.site.register(stages, stagesAdmin)
 admin.site.register(case_type, case_typeAdmin)
