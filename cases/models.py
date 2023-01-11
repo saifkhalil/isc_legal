@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from accounts.models import User
 from django.contrib.auth.models import Group
 from activities.models import task, hearing
-from core.models import priorities,comments,documents,court
+from core.models import priorities,comments,documents,court,status
 from django_countries.fields import CountryField
 from phonenumber_field.modelfields import PhoneNumberField
 from django.urls import reverse
@@ -42,22 +42,6 @@ class case_type(models.Model):
         verbose_name = _('Case Type')
         verbose_name_plural = _('Case Types')
 
-# class case_status(models.Model):
-#     id = models.AutoField(primary_key=True,)
-#     status = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Status'))
-
-#     def __str__(self):
-#         return self.status
-
-#     def __unicode__(self):
-#         return self.status
-
-#     class Meta:
-#         verbose_name = _('Case Status')
-#         verbose_name_plural = _('Case Statuses')
-
-#     def get_default():
-#         return case_status.objects.first().id
 
 @pghistory.track(pghistory.Snapshot())
 class stages(models.Model):
@@ -267,7 +251,7 @@ class LitigationCases(models.Model):
     priority = models.ForeignKey(priorities,  on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Matter Priority'))
     Stage = models.ForeignKey('stages',  on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Stage'))
     # requested_by = models.ForeignKey(User, related_name='%(class)s_requested_by', on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Requested By'))
-    # case_status = models.ForeignKey('case_status', related_name='%(class)s_case_status', on_delete=models.CASCADE, null=False, blank=False,verbose_name=_('Case Status'),default=case_status.get_default)
+    case_status = models.ForeignKey(status, related_name='%(class)s_case_status', on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Case Status'),default=1)
     hearing = models.ManyToManyField(hearing, blank=True, verbose_name=_('Hearing'))
     tasks = models.ManyToManyField(task, related_name='%(class)s_task', blank=True,verbose_name=_('Task'))
     # event = models.ManyToManyField(event, related_name='%(class)s_event', blank=True,verbose_name=_('Event'))

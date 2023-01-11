@@ -27,7 +27,7 @@ class taskSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     class Meta:
         model = task
-        fields = ['id', 'title','description','assignee','due_date','comments','case_id','created_by','created_at','modified_by','modified_at']
+        fields = ['id', 'title','description','assignee','due_date','comments','case_id','task_status','created_by','created_at','modified_by','modified_at']
         extra_kwargs = {'created_by': {'required': False},'modified_by': {'required': False}}
 # class eventSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
 #     event_type = event_typeSerializer()
@@ -59,5 +59,5 @@ class hearingSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
 
     class Meta:
         model = hearing
-        fields = ['id', 'name','hearing_date','assignee','court','comments_by_lawyer','case_id','case_name','created_by','created_at','modified_by','modified_at']
+        fields = ['id', 'name','hearing_date','assignee','court','comments_by_lawyer','case_id','hearing_status','case_name','created_by','created_at','modified_by','modified_at']
         extra_kwargs = {'created_by': {'required': False},'modified_by': {'required': False}}
