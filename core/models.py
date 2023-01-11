@@ -137,3 +137,18 @@ class documents(models.Model):
         User, related_name='%(class)s_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
     modified_by = models.ForeignKey(
         User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False)
+
+
+class status(models.Model):
+    id = models.AutoField(primary_key=True,)
+    status = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Status'))
+
+    def __str__(self):
+        return self.status
+
+    def __unicode__(self):
+        return self.status
+
+    class Meta:
+        verbose_name = _('Status')
+        verbose_name_plural = _('Statuses')

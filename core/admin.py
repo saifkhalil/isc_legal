@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import comments,priorities,replies,court,contracts,documents
+from .models import comments,priorities,replies,court,contracts,documents,status
 from import_export.admin import ImportExportModelAdmin
 
 
@@ -21,6 +21,11 @@ class contractsAdmin(admin.ModelAdmin):
 class documentsAdmin(admin.ModelAdmin):
     list_display = ('id', 'name','attachment','is_deleted')
 
+class statusAdmin(admin.ModelAdmin):
+    list_display = ('id','status')
+
+
+admin.site.register(status, statusAdmin)
 admin.site.register(priorities, prioritiesAdmin)
 admin.site.register(contracts, contractsAdmin)
 admin.site.register(documents, documentsAdmin)

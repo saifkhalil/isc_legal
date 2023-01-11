@@ -94,7 +94,7 @@ class LitigationCasesSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     class Meta:
         model = LitigationCases
 #        list_serializer_class = FilteredListSerializer
-        fields = [ 'id', 'name','description','case_category','priority','shared_with','court','case_type','judge','detective','client_position','opponent_position','assignee','Stage','internal_ref_number','comments','documents','hearing','start_time','end_time','created_by','created_at']
+        fields = [ 'id', 'name','description','case_category','priority','shared_with','court','case_type','case_status','judge','detective','client_position','opponent_position','assignee','Stage','internal_ref_number','comments','documents','hearing','start_time','end_time','created_by','created_at']
         http_method_names = ['get', 'post', 'head','put']
 
 class FoldersSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
