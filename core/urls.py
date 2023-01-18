@@ -30,7 +30,11 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView
 )
 
-
+from .views import (
+    APIPathDocumentAddView, APIPathDocumentListView,
+    APIPathDocumentRemoveView, APIPathListView, APIPathView,
+    APIDocumentPathListView
+)
 
 def handler404(request, *args, **argv):
     response = render(request, '404.html')
@@ -49,12 +53,14 @@ from cases.urls import router as cases_router
 router = routers.DefaultRouter()
 router.register(r'groups', views.GroupViewSet,basename='Groups')
 router.register(r'comments', views.commentsViewSet,basename='comments')
+# router.register(r'directory', views.directoriesViewSet,basename='directory')
 router.register(r'replies', views.repliesViewSet,basename='replies')
 router.register(r'priorities', views.prioritiesViewSet,basename='priorities')
 router.register(r'contracts', views.contractsViewSet,basename='contracts')
 router.register(r'documents', views.documentsViewSet,basename='documents')
 router.register(r'events', views.eventsViewSet,basename='events')
 router.register(r'cases_events', views.caseseventsViewSet,basename='cases_events')
+router.register(r'status', views.StatusViewSet,basename='status')
 
 
 urlpatterns = [
@@ -69,6 +75,13 @@ urlpatterns = [
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path('api/paths/', name='path-list',view=APIPathListView.as_view()),
+    path('api/paths/<path_id>/', name='path-detail',view=APIPathView.as_view()),
+    path('api/paths/<path_id>/documents/',name='path-document-list',view=APIPathDocumentListView.as_view()),
+    path('api/paths/<path_id>/documents/add/',name='path-document-add', view=APIPathDocumentAddView.as_view()),
+    path('api/paths/<path_id>/documents/remove/',name='path-document-remove', view=APIPathDocumentRemoveView.as_view()),
+    path('api/documents/<document_id>/paths/',name='document-path-list',view=APIDocumentPathListView.as_view())
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += i18n_patterns(
     path('lang/', include('rosetta.urls')),

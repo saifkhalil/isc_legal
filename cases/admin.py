@@ -9,7 +9,7 @@ from import_export.admin import ImportExportModelAdmin
 
 class LitigationCasesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'name','description','is_deleted')
-    fields = ( 'name','description','case_category','judge','comments','detective','case_type','court','documents','client_position','opponent_position','assignee','shared_with','priority','end_time','start_time','is_deleted','created_by','created_at','modified_by','modified_at')
+    fields = ( 'name','description','case_category','judge','comments','detective','ImportantDevelopment','case_type','case_status','court','documents','client_position','opponent_position','assignee','shared_with','priority','end_time','start_time','is_deleted','created_by','created_at','modified_by','modified_at')
     readonly_fields = ('created_by','created_at','modified_by','modified_at')
 
     def save(self, *args, **kwargs):
@@ -19,7 +19,7 @@ class LitigationCasesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 class FoldersAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'name','description','is_deleted')
-    fields = ( 'name','description','folder_category','judge','comments','detective','folder_type','court','documents','client_position','opponent_position','assignee','shared_with','priority','end_time','start_time','is_deleted','created_by','created_at','modified_by','modified_at')
+    fields = ( 'name','description','folder_category','judge','comments','detective','ImportantDevelopment','folder_type','court','documents','client_position','opponent_position','assignee','shared_with','priority','end_time','start_time','is_deleted','created_by','created_at','modified_by','modified_at')
     readonly_fields = ('created_by','created_at','modified_by','modified_at')
 
     def save(self, *args, **kwargs):
@@ -34,6 +34,9 @@ class LitigationCasesEventAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 class case_typeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'type')
+
+class ImportantDevelopmentAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    list_display = ('id', 'title')
 
 class stagesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('id', 'name')
@@ -81,7 +84,7 @@ class case_typeAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 admin.site.register(LitigationCases, LitigationCasesAdmin)
 admin.site.register(Folder, FoldersAdmin)
-admin.site.register(LitigationCasesEvent, LitigationCasesEventAdmin)
+admin.site.register(ImportantDevelopment, ImportantDevelopmentAdmin)
 admin.site.register(stages, stagesAdmin)
 admin.site.register(case_type, case_typeAdmin)
 admin.site.register(client_position, client_positionAdmin)

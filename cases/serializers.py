@@ -2,10 +2,10 @@ from core.models import priorities
 from rest_framework import serializers,status
 from rest_framework.response import Response
 from drf_dynamic_fields import DynamicFieldsMixin
-from .models import LitigationCases,stages,client_position,opponent_position,Group,case_type,court,LitigationCasesEvent,Folder
-from core.serializers import commentsSerializer,documentsSerializer
+from .models import LitigationCases,stages,client_position,opponent_position,Group,case_type,court,LitigationCasesEvent,Folder,ImportantDevelopment
+from core.serializers import commentsSerializer,documentsSerializer,StatusSerializer
 from accounts.models import User
-from activities.serializers import hearingSerializer
+from activities.serializers import hearingSerializer,taskSerializer
 # from core.serializers import FilteredListSerializer
 
 
@@ -64,6 +64,11 @@ class stagesSerializer(serializers.ModelSerializer):
         model = stages
         fields = ['id', 'name']
 
+class ImportantDevelopmentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ImportantDevelopment
+        fields = ['id', 'title','case_id']
+
 class LitigationCasesEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = LitigationCasesEvent
@@ -80,6 +85,8 @@ class LitigationCasesSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     assignee = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all())
     comments = commentsSerializer(many=True,read_only=True)
     documents = documentsSerializer(many=True,read_only=True)
+    tasks = taskSerializer(many=True,read_only=True)
+    ImportantDevelopment = ImportantDevelopmentsSerializer(many=True,read_only=True)
     hearing = hearingSerializer(many=True,read_only=True)
     start_time = serializers.DateTimeField(format="%Y-%m-%d", required=False)
     end_time = serializers.DateTimeField(format="%Y-%m-%d", required=False)
@@ -94,7 +101,7 @@ class LitigationCasesSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     class Meta:
         model = LitigationCases
 #        list_serializer_class = FilteredListSerializer
-        fields = [ 'id', 'name','description','case_category','priority','shared_with','court','case_type','case_status','judge','detective','client_position','opponent_position','assignee','Stage','internal_ref_number','comments','documents','hearing','start_time','end_time','created_by','created_at']
+        fields = [ 'id', 'name','description','case_category','priority','shared_with','court','ImportantDevelopment','case_type','case_status','judge','detective','client_position','opponent_position','assignee','Stage','internal_ref_number','comments','tasks','documents','hearing','start_time','end_time','created_by','created_at']
         http_method_names = ['get', 'post', 'head','put']
 
 class FoldersSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
@@ -108,6 +115,7 @@ class FoldersSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     comments = commentsSerializer(many=True,read_only=True)
     documents = documentsSerializer(many=True,read_only=True)
     hearing = hearingSerializer(many=True,read_only=True)
+    ImportantDevelopment = ImportantDevelopmentsSerializer(many=True,read_only=True)
     start_time = serializers.DateTimeField(format="%Y-%m-%d", required=False)
     end_time = serializers.DateTimeField(format="%Y-%m-%d", required=False)
     # company = companySerializer()
@@ -121,6 +129,6 @@ class FoldersSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     class Meta:
         model = Folder
 #        list_serializer_class = FilteredListSerializer
-        fields = [ 'id', 'name','description','folder_category','priority','shared_with','court','folder_type','judge','detective','client_position','opponent_position','assignee','Stage','internal_ref_number','comments','documents','hearing','start_time','end_time','created_by','created_at']
+        fields = [ 'id', 'name','description','folder_category','priority','shared_with','court','ImportantDevelopment','folder_type','judge','detective','client_position','opponent_position','assignee','Stage','internal_ref_number','comments','documents','hearing','start_time','end_time','created_by','created_at']
         http_method_names = ['get', 'post', 'head','put']
 

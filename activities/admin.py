@@ -13,10 +13,10 @@ from .models import *
 #     list_display = ('id', 'type')
 
 class taskAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title','description','assignee','due_date','is_deleted')
+    list_display = ('id', 'title','description','assignee','due_date','task_status','is_deleted')
 
 class hearingAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name','hearing_date','case_id','is_deleted')
+    list_display = ('id', 'name','hearing_date','case_id','hearing_status','is_deleted')
 
 # class eventAdmin(admin.ModelAdmin):
 #     list_display = ('id','eid', 'event_type','created_by','from_date','to_date')

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from drf_dynamic_fields import DynamicFieldsMixin
 from .models import task,hearing
-from core.models import court
+from core.models import court,Status
 from accounts.models import User
 from cases.models import LitigationCases
 
@@ -23,6 +23,7 @@ from cases.models import LitigationCases
 
 class taskSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     assignee = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
+    task_status = serializers.SlugRelatedField(slug_field='status',queryset=Status.objects.all())
     created_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     class Meta:
@@ -42,6 +43,7 @@ class hearingSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     hearing_date = serializers.DateTimeField(required=False, allow_null=True)
     assignee = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     court = serializers.SlugRelatedField(slug_field='name',queryset=court.objects.all())
+    hearing_status = serializers.SlugRelatedField(slug_field='status',queryset=Status.objects.all())
     comments_by_lawyer = serializers.CharField(max_length=200,required=False, allow_null=True)
     case_id = serializers.IntegerField(required=False, allow_null=True)
     case_name = serializers.SerializerMethodField('get_case_name')

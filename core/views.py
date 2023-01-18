@@ -9,8 +9,8 @@ from rest_framework import permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 # from cases.views import get_cases_from_cache
-from core.models import comments,replies,priorities,contracts,documents
-from .serializers import EventsSerializer, GroupSerializer, commentsSerializer,  repliesSerializer,prioritiesSerializer,contractsSerializer,documentsSerializer
+from core.models import comments,replies,priorities,contracts,documents,Status,Path
+from .serializers import EventsSerializer, GroupSerializer, commentsSerializer,  repliesSerializer,prioritiesSerializer,contractsSerializer,documentsSerializer,StatusSerializer
 from cases.models import LitigationCases
 from activities.models import task,hearing
 from django.views.decorators.cache import cache_page
@@ -29,6 +29,18 @@ from .permissions import MyPermission
 import django_filters.rest_framework
 from django.utils import timezone
 from pghistory.models import Events
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+from .serializers import (
+    PathDocumentAddSerializer, PathDocumentRemoveSerializer,
+    PathSerializer
+)
+from rest_api.api_view_mixins import ExternalObjectAPIViewMixin
+
+from rest_api import generics
+
+
+
 
 # from rest_framework_tracking.mixins import LoggingMixin
 ## CALENDAR VIEW
@@ -193,14 +205,29 @@ class prioritiesViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "core.priorities"
 
+class StatusViewSet(viewsets.ModelViewSet):
+    # pagination_class = None
+    queryset = Status.objects.all().order_by('status')
+    serializer_class = StatusSerializer
+    permission_classes = [permissions.IsAuthenticated, MyPermission]
+    perm_slug = "core.Status"
+
 
 class contractsViewSet(viewsets.ModelViewSet):
     
     queryset = contracts.objects.all().order_by('-created_by').filter(is_deleted=False)
     serializer_class = contractsSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
+    filter_backends = [
+        DjangoFilterBackend,
+         SearchFilter,
+          OrderingFilter,
+        #   FullWordSearchFilter,
+          ]
     perm_slug = "core.contracts"
-
+    search_fields = ['@name','=id']
+    ordering_fields = ['created_at', 'id','modified_at']
+    
     def create(self,request):
             req_name = request.data['name']
             req_attachement = request.FILES.get('attachment')
@@ -260,8 +287,15 @@ class documentsViewSet(viewsets.ModelViewSet):
     serializer_class = documentsSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "core.documents"
-    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filter_backends = [
+        DjangoFilterBackend,
+         SearchFilter,
+          OrderingFilter,
+        #   FullWordSearchFilter,
+          ]
     filterset_fields = ['id','name','case_id']
+    search_fields = ['@name','=id']
+    ordering_fields = ['created_at', 'id','modified_at']
 
     def create(self,request):
         req_name = None
@@ -350,3 +384,184 @@ class caseseventsViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filterset_fields = ['pgh_obj_model','pgh_obj_id',]           
+
+
+
+
+# class directoriesViewSet(viewsets.ModelViewSet):
+
+#     queryset = directory.objects.all().order_by('-created_by').filter(is_deleted=False)
+#     serializer_class = directoriesSerializer
+#     permission_classes = [permissions.IsAuthenticated, MyPermission]
+#     perm_slug = "core.directory"
+#     filter_backends = [
+#         DjangoFilterBackend,
+#          SearchFilter,
+#           OrderingFilter,
+#         #   FullWordSearchFilter,
+#           ]
+#     filterset_fields = ['id','name',]
+#     search_fields = ['@name','=id']
+#     ordering_fields = ['created_at', 'id','modified_at']
+
+    # def create(self,request):
+    #     req_name = None
+    #     req_attachement = None
+    #     req_case_id = None
+    #     req_name = request.data['name']
+    #     req_attachement = request.FILES.get('attachment')
+    #     if "case_id" in request.data:
+    #         req_case_id = request.data['case_id']
+    #         if req_case_id != "":
+    #             document = documents(id=None,name=req_name,case_id=req_case_id,attachment=req_attachement,created_by=request.user)
+    #             document.save()
+    #             case = get_object_or_404(LitigationCases,pk=req_case_id)
+    #             case.documents.add(document)
+    #         else:
+    #             document = documents(id=None,name=req_name,attachment=req_attachement,created_by=request.user)
+    #             document.save()
+    #     else:
+    #         document = documents(id=None,name=req_name,attachment=req_attachement,created_by=request.user)
+    #         document.save()
+    #     serializer = self.get_serializer(document)
+    #     return Response(serializer.data,status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, pk=None):
+        case = documents.objects.filter(id=pk)
+        case.update(is_deleted=True)
+        case.update(modified_by=request.user)
+        case.update(modified_at=timezone.now())
+        return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
+
+    
+    # def list(self, request):
+    #     queryset = documents.objects.all().filter(is_deleted=False).order_by('-created_by')
+    #     if request.user.is_manager == False:
+    #         queryset = queryset.filter(created_by=request.user)
+    #     page = self.paginate_queryset(queryset)
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True)
+    #         return self.get_paginated_response(serializer.data)
+    #     serializer = self.get_serializer(page,many=True)
+    #     return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+    # def retrieve(self, request, pk=None):
+    #     queryset = documents.objects.filter(is_deleted=False).order_by('-created_by')
+    #     if request.user.is_manager == False:
+    #         queryset = queryset.filter(created_by=request.user)
+    #     document = get_object_or_404(queryset, pk=pk)
+    #     serializer = self.get_serializer(document)
+    #     return Response(serializer.data,status=status.HTTP_200_OK)
+
+class APIDocumentPathListView(
+    ExternalObjectAPIViewMixin, generics.ListAPIView
+):
+    """
+    Returns a list of all the Paths to which a document belongs.
+    """
+    external_object_queryset = documents.objects.all()
+    external_object_pk_url_kwarg = 'document_id'
+
+    def get_source_queryset(self):
+        return self.get_external_object().Paths.all()
+
+
+class APIPathListView(generics.ListCreateAPIView):
+    """
+    get: Returns a list of all the Paths.
+    post: Create a new Path.
+    """
+
+    ordering_fields = ('id', 'name')
+    serializer_class = PathSerializer
+    source_queryset = Path.objects.all()
+
+    # def get_instance_extra_data(self):
+    #     return {
+    #         '_event_actor': self.request.user
+    #     }
+
+    # def get_mayan_view_permissions(self, request, view):
+    #     if request.method == 'POST':
+    #         serializer = self.get_serializer(data=request.data)
+    #         serializer.is_valid(raise_exception=True)
+
+    #         if serializer.validated_data['parent']:
+    #             return ()
+    #         else:
+    #             return self.mayan_view_permissions.get(request.method, None)
+    #     else:
+    #         return self.mayan_view_permissions.get(request.method, None)
+
+    # def perform_create(self, serializer):
+    #     parent = serializer.validated_data['parent']
+
+    #     if parent:
+    #         queryset=self.get_source_queryset()
+    #         get_object_or_404(Path, pk=parent.pk)
+
+    #     return super().perform_create(serializer)
+
+
+class APIPathView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    delete: Delete the selected Path.
+    get: Returns the details of the selected Path.
+    patch: Edit the selected Path.
+    put: Edit the selected Path.
+    """
+    lookup_url_kwarg = 'path_id'
+
+    serializer_class = PathSerializer
+    source_queryset = Path.objects.all()
+
+    def get_instance_extra_data(self):
+        return {
+            '_event_actor': self.request.user
+        }
+
+
+class APIPathDocumentAddView(generics.ObjectActionAPIView):
+    """
+    post: Add a document to a Path.
+    """
+    lookup_url_kwarg = 'path_id'
+
+    serializer_class = PathDocumentAddSerializer
+    source_queryset = Path.objects.all()
+
+    def object_action(self, obj, request, serializer):
+        document = serializer.validated_data['document']
+        obj.document_add(document=document, user=self.request.user)
+
+
+class APIPathDocumentRemoveView(generics.ObjectActionAPIView):
+    """
+    post: Remove a document from a Path.
+    """
+    lookup_url_kwarg = 'path_id'
+
+    serializer_class = PathDocumentRemoveSerializer
+    source_queryset = Path.objects.all()
+
+    def object_action(self, obj, request, serializer):
+        document = serializer.validated_data['document']
+        obj.document_remove(document=document, user=self.request.user)
+
+
+class APIPathDocumentListView(
+    ExternalObjectAPIViewMixin, generics.ListAPIView
+):
+    """
+    get: Returns a list of all the documents contained in a particular Path.
+    """
+    external_object_class = Path
+    external_object_pk_url_kwarg = 'path_id'
+
+    serializer_class = documentsSerializer
+
+    def get_source_queryset(self):
+        return documents.objects.filter(
+            pk__in=self.get_external_object().documents.only('pk')
+        )

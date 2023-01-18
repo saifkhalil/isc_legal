@@ -75,6 +75,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'pghistory',
     'pgtrigger',
+    'mptt',
+    'furl',
 ]
 
 MIDDLEWARE = [
