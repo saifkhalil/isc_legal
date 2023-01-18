@@ -15,6 +15,7 @@ router.register(r'stages', views.stagesViewSet,"stages")
 router.register(r'courts', views.courtViewSet,"courts")
 router.register(r'opponent_position', views.opponent_positionViewSet,"opponent_position")
 router.register(r'client_position', views.client_positionViewSet,"client_position")
+router.register(r'ImportantDevelopments', views.ImportantDevelopmentsViewSet,"ImportantDevelopments")
 # router.register(r'company', views.companyViewSet,"company")
 
 

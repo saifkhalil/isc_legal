@@ -19,6 +19,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 import django_filters.rest_framework
 from datetime import datetime
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.db.models import Q
 # from rest_framework_tracking.mixins import LoggingMixin
@@ -96,13 +97,28 @@ from accounts.models import User
 #     perm_slug = "activities.hearing_type"
 
 class taskViewSet(viewsets.ModelViewSet):
-    
+    model = task
     queryset = task.objects.all().order_by('-id').filter(is_deleted=False)
     serializer_class = taskSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
-    permission_classes = [permissions.IsAuthenticated, MyPermission]
-    perm_slug = "activities.task"
-    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    permission_classes = [
+        permissions.IsAuthenticated,
+    #  MyPermission
+     ]
+    # perm_slug = "activities.task"
+    filter_backends = [
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter
+        ]
+    ordering_fields = [
+        'created_at',
+        'id',
+        'modified_at'
+        ]
+
+    search_fields = ['=id','@title']
+
     filterset_fields = [
         'title',
         'description',
@@ -158,22 +174,26 @@ class taskViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(due_date__year=req_date.year,due_date__month=req_date.month)
         return queryset
 
-    def list(self, request):
-        queryset = task.objects.all().filter(is_deleted=False).order_by('-created_by')
-        current_user_id = request.user.id
-        if request.user.is_manager == False:
-            filter_query = Q(assignee__id__exact=current_user_id) | Q(created_by__id__exact=current_user_id)
-            queryset = queryset.filter(filter_query).distinct()
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(page,many=True)
-        return rest_response(serializer.data,status=status.HTTP_200_OK)
+    # def list(self, request):
+    #     req_due_date = self.request.query_params.get('due_date')
+    #     queryset = task.objects.all().filter(is_deleted=False).order_by('-created_by').filter(is_deleted=False)
+    #     if req_due_date is not None:
+    #         req_date = datetime.strptime(req_due_date, '%Y-%m').date()
+    #         queryset = queryset.filter(due_date__year=req_date.year,due_date__month=req_date.month)
+    #     current_user_id = request.user.id
+    #     if request.user.is_manager == False:
+    #         filter_query = Q(assignee__id__exact=current_user_id) | Q(created_by__id__exact=current_user_id)
+    #         queryset = queryset.filter(filter_query).distinct()
+    #     page = self.paginate_queryset(queryset)
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True)
+    #         return self.get_paginated_response(serializer.data)
+    #     serializer = self.get_serializer(page,many=True)
+    #     return rest_response(serializer.data,status=status.HTTP_200_OK)
 
 
     def retrieve(self, request, pk=None):
-        queryset = task.objects.filter(is_deleted=False).order_by('-created_by')
+        queryset = task.objects.filter(is_deleted=False).order_by('-created_by').filter(is_deleted=False)
         current_user_id = request.user.id
         if request.user.is_manager == False:
             filter_query = Q(assignee__id__exact=current_user_id) | Q(created_by__id__exact=current_user_id)
@@ -188,7 +208,15 @@ class hearingViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication,SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "activities.hearing" 
-    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filter_backends = [
+        DjangoFilterBackend,
+         SearchFilter,
+          OrderingFilter,
+        #   FullWordSearchFilter,
+          ]
+    ordering_fields = ['created_at', 'id','modified_at']
+    search_fields = ['@name','=id','@court__name']
+
     filterset_fields = [
         'name',
         'court',
@@ -243,16 +271,20 @@ class hearingViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(hearing_date__year=req_date.year,hearing_date__month=req_date.month)
         return queryset
 
-    def list(self, request):
-        queryset = hearing.objects.all().filter(is_deleted=False).order_by('-created_by')
-        if request.user.is_manager == False:
-            queryset = queryset.filter(created_by=request.user)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(page,many=True)
-        return rest_response(serializer.data,status=status.HTTP_200_OK)
+    # def list(self, request):
+    #     req_hearing_date = self.request.query_params.get('hearing_date')
+    #     queryset = hearing.objects.all().filter(is_deleted=False).order_by('-created_by')
+    #     if req_hearing_date is not None:
+    #         req_date = datetime.strptime(req_hearing_date, '%Y-%m').date()
+    #         queryset = queryset.filter(hearing_date__year=req_date.year,hearing_date__month=req_date.month)
+    #     if request.user.is_manager == False:
+    #         queryset = queryset.filter(created_by=request.user)
+    #     page = self.paginate_queryset(queryset)
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True)
+    #         return self.get_paginated_response(serializer.data)
+    #     serializer = self.get_serializer(page,many=True)
+    #     return rest_response(serializer.data,status=status.HTTP_200_OK)
 
 
     def retrieve(self, request, pk=None):

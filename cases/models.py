@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from accounts.models import User
 from django.contrib.auth.models import Group
 from activities.models import task, hearing
-from core.models import priorities,comments,documents,court,status
+from core.models import priorities,comments,documents,court,Status
 from django_countries.fields import CountryField
 from phonenumber_field.modelfields import PhoneNumberField
 from django.urls import reverse
@@ -72,6 +72,32 @@ class client_position(models.Model):
     class Meta:
         verbose_name = _('Client Position')
         verbose_name_plural = _('Client Positions')
+
+@pghistory.track(pghistory.Snapshot())
+class ImportantDevelopment(models.Model):
+    id = models.AutoField(primary_key=True,)
+    title = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Title'))
+    is_deleted = models.BooleanField(default=False,verbose_name=_("Is Deleted"))
+    case_id = models.BigIntegerField(blank=True, null=True)
+    # event_id = models.BigIntegerField(blank=True, null=True)
+    # task_id = models.BigIntegerField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True,blank=True, null=True, editable=False)
+    modified_at = models.DateTimeField(auto_now=True,blank=True, null=True, editable=False)
+    created_by = models.ForeignKey(
+        User, related_name='%(class)s_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
+    modified_by = models.ForeignKey(
+        User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False)
+
+    def __str__(self):
+        return self.title
+
+    def __unicode__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = _('Important Development')
+        verbose_name_plural = _('Important Developments')
+
 
 # class client_type(models.Model):
 #     id = models.AutoField(primary_key=True,)
@@ -251,9 +277,10 @@ class LitigationCases(models.Model):
     priority = models.ForeignKey(priorities,  on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Matter Priority'))
     Stage = models.ForeignKey('stages',  on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Stage'))
     # requested_by = models.ForeignKey(User, related_name='%(class)s_requested_by', on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Requested By'))
-    case_status = models.ForeignKey(status, related_name='%(class)s_case_status', on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Case Status'),default=1)
+    case_status = models.ForeignKey(Status, related_name='%(class)s_case_status', on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Case Status'))
     hearing = models.ManyToManyField(hearing, blank=True, verbose_name=_('Hearing'))
     tasks = models.ManyToManyField(task, related_name='%(class)s_task', blank=True,verbose_name=_('Task'))
+    ImportantDevelopment = models.ManyToManyField(ImportantDevelopment, related_name='%(class)s_ImportantDevelopment', blank=True,verbose_name=_('Important Development'))
     # event = models.ManyToManyField(event, related_name='%(class)s_event', blank=True,verbose_name=_('Event'))
     comments = models.ManyToManyField(comments,verbose_name="Comments", blank=True)
     start_time = models.DateTimeField(default=timezone.now)
@@ -357,6 +384,7 @@ class Folder(models.Model):
     internal_ref_number = models.CharField(max_length=50, blank=True,null=True, verbose_name=_('Internal Ref Number'))    
     priority = models.ForeignKey(priorities,  on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Matter Priority'))
     Stage = models.ForeignKey('stages',  on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Stage'))
+    ImportantDevelopment = models.ManyToManyField(ImportantDevelopment, related_name='%(class)s_ImportantDevelopment', blank=True,verbose_name=_('Important Development'))
     # requested_by = models.ForeignKey(User, related_name='%(class)s_requested_by', on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Requested By'))
     # case_status = models.ForeignKey('case_status', related_name='%(class)s_case_status', on_delete=models.CASCADE, null=False, blank=False,verbose_name=_('Case Status'),default=case_status.get_default)
     hearing = models.ManyToManyField(hearing, blank=True, verbose_name=_('Hearing'))

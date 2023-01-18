@@ -3,11 +3,11 @@ from django.shortcuts import render
 from rest_framework import viewsets,status
 from rest_framework import permissions
 from rest_framework.response import Response
-from .serializers import LitigationCasesSerializer,stagesSerializer,case_typeSerializer,courtSerializer,client_positionSerializer,opponent_positionSerializer,LitigationCasesEventSerializer,FoldersSerializer
-from .models import LitigationCases,stages,case_type,court,client_position,opponent_position,LitigationCasesEvent,Folder
+from .serializers import LitigationCasesSerializer,stagesSerializer,case_typeSerializer,courtSerializer,client_positionSerializer,opponent_positionSerializer,LitigationCasesEventSerializer,FoldersSerializer,ImportantDevelopmentsSerializer
+from .models import LitigationCases,stages,case_type,court,client_position,opponent_position,LitigationCasesEvent,Folder,ImportantDevelopment
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication
 from rest_framework.decorators import action
-from activities.models import task
+from activities.models import task,hearing
 from django.db.models import Q
 from django.core.cache import cache
 from django.conf import settings
@@ -143,18 +143,18 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
         case.update(modified_at=timezone.now())
         return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
 
-    @action(detail=True)
-    def get_comments(self, request,pk=None):
-        req_id =self.request.query_params.get('id')
-        commments = LitigationCases.objects.filter(id=pk).comments.all()
-        serializer = self.get_serializer(commments)
-        return Response(commments, status=status.HTTP_200_OK)
+    # @action(detail=True)
+    # def get_comments(self, request,pk=None):
+    #     req_id =self.request.query_params.get('id')
+    #     commments = LitigationCases.objects.filter(id=pk).comments.all()
+    #     serializer = self.get_serializer(commments)
+    #     return Response(commments, status=status.HTTP_200_OK)
 
     def get_queryset(self):
         internal_ref_number = self.request.query_params.get('internal_ref_number')
         start_time = self.request.query_params.get('start_time')
         Stage = self.request.query_params.get('stage')
-        queryset = LitigationCases.objects.all().order_by('-created_by')
+        queryset = LitigationCases.objects.all().order_by('-created_by').filter(is_deleted=False)
         current_user_id = self.request.user.id
         cuser = User.objects.get(id=current_user_id)
         is_manager = cuser.is_manager
@@ -207,7 +207,7 @@ class FoldersViewSet(viewsets.ModelViewSet):
     @action(detail=True)
     def get_comments(self, request,pk=None):
         req_id =self.request.query_params.get('id')
-        commments = Folder.objects.filter(id=pk).comments.all()
+        commments = Folder.objects.filter(id=pk).comments.all().filter(is_deleted=False)
         serializer = self.get_serializer(commments)
         return Response(commments, status=status.HTTP_200_OK)
 
@@ -283,3 +283,46 @@ class case_typeViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "cases.case_type"
 
+class ImportantDevelopmentsViewSet(viewsets.ModelViewSet):
+    # pagination_class = None
+    queryset = ImportantDevelopment.objects.all().order_by('-id').filter(is_deleted=False)
+    serializer_class = ImportantDevelopmentsSerializer
+    permission_classes = [permissions.IsAuthenticated, MyPermission]
+    perm_slug = "core.ImportantDevelopment"
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = ['id','case_id']
+
+    def create(self, request):
+        ImportantDevelopments = []
+        serializer = []
+        if "case_id" in request.data:
+            req_case_id = request.data['case_id']
+            ImportantDevelopments = ImportantDevelopment(id=None,case_id=req_case_id,title=request.data['title'],created_by=request.user)
+            ImportantDevelopments.save()
+            LitigationCases.objects.get(id=req_case_id).ImportantDevelopment.add(ImportantDevelopments)
+            serializer = self.get_serializer(ImportantDevelopments)
+        # if "task_id" in request.data:
+        #     req_task_id = request.data['task_id']
+        #     ImportantDevelopments = ImportantDevelopment(id=None,task_id=req_task_id,title=request.data['title'],created_by=request.user)
+        #     ImportantDevelopments.save()
+        #     task.objects.get(id=req_task_id).ImportantDevelopment.add(ImportantDevelopments)
+        #     serializer = self.get_serializer(ImportantDevelopments)
+        # if "hearing_id" in request.data:
+        #     req_hearing_id = request.data['hearing_id']
+        #     ImportantDevelopments = ImportantDevelopment(id=None,hearing_id=req_hearing_id,title=request.data['title'],created_by=request.user)
+        #     ImportantDevelopments.save()
+        #     hearing.objects.get(id=req_hearing_id).ImportantDevelopment.add(ImportantDevelopments)
+        #     serializer = self.get_serializer(ImportantDevelopments)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+
+    # def list(self, request):
+    #     queryset = comments.objects.all().order_by('-id').filter(is_deleted=False)
+    #     serializer = self.get_serializer(queryset)
+    #     return Response(serializer.data,status=status.HTTP_200_OK)
+
+    def destroy(self, request, pk=None):
+        ImportantDevelopments = ImportantDevelopment.objects.filter(id=pk)
+        ImportantDevelopments.update(is_deleted=True)
+        ImportantDevelopments.update(modified_by=request.user)
+        ImportantDevelopments.update(modified_at=timezone.now())
+        return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
