@@ -215,7 +215,7 @@ class FoldersViewSet(viewsets.ModelViewSet):
         internal_ref_number = self.request.query_params.get('internal_ref_number')
         start_time = self.request.query_params.get('start_time')
         Stage = self.request.query_params.get('stage')
-        queryset = Folder.objects.all().order_by('-created_by')
+        queryset = Folder.objects.all().order_by('-created_by').filter(is_deleted=False)
         current_user_id = self.request.user.id
         cuser = User.objects.get(id=current_user_id)
         is_manager = cuser.is_manager

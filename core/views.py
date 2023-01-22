@@ -11,7 +11,7 @@ from rest_framework.response import Response
 # from cases.views import get_cases_from_cache
 from core.models import comments,replies,priorities,contracts,documents,Status,Path
 from .serializers import EventsSerializer, GroupSerializer, commentsSerializer,  repliesSerializer,prioritiesSerializer,contractsSerializer,documentsSerializer,StatusSerializer
-from cases.models import LitigationCases
+from cases.models import LitigationCases,Folder
 from activities.models import task,hearing
 from django.views.decorators.cache import cache_page
 from django.views.decorators.cache import never_cache
@@ -128,6 +128,12 @@ class commentsViewSet(viewsets.ModelViewSet):
             comment.save()
             LitigationCases.objects.get(id=req_case_id).comments.add(comment)
             serializer = self.get_serializer(comment)
+        if "folder_id" in request.data:
+            req_folder_id = request.data['folder_id']
+            comment = comments(id=None,folder_id=req_folder_id,comment=request.data['comment'],created_by=request.user)
+            comment.save()
+            Folder.objects.get(id=req_folder_id).comments.add(comment)
+            serializer = self.get_serializer(comment)
         # if "event_id" in request.data:
         #     event_id = request.data['event_id']
         #     event.objects.get(id=event_id).comments.add(comment)
@@ -243,16 +249,16 @@ class contractsViewSet(viewsets.ModelViewSet):
         contract.update(modified_at=timezone.now())
         return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
 
-    def list(self, request):
-        queryset = contracts.objects.all().filter(is_deleted=False).order_by('-created_by')
-        if request.user.is_manager == False:
-            queryset = queryset.filter(created_by=request.user)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(page,many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+    # def list(self, request):
+    #     queryset = contracts.objects.all().filter(is_deleted=False).order_by('-created_by')
+    #     if request.user.is_manager == False:
+    #         queryset = queryset.filter(created_by=request.user)
+    #     page = self.paginate_queryset(queryset)
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True)
+    #         return self.get_paginated_response(serializer.data)
+    #     serializer = self.get_serializer(page,many=True)
+    #     return Response(serializer.data,status=status.HTTP_200_OK)
 
 
     def retrieve(self, request, pk=None):
@@ -327,16 +333,16 @@ class documentsViewSet(viewsets.ModelViewSet):
         return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
 
     
-    def list(self, request):
-        queryset = documents.objects.all().filter(is_deleted=False).order_by('-created_by')
-        if request.user.is_manager == False:
-            queryset = queryset.filter(created_by=request.user)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(page,many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+    # def list(self, request):
+    #     queryset = documents.objects.all().filter(is_deleted=False).order_by('-created_by')
+    #     if request.user.is_manager == False:
+    #         queryset = queryset.filter(created_by=request.user)
+    #     page = self.paginate_queryset(queryset)
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True)
+    #         return self.get_paginated_response(serializer.data)
+    #     serializer = self.get_serializer(page,many=True)
+    #     return Response(serializer.data,status=status.HTTP_200_OK)
 
 
     def retrieve(self, request, pk=None):

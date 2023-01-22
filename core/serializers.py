@@ -105,7 +105,7 @@ class commentsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
         ref_name = 'Comments'
         # list_serializer_class = FilteredListSerializer
         model = comments
-        fields = ['id', 'comment','replies','case_id','event_id','task_id','hearing_id','created_by','created_at','modified_by','modified_at']
+        fields = ['id', 'comment','replies','case_id','folder_id','event_id','task_id','hearing_id','created_by','created_at','modified_by','modified_at']
         extra_kwargs = {'created_by': {'required': False},'modified_by': {'required': False}}
 
 class EventsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):

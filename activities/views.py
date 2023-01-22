@@ -7,7 +7,7 @@ from rest_framework import viewsets,status
 from rest_framework import permissions
 from django.utils import timezone
 from cases.models import LitigationCases
-from core.models import court
+from core.models import court,Status
 from .serializers import taskSerializer,hearingSerializer
 from .models import task,hearing
 from rest_framework.authentication import TokenAuthentication ,SessionAuthentication
@@ -230,6 +230,7 @@ class hearingViewSet(viewsets.ModelViewSet):
         req_comments_by_lawyer = None
         req_name = None
         req_court = None
+        req_hearing_status = None
         if "name" in request.data:
             req_name = request.data['name']
         if "court" in request.data:
@@ -240,18 +241,21 @@ class hearingViewSet(viewsets.ModelViewSet):
             req_hearing_date = request.data['hearing_date']
         if "assignee" in request.data:
             req_assignee = request.data["assignee"]
+        if "hearing_status" in request.data:
+            req_hearing_status = request.data["hearing_status"]
+            h_status = Status.objects.get(status=req_hearing_status)
         if "comments_by_lawyer" in request.data:
             req_comments_by_lawyer = request.data["comments_by_lawyer"]
         if "case_id" in request.data:
             req_case_id = request.data["case_id"]
             case = get_object_or_404(LitigationCases,pk=req_case_id)
-            hearings = hearing(id=None,court=req_court,name=req_name,case_id=req_case_id,hearing_date=req_hearing_date,comments_by_lawyer=req_comments_by_lawyer,created_by=request.user)
+            hearings = hearing(id=None,court=req_court,hearing_status=h_status,name=req_name,case_id=req_case_id,hearing_date=req_hearing_date,comments_by_lawyer=req_comments_by_lawyer,created_by=request.user)
             hearings.save()
             serializer = self.get_serializer(hearings)    
             case.hearing.add(hearings)
             return rest_response(serializer.data,status=status.HTTP_201_CREATED)
         else:
-            hearings = hearing(id=None,court=req_court,name=req_name,hearing_date=req_hearing_date,comments_by_lawyer=req_comments_by_lawyer,created_by=request.user)
+            hearings = hearing(id=None,court=req_court,hearing_status=h_status,name=req_name,hearing_date=req_hearing_date,comments_by_lawyer=req_comments_by_lawyer,created_by=request.user)
             hearings.save()
             serializer = self.get_serializer(hearings)
             return rest_response(serializer.data,status=status.HTTP_201_CREATED)
