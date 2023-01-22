@@ -74,6 +74,7 @@ class comments(models.Model):
     comment = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Comment'))
     replies = models.ManyToManyField(replies, related_name='%(class)s_replies', blank=True,verbose_name=_('Reply'))
     case_id = models.BigIntegerField(blank=True, null=True)
+    folder_id = models.BigIntegerField(blank=True, null=True)
     event_id = models.BigIntegerField(blank=True, null=True)
     task_id = models.BigIntegerField(blank=True, null=True)
     hearing_id = models.BigIntegerField(blank=True, null=True)

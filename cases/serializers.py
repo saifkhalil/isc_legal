@@ -65,9 +65,11 @@ class stagesSerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 class ImportantDevelopmentsSerializer(serializers.ModelSerializer):
+    created_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all())
+
     class Meta:
         model = ImportantDevelopment
-        fields = ['id', 'title','case_id']
+        fields = ['id', 'title','case_id','created_at','created_by']
 
 class LitigationCasesEventSerializer(serializers.ModelSerializer):
     class Meta:
