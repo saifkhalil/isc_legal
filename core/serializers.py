@@ -64,6 +64,7 @@ class documentsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     created_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     case_name = serializers.SerializerMethodField('get_case_name')
+    path_name = serializers.SerializerMethodField('get_path_name')
 
     def get_case_name(self, obj):
         if obj.case_id:
@@ -74,10 +75,21 @@ class documentsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
             return case
         else:
             return None
+
+    def get_path_name(self, obj):
+        if obj.path_id:
+            try:
+                path =  Path.objects.get(id=obj.path_id).name
+            except Path.DoesNotExist:
+                path = None
+            return path
+        else:
+            return None
+
     class Meta:
         model = documents
         # list_serializer_class = FilteredListSerializer
-        fields = ['id', 'name','attachment','case_id','case_name','created_by','created_at','modified_by','modified_at']
+        fields = ['id', 'name','attachment','case_id','case_name','path_id','path_name','created_by','created_at','modified_by','modified_at']
         extra_kwargs = {'created_by': {'required': False},'modified_by': {'required': False}}
 
 # class directoriesSerializer(DynamicFieldsMixin,serializers.ModelSerializer):

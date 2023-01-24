@@ -117,6 +117,7 @@ class FoldersSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     comments = commentsSerializer(many=True,read_only=True)
     documents = documentsSerializer(many=True,read_only=True)
     hearing = hearingSerializer(many=True,read_only=True)
+    tasks = taskSerializer(many=True,read_only=True)
     ImportantDevelopment = ImportantDevelopmentsSerializer(many=True,read_only=True)
     start_time = serializers.DateTimeField(format="%Y-%m-%d", required=False)
     end_time = serializers.DateTimeField(format="%Y-%m-%d", required=False)
@@ -131,6 +132,6 @@ class FoldersSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     class Meta:
         model = Folder
 #        list_serializer_class = FilteredListSerializer
-        fields = [ 'id', 'name','description','folder_category','priority','shared_with','court','ImportantDevelopment','folder_type','judge','detective','client_position','opponent_position','assignee','Stage','internal_ref_number','comments','documents','hearing','start_time','end_time','created_by','created_at']
+        fields = [ 'id', 'name','description','folder_category','priority','shared_with','court','ImportantDevelopment','folder_type','folder_status','judge','detective','client_position','opponent_position','assignee','Stage','internal_ref_number','comments','tasks','documents','hearing','start_time','end_time','created_by','created_at']
         http_method_names = ['get', 'post', 'head','put']
 

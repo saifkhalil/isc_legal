@@ -77,10 +77,10 @@ urlpatterns = [
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('api/paths/', name='path-list',view=APIPathListView.as_view()),
     path('api/paths/<path_id>/', name='path-detail',view=APIPathView.as_view()),
-    path('api/paths/<path_id>/documents/',name='path-document-list',view=APIPathDocumentListView.as_view()),
-    path('api/paths/<path_id>/documents/add/',name='path-document-add', view=APIPathDocumentAddView.as_view()),
-    path('api/paths/<path_id>/documents/remove/',name='path-document-remove', view=APIPathDocumentRemoveView.as_view()),
-    path('api/documents/<document_id>/paths/',name='document-path-list',view=APIDocumentPathListView.as_view())
+    # path('api/paths/<path_id>/documents/',name='path-document-list',view=APIPathDocumentListView.as_view()),
+    # path('api/paths/<path_id>/documents/add/',name='path-document-add', view=APIPathDocumentAddView.as_view()),
+    # path('api/paths/<path_id>/documents/remove/',name='path-document-remove', view=APIPathDocumentRemoveView.as_view()),
+    # path('api/documents/<document_id>/paths/',name='document-path-list',view=APIDocumentPathListView.as_view())
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += i18n_patterns(

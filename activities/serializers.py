@@ -3,7 +3,7 @@ from drf_dynamic_fields import DynamicFieldsMixin
 from .models import task,hearing
 from core.models import court,Status
 from accounts.models import User
-from cases.models import LitigationCases
+from cases.models import LitigationCases,Folder
 
 
 # class task_typeSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
@@ -28,7 +28,7 @@ class taskSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     class Meta:
         model = task
-        fields = ['id', 'title','description','assignee','due_date','comments','case_id','task_status','created_by','created_at','modified_by','modified_at']
+        fields = ['id', 'title','description','assignee','due_date','comments','case_id','folder_id','task_status','created_by','created_at','modified_by','modified_at']
         extra_kwargs = {'created_by': {'required': False},'modified_by': {'required': False}}
 # class eventSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
 #     event_type = event_typeSerializer()
@@ -46,7 +46,9 @@ class hearingSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     hearing_status = serializers.SlugRelatedField(slug_field='status',queryset=Status.objects.all())
     comments_by_lawyer = serializers.CharField(max_length=200,required=False, allow_null=True)
     case_id = serializers.IntegerField(required=False, allow_null=True)
+    folder_id = serializers.IntegerField(required=False, allow_null=True)
     case_name = serializers.SerializerMethodField('get_case_name')
+    folder_name = serializers.SerializerMethodField('get_folder_name')
     created_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     def get_case_name(self, obj):
@@ -59,7 +61,17 @@ class hearingSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
         else:
             return None
 
+    def get_folder_name(self, obj):
+        if obj.folder_id:
+            try:
+                folder =  Folder.objects.get(id=obj.folder_id).name
+            except Folder.DoesNotExist:
+                folder = None
+            return folder
+        else:
+            return None
+
     class Meta:
         model = hearing
-        fields = ['id', 'name','hearing_date','assignee','court','comments_by_lawyer','case_id','hearing_status','case_name','created_by','created_at','modified_by','modified_at']
+        fields = ['id', 'name','hearing_date','assignee','court','comments_by_lawyer','case_id','folder_id','folder_name','hearing_status','case_name','created_by','created_at','modified_by','modified_at']
         extra_kwargs = {'created_by': {'required': False},'modified_by': {'required': False}}

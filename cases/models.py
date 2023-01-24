@@ -324,10 +324,8 @@ def LitigationCases_send_email(sender, instance, created, *args, **kwargs):
             'msgtype':_('You have been assigned with you below case details')
             })
             send_html_mail(email_subject, email_body,  [case.assignee.email])
-        print(instance.shared_with)
         if case.shared_with.exists():
             for shuser in case.shared_with.all():
-                print(shuser)
                 if shuser.email_notification:
                     message = 'text version of HTML message'
                     email_subject = _('New Case #') + str(case.id)
@@ -391,6 +389,7 @@ class Folder(models.Model):
     tasks = models.ManyToManyField(task, related_name='%(class)s_task', blank=True,verbose_name=_('Task'))
     # event = models.ManyToManyField(event, related_name='%(class)s_event', blank=True,verbose_name=_('Event'))
     comments = models.ManyToManyField(comments,verbose_name="Comments", blank=True)
+    folder_status = models.ForeignKey(Status, related_name='%(class)s_folder_status', on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Folder Status'))
     start_time = models.DateTimeField(default=timezone.now)
     end_time = models.DateTimeField(default=timezone.now)
     is_deleted = models.BooleanField(default=False,verbose_name=_("Is Deleted"))
@@ -432,10 +431,8 @@ def LitigationCases_send_email(sender, instance, created, *args, **kwargs):
             'msgtype':_('You have been assigned with you below case details')
             })
             send_html_mail(email_subject, email_body,  [case.assignee.email])
-        print(instance.shared_with)
         if case.shared_with.exists():
             for shuser in case.shared_with.all():
-                print(shuser)
                 if shuser.email_notification:
                     message = 'text version of HTML message'
                     email_subject = _('New Case #') + str(case.id)
