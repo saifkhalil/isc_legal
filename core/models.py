@@ -14,8 +14,11 @@ from .events import (
     event_path_document_added, event_path_document_removed
 )
 from django.core.exceptions import ValidationError,NON_FIELD_ERRORS
-
+from .model_mixins import ExtraDataModelMixin,HooksModelMixin
 from .classes import EventManagerMethodAfter, EventManagerSave
+
+
+
 
 @pghistory.track(pghistory.Snapshot())
 class priorities(models.Model):
@@ -135,11 +138,13 @@ class contracts(models.Model):
 
 
 @pghistory.track(pghistory.Snapshot())
-class documents(models.Model):
+class documents(ExtraDataModelMixin,HooksModelMixin,models.Model):
     id = models.AutoField(primary_key=True,)
     name = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Name'))
     attachment = models.FileField(upload_to='documents/%Y/%m/%d/',verbose_name=_('Attachment'),validators=[FileExtensionValidator(['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'git'])])
     case_id = models.IntegerField(blank=True,null=True, verbose_name=_('Litigation Case'))
+    path_id = models.IntegerField(blank=True,null=True, verbose_name=_('Path'))
+    folder_id = models.IntegerField(blank=True,null=True, verbose_name=_('Folder'))
     is_deleted = models.BooleanField(default=False,verbose_name=_("Is Deleted"))
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
@@ -184,9 +189,6 @@ class Path(MPTTModel):
         unique_together = ('parent', 'name')
         verbose_name = _('Path')
         verbose_name_plural = _('Paths')
-
-    # def __str__(self):
-    #     return self.get_full_path()
 
     @method_event(
         action_object='self',

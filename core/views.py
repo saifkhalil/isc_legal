@@ -299,26 +299,35 @@ class documentsViewSet(viewsets.ModelViewSet):
           OrderingFilter,
         #   FullWordSearchFilter,
           ]
-    filterset_fields = ['id','name','case_id']
+    filterset_fields = ['id','name','case_id','path_id']
     search_fields = ['@name','=id']
     ordering_fields = ['created_at', 'id','modified_at']
 
     def create(self,request):
         req_name = None
         req_attachement = None
-        req_case_id = None
+        req_case_id = request.data.get('case_id')
+        req_path_id = request.data.get('path_id')
+        req_folder_id = request.data.get('folder_id')
         req_name = request.data['name']
         req_attachement = request.FILES.get('attachment')
-        if "case_id" in request.data:
-            req_case_id = request.data['case_id']
-            if req_case_id != "":
-                document = documents(id=None,name=req_name,case_id=req_case_id,attachment=req_attachement,created_by=request.user)
-                document.save()
-                case = get_object_or_404(LitigationCases,pk=req_case_id)
-                case.documents.add(document)
-            else:
-                document = documents(id=None,name=req_name,attachment=req_attachement,created_by=request.user)
-                document.save()
+        if req_attachement in ('',None):
+            return Response(data={"detail":"Please select Document to upload"},status=status.HTTP_400_BAD_REQUEST)
+        if not req_case_id in ('',None):
+            document = documents(id=None,name=req_name,case_id=req_case_id,attachment=req_attachement,created_by=request.user)
+            document.save()
+            case = get_object_or_404(LitigationCases,pk=req_case_id)
+            case.documents.add(document)
+        if not req_path_id in ('',None):
+            document = documents(id=None,name=req_name,path_id=req_path_id,attachment=req_attachement,created_by=request.user)
+            document.save()
+            path = get_object_or_404(Path,pk=req_path_id)
+            path.documents.add(document)
+        if not req_folder_id in ('',None):
+            document = documents(id=None,name=req_name,folder_id=req_folder_id,attachment=req_attachement,created_by=request.user)
+            document.save()
+            path = get_object_or_404(Folder,pk=req_folder_id)
+            path.documents.add(document)
         else:
             document = documents(id=None,name=req_name,attachment=req_attachement,created_by=request.user)
             document.save()
@@ -482,6 +491,7 @@ class APIPathListView(generics.ListCreateAPIView):
     ordering_fields = ('id', 'name')
     serializer_class = PathSerializer
     source_queryset = Path.objects.all()
+    
 
     # def get_instance_extra_data(self):
     #     return {
@@ -500,14 +510,14 @@ class APIPathListView(generics.ListCreateAPIView):
     #     else:
     #         return self.mayan_view_permissions.get(request.method, None)
 
-    # def perform_create(self, serializer):
-    #     parent = serializer.validated_data['parent']
+    def perform_create(self, serializer):
+        parent = serializer.validated_data['parent']
 
-    #     if parent:
-    #         queryset=self.get_source_queryset()
-    #         get_object_or_404(Path, pk=parent.pk)
+        if parent:
+            queryset=self.get_source_queryset()
+            get_object_or_404(Path, pk=parent.pk)
 
-    #     return super().perform_create(serializer)
+        return super().perform_create(serializer)
 
 
 class APIPathView(generics.RetrieveUpdateDestroyAPIView):
@@ -566,6 +576,7 @@ class APIPathDocumentListView(
     external_object_pk_url_kwarg = 'path_id'
 
     serializer_class = documentsSerializer
+    source_queryset = documents.objects.all()
 
     def get_source_queryset(self):
         return documents.objects.filter(
