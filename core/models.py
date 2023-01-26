@@ -190,6 +190,9 @@ class Path(MPTTModel):
         verbose_name = _('Path')
         verbose_name_plural = _('Paths')
 
+    # def __str__(self):
+    #     return self.get_full_path()
+
     @method_event(
         action_object='self',
         event=event_path_document_added,

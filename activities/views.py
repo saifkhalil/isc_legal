@@ -126,6 +126,20 @@ class taskViewSet(viewsets.ModelViewSet):
         'assignee'
     ]
 
+    def update(self, request, *args, **kwargs):
+        super().update(request, *args, **kwargs)
+        instance = self.get_object()
+        req_case_id = request.data.get('case_id')
+        req_folder_id = request.data.get('folder_id')
+        if not req_case_id in ('',None):
+            case = get_object_or_404(LitigationCases,pk=req_case_id)
+            case.tasks.add(instance)
+        if not req_folder_id in ('',None):
+            folder = get_object_or_404(Folder,pk=req_case_id)
+            folder.tasks.add(instance)
+        serializer = self.get_serializer(instance)    
+        return rest_response(serializer.data,status=status.HTTP_200_OK)
+
     def create(self,request):
         req_title = request.data.get('title')
         req_description = request.data.get('description')
@@ -136,7 +150,7 @@ class taskViewSet(viewsets.ModelViewSet):
         req_task_status = request.data.get('task_status')
         t_status,req_assignee_user = None,None
         if not req_task_status in ('',None):
-            t_status = Status.objects.get(status=req_task_status)
+            t_status = Status.objects.get(pk=req_task_status)
         else:
             t_status = Status.objects.get(pk=1)
         if not req_assignee in ('',None):
@@ -228,6 +242,21 @@ class hearingViewSet(viewsets.ModelViewSet):
         'case_id'
     ]
 
+
+    def update(self, request, *args, **kwargs):
+        super().update(request, *args, **kwargs)
+        instance = self.get_object()
+        req_case_id = request.data.get('case_id')
+        req_folder_id = request.data.get('folder_id')
+        if not req_case_id in ('',None):
+            case = get_object_or_404(LitigationCases,pk=req_case_id)
+            case.tasks.add(instance)
+        if not req_folder_id in ('',None):
+            folder = get_object_or_404(Folder,pk=req_case_id)
+            folder.tasks.add(instance)
+        serializer = self.get_serializer(instance)    
+        return rest_response(serializer.data,status=status.HTTP_200_OK)
+
     def create(self,request):
         req_hearing_date = request.data.get('hearing_date')
         req_assignee = request.data.get('assignee')
@@ -235,6 +264,7 @@ class hearingViewSet(viewsets.ModelViewSet):
         req_name = request.data.get('name')
         req_court = request.data.get('court')
         req_hearing_status = request.data.get('hearing_status')
+        req_folder_id = request.data.get('folder_id')
         req_case_id = request.data.get('case_id')
         h_status,req_assignee_user = None,None
         if not req_court in ('',None):
@@ -252,6 +282,13 @@ class hearingViewSet(viewsets.ModelViewSet):
             hearings.save()
             serializer = self.get_serializer(hearings)    
             case.hearing.add(hearings)
+            return rest_response(serializer.data,status=status.HTTP_201_CREATED)
+        if not req_folder_id in ('',None):
+            folder = get_object_or_404(Folder,pk=req_folder_id)
+            hearings = hearing(id=None,court=req_court,hearing_status=h_status,name=req_name,folder_id=req_folder_id,hearing_date=req_hearing_date,comments_by_lawyer=req_comments_by_lawyer,created_by=request.user,assignee=req_assignee_user)
+            hearings.save()
+            serializer = self.get_serializer(hearings)    
+            folder.hearing.add(hearings)
             return rest_response(serializer.data,status=status.HTTP_201_CREATED)
         else:
             hearings = hearing(id=None,court=req_court,hearing_status=h_status,name=req_name,hearing_date=req_hearing_date,comments_by_lawyer=req_comments_by_lawyer,created_by=request.user,assignee=req_assignee_user)
