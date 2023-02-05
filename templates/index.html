@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% get_current_language as CURRENT_LANGUAGE %}
+{% get_available_languages as AVAILABLE_LANGUAGES %}
+{% get_language_info_list for AVAILABLE_LANGUAGES as languages %}
+{% block content %}
+{% load static %}
+<link href="{% static 'css/cal.css' %}" rel="stylesheet">
+<div class="main">
+    <h1 class="text-center">
+      {% trans 'Welcome to ISC Legal App' %}
+    </h1>
+  <div class="row">
+    <div class="col-lg-6 col-md-6 col-sm-12">
+      <table style="width:100%" class="table table-responsive table-striped table-hover table-bordered qi-border">
+        <thead>
+          <tr>
+          <td>id</td>
+          <td>name</td>
+          <td>subject</td>
+          <tr>
+          </thead>
+          <tbody>
+        <tr>
+          {% for case in cases %}
+              <td>{{ case.id }}</td>
+          <td>{{ case.name }}</td>
+          <td>{{ case.description }}</td>
+          {% endfor %}
+        </tr>
+      </tbody>
+      </table>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-12">
+        <div class="clearfix m-3">
+          <a class="btn qi-primary left" href="{% url 'home' %}?{{ prev_month }}"> Previous Month </a>
+          <a class="btn qi-primary right" href="{% url 'home' %}?{{ next_month }}"> Next Month </a>
+        </div>
+        {{ calendar }}
+      </div>
+    </div>
+  </div>
+{% endblock %}
