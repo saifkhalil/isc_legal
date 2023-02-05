@@ -1,0 +1,2534 @@
+openapi: 3.0.3
+info:
+  title: ISC Legal App
+  version: '0.3'
+  description: ISC Legal App
+  contact:
+    name: Saif AlKhateeb
+    email: saif.ibrahim@qi.iq
+paths:
+  /ar/api/auth/token/login/:
+    post:
+      operationId: ar_api_auth_token_login_create
+      description: Use this endpoint to obtain user authentication token.
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenCreate'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenCreate'
+          description: ''
+  /ar/api/auth/token/logout/:
+    post:
+      operationId: ar_api_auth_token_logout_create
+      description: Use this endpoint to logout user (remove user authentication token).
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /ar/api/auth/users/:
+    get:
+      operationId: ar_api_auth_users_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+    post:
+      operationId: ar_api_auth_users_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCreate'
+          description: ''
+  /ar/api/auth/users/{id}/:
+    get:
+      operationId: ar_api_auth_users_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this المستخدم.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: ar_api_auth_users_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this المستخدم.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: ar_api_auth_users_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this المستخدم.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: ar_api_auth_users_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this المستخدم.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /ar/api/auth/users/activation/:
+    post:
+      operationId: ar_api_auth_users_activation_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Activation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Activation'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activation'
+          description: ''
+  /ar/api/auth/users/me/:
+    get:
+      operationId: ar_api_auth_users_me_retrieve
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: ar_api_auth_users_me_update
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: ar_api_auth_users_me_partial_update
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: ar_api_auth_users_me_destroy
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /ar/api/auth/users/resend_activation/:
+    post:
+      operationId: ar_api_auth_users_resend_activation_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailReset'
+          description: ''
+  /ar/api/auth/users/reset_email/:
+    post:
+      operationId: ar_api_auth_users_reset_email_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailReset'
+          description: ''
+  /ar/api/auth/users/reset_email_confirm/:
+    post:
+      operationId: ar_api_auth_users_reset_email_confirm_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsernameResetConfirm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsernameResetConfirm'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsernameResetConfirm'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsernameResetConfirm'
+          description: ''
+  /ar/api/auth/users/reset_password/:
+    post:
+      operationId: ar_api_auth_users_reset_password_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SendEmailReset'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailReset'
+          description: ''
+  /ar/api/auth/users/reset_password_confirm/:
+    post:
+      operationId: ar_api_auth_users_reset_password_confirm_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirm'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetConfirm'
+          description: ''
+  /ar/api/auth/users/set_email/:
+    post:
+      operationId: ar_api_auth_users_set_email_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetUsername'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SetUsername'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SetUsername'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetUsername'
+          description: ''
+  /ar/api/auth/users/set_password/:
+    post:
+      operationId: ar_api_auth_users_set_password_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SetPassword'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetPassword'
+          description: ''
+  /ar/api/comments/:
+    get:
+      operationId: ar_api_comments_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedcommentsList'
+          description: ''
+    post:
+      operationId: ar_api_comments_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/comments'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/comments'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/comments'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/comments'
+          description: ''
+  /ar/api/comments/{id}/:
+    get:
+      operationId: ar_api_comments_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ملاحظات.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/comments'
+          description: ''
+    put:
+      operationId: ar_api_comments_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ملاحظات.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/comments'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/comments'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/comments'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/comments'
+          description: ''
+    patch:
+      operationId: ar_api_comments_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ملاحظات.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patchedcomments'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patchedcomments'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Patchedcomments'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/comments'
+          description: ''
+    delete:
+      operationId: ar_api_comments_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ملاحظات.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /ar/api/company/:
+    get:
+      operationId: ar_api_company_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedcompanyList'
+          description: ''
+    post:
+      operationId: ar_api_company_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/company'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/company'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/company'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/company'
+          description: ''
+  /ar/api/company/{id}/:
+    get:
+      operationId: ar_api_company_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this الشركة.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/company'
+          description: ''
+    put:
+      operationId: ar_api_company_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this الشركة.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/company'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/company'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/company'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/company'
+          description: ''
+    patch:
+      operationId: ar_api_company_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this الشركة.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patchedcompany'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patchedcompany'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Patchedcompany'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/company'
+          description: ''
+    delete:
+      operationId: ar_api_company_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this الشركة.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /ar/api/groups/:
+    get:
+      operationId: ar_api_groups_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedGroupList'
+          description: ''
+    post:
+      operationId: ar_api_groups_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Group'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Group'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: ''
+  /ar/api/groups/{id}/:
+    get:
+      operationId: ar_api_groups_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this مجموعة.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: ''
+    put:
+      operationId: ar_api_groups_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this مجموعة.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Group'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Group'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: ''
+    patch:
+      operationId: ar_api_groups_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this مجموعة.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedGroup'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedGroup'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedGroup'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: ''
+    delete:
+      operationId: ar_api_groups_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this مجموعة.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /ar/api/litigationcases/:
+    get:
+      operationId: ar_api_litigationcases_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLitigationCasesList'
+          description: ''
+    post:
+      operationId: ar_api_litigationcases_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LitigationCases'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LitigationCases'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LitigationCases'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LitigationCases'
+          description: ''
+  /ar/api/litigationcases/{id}/:
+    get:
+      operationId: ar_api_litigationcases_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this دعوى.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LitigationCases'
+          description: ''
+    put:
+      operationId: ar_api_litigationcases_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this دعوى.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LitigationCases'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LitigationCases'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LitigationCases'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LitigationCases'
+          description: ''
+    patch:
+      operationId: ar_api_litigationcases_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this دعوى.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLitigationCases'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLitigationCases'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLitigationCases'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LitigationCases'
+          description: ''
+    delete:
+      operationId: ar_api_litigationcases_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this دعوى.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /ar/api/practice_area/:
+    get:
+      operationId: ar_api_practice_area_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Paginatedpractice_areaList'
+          description: ''
+    post:
+      operationId: ar_api_practice_area_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/practice_area'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/practice_area'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/practice_area'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/practice_area'
+          description: ''
+  /ar/api/practice_area/{id}/:
+    get:
+      operationId: ar_api_practice_area_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this نطاق العمل.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/practice_area'
+          description: ''
+    put:
+      operationId: ar_api_practice_area_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this نطاق العمل.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/practice_area'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/practice_area'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/practice_area'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/practice_area'
+          description: ''
+    patch:
+      operationId: ar_api_practice_area_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this نطاق العمل.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patchedpractice_area'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patchedpractice_area'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Patchedpractice_area'
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/practice_area'
+          description: ''
+    delete:
+      operationId: ar_api_practice_area_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this نطاق العمل.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /ar/api/replies/:
+    get:
+      operationId: ar_api_replies_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedrepliesList'
+          description: ''
+    post:
+      operationId: ar_api_replies_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/replies'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/replies'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/replies'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/replies'
+          description: ''
+  /ar/api/replies/{id}/:
+    get:
+      operationId: ar_api_replies_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Reply.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/replies'
+          description: ''
+    put:
+      operationId: ar_api_replies_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Reply.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/replies'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/replies'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/replies'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/replies'
+          description: ''
+    patch:
+      operationId: ar_api_replies_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Reply.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patchedreplies'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patchedreplies'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Patchedreplies'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/replies'
+          description: ''
+    delete:
+      operationId: ar_api_replies_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Reply.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /ar/api/schema/:
+    get:
+      operationId: ar_api_schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - ar
+          - en
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /ar/api/stages/:
+    get:
+      operationId: ar_api_stages_list
+      parameters:
+      - name: limit
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedstagesList'
+          description: ''
+    post:
+      operationId: ar_api_stages_create
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/stages'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/stages'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/stages'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stages'
+          description: ''
+  /ar/api/stages/{id}/:
+    get:
+      operationId: ar_api_stages_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this مرحلة الدعوى.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stages'
+          description: ''
+    put:
+      operationId: ar_api_stages_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this مرحلة الدعوى.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/stages'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/stages'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/stages'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stages'
+          description: ''
+    patch:
+      operationId: ar_api_stages_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this مرحلة الدعوى.
+        required: true
+      tags:
+      - ar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Patchedstages'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Patchedstages'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Patchedstages'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/stages'
+          description: ''
+    delete:
+      operationId: ar_api_stages_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this مرحلة الدعوى.
+        required: true
+      tags:
+      - ar
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    Activation:
+      type: object
+      properties:
+        uid:
+          type: string
+        token:
+          type: string
+      required:
+      - token
+      - uid
+    Group:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        name:
+          type: string
+          title: الاسم
+          maxLength: 150
+      required:
+      - name
+      - url
+    LitigationCases:
+      type: object
+      description: |-
+        A serializer mixin that takes an additional `fields` argument that controls
+        which fields should be displayed.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cid:
+          type: string
+          readOnly: true
+          nullable: true
+          title: رقم الدعوى
+        name:
+          type: string
+          title: العنوان
+          maxLength: 500
+        description:
+          type: string
+          title: الموضوع
+          maxLength: 500
+        practice_area:
+          type: integer
+          nullable: true
+          title: نطاق العمل
+        arrival_date:
+          type: string
+          format: date-time
+          title: تاريخ التأسيس
+        company:
+          $ref: '#/components/schemas/company'
+        person:
+          $ref: '#/components/schemas/persons'
+        opponent:
+          $ref: '#/components/schemas/opponent'
+        client_position:
+          $ref: '#/components/schemas/client_position'
+        opponent_position:
+          $ref: '#/components/schemas/opponent_position'
+        assigned_team:
+          $ref: '#/components/schemas/assigned_team'
+        Stage:
+          $ref: '#/components/schemas/stages'
+        internal_ref_number:
+          type: string
+          nullable: true
+          title: رقم المرجع الداخلي
+          maxLength: 50
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/comments'
+      required:
+      - Stage
+      - arrival_date
+      - assigned_team
+      - cid
+      - client_position
+      - comments
+      - company
+      - description
+      - id
+      - name
+      - opponent
+      - opponent_position
+      - person
+    PaginatedGroupList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+    PaginatedLitigationCasesList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/LitigationCases'
+    PaginatedUserList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    PaginatedcommentsList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/comments'
+    PaginatedcompanyList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/company'
+    Paginatedpractice_areaList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/practice_area'
+    PaginatedrepliesList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/replies'
+    PaginatedstagesList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&limit=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&limit=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/stages'
+    PasswordResetConfirm:
+      type: object
+      properties:
+        uid:
+          type: string
+        token:
+          type: string
+        new_password:
+          type: string
+      required:
+      - new_password
+      - token
+      - uid
+    PatchedGroup:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          readOnly: true
+        name:
+          type: string
+          title: الاسم
+          maxLength: 150
+    PatchedLitigationCases:
+      type: object
+      description: |-
+        A serializer mixin that takes an additional `fields` argument that controls
+        which fields should be displayed.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cid:
+          type: string
+          readOnly: true
+          nullable: true
+          title: رقم الدعوى
+        name:
+          type: string
+          title: العنوان
+          maxLength: 500
+        description:
+          type: string
+          title: الموضوع
+          maxLength: 500
+        practice_area:
+          type: integer
+          nullable: true
+          title: نطاق العمل
+        arrival_date:
+          type: string
+          format: date-time
+          title: تاريخ التأسيس
+        company:
+          $ref: '#/components/schemas/company'
+        person:
+          $ref: '#/components/schemas/persons'
+        opponent:
+          $ref: '#/components/schemas/opponent'
+        client_position:
+          $ref: '#/components/schemas/client_position'
+        opponent_position:
+          $ref: '#/components/schemas/opponent_position'
+        assigned_team:
+          $ref: '#/components/schemas/assigned_team'
+        Stage:
+          $ref: '#/components/schemas/stages'
+        internal_ref_number:
+          type: string
+          nullable: true
+          title: رقم المرجع الداخلي
+          maxLength: 50
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/comments'
+    PatchedUser:
+      type: object
+      properties:
+        username:
+          type: string
+          title: اسم المستخدم
+          maxLength: 30
+        is_manager:
+          type: boolean
+        firstname:
+          type: string
+          title: الاسم الاول
+          maxLength: 30
+        lastname:
+          type: string
+          title: الاسم الاخير
+          maxLength: 30
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+          title: البريد الالكتروني
+    Patchedcomments:
+      type: object
+      description: |-
+        A serializer mixin that takes an additional `fields` argument that controls
+        which fields should be displayed.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        comment:
+          type: string
+          title: ملاحظات
+        replies:
+          type: array
+          items:
+            $ref: '#/components/schemas/replies'
+        case_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        event_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        task_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        hearing_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        modified_at:
+          type: string
+          format: date-time
+          readOnly: true
+    Patchedcompany:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        full_name:
+          type: string
+          title: الاسم الكامل
+          maxLength: 250
+        name:
+          type: string
+          title: الاسم
+          maxLength: 250
+        foreign_name:
+          type: string
+          title: الاسم الاجنبي
+          maxLength: 250
+        category_id:
+          type: integer
+          title: الفئة
+          readOnly: true
+        sub_category_id:
+          type: integer
+          title: الفئة الفرعية
+          readOnly: true
+        company_legal_type_id:
+          type: integer
+          title: نوع الشركة القانوني
+          readOnly: true
+        company_group_id:
+          type: integer
+          title: مجموعة الشركة
+          readOnly: true
+        reference:
+          type: string
+          title: رقم المرجع الداخلي
+          maxLength: 100
+    Patchedpractice_area:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: الاسم
+          maxLength: 250
+    Patchedreplies:
+      type: object
+      description: |-
+        A serializer mixin that takes an additional `fields` argument that controls
+        which fields should be displayed.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        reply:
+          type: string
+          maxLength: 250
+        comment_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        modified_at:
+          type: string
+          format: date-time
+          readOnly: true
+    Patchedstages:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: الاسم
+          maxLength: 250
+    SendEmailReset:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    SetPassword:
+      type: object
+      properties:
+        new_password:
+          type: string
+        current_password:
+          type: string
+      required:
+      - current_password
+      - new_password
+    SetUsername:
+      type: object
+      properties:
+        current_password:
+          type: string
+        new_email:
+          type: string
+          format: email
+          title: البريد الالكتروني
+          maxLength: 60
+      required:
+      - current_password
+      - new_email
+    TokenCreate:
+      type: object
+      properties:
+        password:
+          type: string
+        email:
+          type: string
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+          title: اسم المستخدم
+          maxLength: 30
+        is_manager:
+          type: boolean
+        firstname:
+          type: string
+          title: الاسم الاول
+          maxLength: 30
+        lastname:
+          type: string
+          title: الاسم الاخير
+          maxLength: 30
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+          title: البريد الالكتروني
+      required:
+      - email
+      - firstname
+      - id
+      - lastname
+      - username
+    UserCreate:
+      type: object
+      properties:
+        username:
+          type: string
+          title: اسم المستخدم
+          maxLength: 30
+        is_manager:
+          type: boolean
+        firstname:
+          type: string
+          title: الاسم الاول
+          maxLength: 30
+        lastname:
+          type: string
+          title: الاسم الاخير
+          maxLength: 30
+        email:
+          type: string
+          format: email
+          title: البريد الالكتروني
+          maxLength: 60
+        id:
+          type: integer
+          readOnly: true
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - firstname
+      - id
+      - lastname
+      - password
+      - username
+    UsernameResetConfirm:
+      type: object
+      properties:
+        new_email:
+          type: string
+          format: email
+          title: البريد الالكتروني
+          maxLength: 60
+      required:
+      - new_email
+    assigned_team:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: الاسم
+          maxLength: 150
+      required:
+      - id
+      - name
+    client_position:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: الاسم
+          maxLength: 250
+      required:
+      - id
+      - name
+    comments:
+      type: object
+      description: |-
+        A serializer mixin that takes an additional `fields` argument that controls
+        which fields should be displayed.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        comment:
+          type: string
+          title: ملاحظات
+        replies:
+          type: array
+          items:
+            $ref: '#/components/schemas/replies'
+        case_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        event_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        task_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        hearing_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        modified_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - comment
+      - created_at
+      - created_by
+      - id
+      - modified_at
+      - modified_by
+      - replies
+    company:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        full_name:
+          type: string
+          title: الاسم الكامل
+          maxLength: 250
+        name:
+          type: string
+          title: الاسم
+          maxLength: 250
+        foreign_name:
+          type: string
+          title: الاسم الاجنبي
+          maxLength: 250
+        category_id:
+          type: integer
+          title: الفئة
+          readOnly: true
+        sub_category_id:
+          type: integer
+          title: الفئة الفرعية
+          readOnly: true
+        company_legal_type_id:
+          type: integer
+          title: نوع الشركة القانوني
+          readOnly: true
+        company_group_id:
+          type: integer
+          title: مجموعة الشركة
+          readOnly: true
+        reference:
+          type: string
+          title: رقم المرجع الداخلي
+          maxLength: 100
+      required:
+      - category_id
+      - company_group_id
+      - company_legal_type_id
+      - foreign_name
+      - full_name
+      - id
+      - name
+      - reference
+      - sub_category_id
+    opponent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: الاسم
+          maxLength: 250
+      required:
+      - id
+      - name
+    opponent_position:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        position:
+          type: string
+          title: صفة الموكل
+          maxLength: 250
+      required:
+      - id
+      - position
+    persons:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: الاسم
+          maxLength: 250
+      required:
+      - id
+      - name
+    practice_area:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: الاسم
+          maxLength: 250
+      required:
+      - id
+      - name
+    replies:
+      type: object
+      description: |-
+        A serializer mixin that takes an additional `fields` argument that controls
+        which fields should be displayed.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        reply:
+          type: string
+          maxLength: 250
+        comment_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        modified_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        modified_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - created_by
+      - id
+      - modified_at
+      - modified_by
+      - reply
+    stages:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: الاسم
+          maxLength: 250
+      required:
+      - id
+      - name
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"

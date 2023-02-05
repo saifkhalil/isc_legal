@@ -1,0 +1,1 @@
+docker-compose run web -p 8000:8000 

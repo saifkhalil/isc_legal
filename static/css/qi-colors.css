@@ -1,0 +1,89 @@
+/* change the colors */
+
+:root {
+    --qi-primary: #4F758B;
+    --qi-secondary: #FFDD00;
+    --qi-text: #fff;
+}
+
+.qi-border {
+    border-color: var(--qi-secondary) !important;
+}
+
+.calendar td:hover {
+    background-color: var(--qi-secondary);
+    color: var(--qi-text);
+}
+
+.qi-light {
+    background-color: var(--qi-primary) !important;
+    color: var(--qi-text) !important;
+}
+
+.nav-link {
+    color: var(--qi-text) !important;
+}
+
+.qi-primary-outline {
+    background-color: transparent !important;
+    color: var(--qi-text) !important;
+    border-color: var(--qi-secondary) !important;
+}
+
+.qi-primary-outline:hover {
+    background-color: var(--qi-secondary) !important;
+    color: var(--qi-primary) !important;
+    border-color: var(--qi-primary) !important;
+}
+
+.btn-primary {
+    background-color: var(--qi-secondary) !important;
+    color: var(--qi-primary) !important;
+    border-color: var(--qi-secondary) !important;
+}
+
+.qi-primary {
+    background-color: var(--qi-secondary) !important;
+    color: var(--qi-primary) !important;
+    border-color: var(--qi-secondary) !important;
+}
+
+.qi-primary:hover {
+    background-color: var(--qi-primary) !important;
+    color: var(--qi-secondary) !important;
+    border-color: var(--qi-primary) !important;
+}
+
+.form-select {
+    background-color: var(--qi-secondary) !important;
+    color: var(--qi-primary) !important;
+    border-color: var(--qi-primary) !important;
+}
+
+.form-select:hover {
+    background-color: var(--qi-primary) !important;
+    color: var(--qi-secondary) !important;
+    border-color: var(--qi-secondary) !important;
+}
+
+.navbar-toggler {
+    background-color: var(--qi-secondary) !important;
+    color: var(--qi-text) !important;
+    border-color: var(--qi-primary) !important;
+}
+
+.navbar-brand {
+    color: var(--qi-text) !important;
+}
+
+.qi-enav {
+    border-top-left-radius: 30px !important;
+    border-bottom-left-radius: 30px !important;
+    margin-left: 30px !important;
+}
+
+.qi-anav {
+    border-top-right-radius: 30px !important;
+    border-bottom-right-radius: 30px !important;
+    margin-right: 30px !important;
+}

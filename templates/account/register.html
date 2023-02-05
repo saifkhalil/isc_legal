@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+{% load i18n %}
+{% load widget_tweaks %}
+<!-- ===== Start of Login - Register Section ===== -->
+<section class="ptb150" id="login">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-md-offset-3 col-xs-12">
+      <!-- Start of Login Box -->
+      <div class="login-box">
+        <div class="login-title">
+          <h4>{% trans 'Register to ISC Legal App' %}</h4>
+        </div>
+        <form class="form-signin" method="post">
+          {% csrf_token %}
+          <h1 class="h3 mb-3 text-center text-white">{% trans 'User Registration' %}</h1>
+          <div class="form-floating mb-3">
+            <input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email" required
+              autofocus>
+            <label for="inputEmail">{% trans 'Email' %}</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="text" name="username" id="inputUsername" class="form-control" placeholder="Username" required>
+            <label for="inputUsername">{% trans 'Username' %}</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="text" name="firstname" id="inputFirstname" class="form-control" placeholder="First Name"
+              required>
+            <label for="inputFirstname">{% trans 'First Name' %}</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="text" name="lastname" id="inputLastName" class="form-control" placeholder="Last Name" required>
+            <label for="inputLastName">{% trans 'Last Name' %}</label>
+          </div>
+          {% for field in form.visible_fields %}
+          {% if field.name == 'phone' %}
+          <div class="form-floating  mb-3">
+            {% render_field field class="form-control" %}
+            <label for="id_phone_1">{% trans 'Phone' %}</label>
+          </div>
+          {% endif %}
+          {% endfor %}
+          <div class="form-floating mb-3">
+            <input type="password" name="password1" id="inputPassword1" class="form-control" placeholder="Password"
+              required>
+            <label for="inputPassword1">{% trans 'Password' %}</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="password" name="password2" id="inputPassword2" class="form-control"
+              placeholder="Confirm Password" required>
+            <label for="inputPassword2">{% trans 'Confirm Password' %}</label>
+          </div>
+          {% if form.errors %}
+          <div class="alert alert-danger mt-3" role="alert">
+            <p>{% trans 'Please check the below:' %}</p>
+            <ol>
+              {% for field in form %}
+              {% for error in field.errors %}
+              <li>{{field.label}} : {{ error }}</li>
+              {% endfor %}
+              {% endfor %}
+            </ol>
+          </div>
+          {% endif %}
+          {% if registration_form.non_field_errors %}
+          <div style="color: red">
+            <p>{{registration_form.non_field_errors}}</p>
+          </div>
+          {% endif %}
+          <button class="btn btn-primary" type="submit">{% trans 'Register' %}</button>
+        </form>
+      </div>
+      <!-- End of Login Box -->
+    </div>
+  </div>
+</section>
+<!-- ===== End of Login - Register Section ===== -->
+<script type="text/javascript" src="{% static 'js/bootstrap-filestyle.min.js' %}"> </script>
+{% endblock content %}

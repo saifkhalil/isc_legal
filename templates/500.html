@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load countries %}
+{% get_current_language as CURRENT_LANGUAGE %}
+{% get_available_languages as AVAILABLE_LANGUAGES %}
+{% get_language_info_list for AVAILABLE_LANGUAGES as languages %}
+{% block content %}
+{% load static %}
+
+    <!-- ===== Start of Error page Section ===== -->
+    <section class="ptb160" id="page-error">
+        <div class="container">
+            <div class="col-md-12">
+
+                <h2>500</h2>
+                <h3 class="capitalize">Internal Server Error</h3>
+                <a href="{% url 'home' %}" class="btn btn-blue btn-effect mt20">back home</a>
+
+            </div>
+        </div>
+    </section>
+    <!-- ===== End of Page not Found Section ===== -->
+
+{% endblock %}
