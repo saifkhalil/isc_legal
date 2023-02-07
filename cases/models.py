@@ -326,10 +326,8 @@ def LitigationCases_send_email(sender, instance, created, *args, **kwargs):
             'msgtype':_('You have been assigned with you below case details')
             })
             send_html_mail(email_subject, email_body,  [case.assignee.email])
-        print(instance.shared_with)
         if case.shared_with.exists():
             for shuser in case.shared_with.all():
-                print(shuser)
                 if shuser.email_notification:
                     message = 'text version of HTML message'
                     email_subject = _('New Case #') + str(case.id)
@@ -455,7 +453,11 @@ def LitigationCases_sharedwith_send_email(sender, instance, action,reverse,pk_se
     # request = current_request()
     current_case = instance
     case = LitigationCases.objects.get(id=current_case.id)
+    # createdBy = case.created_by
     if action == 'post_add':
+        # if not createdBy in pk_set and pk_set:
+        #     createdby = User.objects.get(id=createdBy)
+        #     case.shared_with.add(createdby)
         for shuser in pk_set:
             cuser = User.objects.get(id=shuser)
             if cuser.email_notification:
