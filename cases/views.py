@@ -4,7 +4,7 @@ from rest_framework import viewsets,status
 from rest_framework import permissions
 from rest_framework.response import Response
 from .serializers import LitigationCasesSerializer,stagesSerializer,case_typeSerializer,courtSerializer,client_positionSerializer,opponent_positionSerializer,LitigationCasesEventSerializer,FoldersSerializer,ImportantDevelopmentsSerializer
-from .models import LitigationCases,stages,case_type,court,client_position,opponent_position,LitigationCasesEvent,Folder,ImportantDevelopment
+from .models import LitigationCases,stages,case_type,court,client_position,opponent_position,LitigationCasesEvent,Folder,ImportantDevelopment,Status
 from rest_framework.authentication import TokenAuthentication,SessionAuthentication
 from rest_framework.decorators import action
 from activities.models import task,hearing
@@ -31,6 +31,8 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 # from rest_framework_tracking.mixins import LoggingMixin
 from rest_framework_word_filter import FullWordSearchFilter
+from core.models import priorities
+
 # def get_cases_from_cache():
 #     if 'all_cases' in cache:
 #         return cache.get('all_cases')
@@ -136,6 +138,56 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
     ordering_fields = ['created_at', 'id','modified_at']
     ordering = ['-id']
 
+    def create(self,request):
+        req_name = request.data.get('name')
+        req_description = request.data.get('description')
+        req_case_category = request.data.get('case_category')
+        req_judge = request.data.get('judge')
+        req_detective = request.data.get('detective')
+        req_case_type = case_type.objects.get(type=request.data.get('case_type'))
+        req_court = court.objects.get(name= request.data.get('court'))
+        req_client_position = client_position.objects.get(name= request.data.get('client_position'))
+        req_opponent_position = opponent_position.objects.get(position=  request.data.get('opponent_position'))
+        req_assignee = User.objects.get(username=request.data.get('assignee'))
+        req_shared_with = request.data.get('shared_with')
+        req_internal_ref_number = request.data.get('internal_ref_number')
+        req_priority = priorities.objects.get(priority= request.data.get('priority'))
+        req_Stage =stages.objects.get(name= request.data.get('Stage'))
+        req_case_status = Status.objects.get(id= request.data.get('case_status'))
+        req_start_time = datetime.strptime(request.data.get('start_time'),'%Y-%m-%d') if not request.data.get('start_time') in ('',None) else None
+        req_end_time = datetime.strptime(request.data.get('end_time'),'%Y-%m-%d') if not request.data.get('end_time')  in ('',None) else None
+        cases = LitigationCases(
+            id=None,
+            name=req_name,
+            description=req_description,
+            case_category=req_case_category,
+            judge=req_judge,
+            detective=req_detective,
+            case_type=req_case_type,
+            court = req_court,
+            client_position = req_client_position,
+            opponent_position=req_opponent_position,
+            assignee = req_assignee,
+            internal_ref_number = req_internal_ref_number,
+            priority = req_priority,
+            Stage = req_Stage,
+            case_status = req_case_status,
+            start_time = req_start_time,
+            end_time = req_end_time,
+            created_by=request.user,
+            )
+        cases.save()
+        if req_shared_with:
+            shared_with_list = list(req_shared_with)
+            for sh in shared_with_list:
+                cases.shared_with.add(sh)
+            cases.shared_with.add(request.user)
+        else:
+            cases.shared_with.add(request.user)
+        serializer = self.get_serializer(cases)
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+
+
     def destroy(self, request, pk=None):
         case = LitigationCases.objects.filter(id=pk)
         cases = LitigationCases.objects.get(id=pk)
@@ -154,7 +206,7 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         internal_ref_number = self.request.query_params.get('internal_ref_number')
-        start_time = self.request.query_params.get('start_time')
+        start_time = self.request.query_params.get('start_time',None)
         Stage = self.request.query_params.get('stage')
         queryset = LitigationCases.objects.all().order_by('-created_by').filter(is_deleted=False)
         current_user_id = self.request.user.id
@@ -162,10 +214,10 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
         is_manager = cuser.is_manager
         if internal_ref_number is not None:
             queryset = queryset.filter(internal_ref_number=internal_ref_number)
-        if start_time is not None:
+        if not start_time in  ('',None):
             req_date = datetime.strptime(start_time, '%Y-%m-%d').date()
             queryset = queryset.filter(start_time__year=req_date.year,start_time__month=req_date.month,start_time__day=req_date.day)
-        if Stage is not None:
+        if not Stage in  ('',None):
             queryset = queryset.filter(Stage__id=Stage)
         if is_manager:
             queryset = queryset

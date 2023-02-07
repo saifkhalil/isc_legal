@@ -98,6 +98,7 @@ class LitigationCasesSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     hearing = serializers.SerializerMethodField()
     start_time = serializers.DateTimeField(format="%Y-%m-%d", required=False)
     end_time = serializers.DateTimeField(format="%Y-%m-%d", required=False)
+    created_by = serializers.StringRelatedField(default=serializers.CurrentUserDefault(), read_only=True)
     # company = companySerializer()
     # person = personsSerializer()
     # client_position = client_positionSerializer()
