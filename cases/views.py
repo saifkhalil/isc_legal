@@ -245,7 +245,7 @@ class FoldersViewSet(viewsets.ModelViewSet):
         #   FullWordSearchFilter,
           ]
     # perm_slug = "folders.Folder"
-    filterset_fields = ['id', 'Stage','folder_type','folder_category','assignee','court']
+    filterset_fields = ['id', 'folder_type','folder_category','assignee','court']
     # word_fields = ('name','description')
     search_fields = ['@name','@internal_ref_number','=id']
     ordering_fields = ['created_at', 'id','modified_at']
@@ -270,7 +270,7 @@ class FoldersViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         internal_ref_number = self.request.query_params.get('internal_ref_number')
         start_time = self.request.query_params.get('start_time')
-        Stage = self.request.query_params.get('stage')
+        # Stage = self.request.query_params.get('stage')
         queryset = Folder.objects.all().order_by('-created_by').filter(is_deleted=False)
         current_user_id = self.request.user.id
         cuser = User.objects.get(id=current_user_id)
@@ -280,8 +280,8 @@ class FoldersViewSet(viewsets.ModelViewSet):
         if start_time is not None:
             req_date = datetime.strptime(start_time, '%Y-%m').date()
             queryset = queryset.filter(start_time__year=req_date.year,start_time__month=req_date.month)
-        if Stage is not None:
-            queryset = queryset.filter(Stage__id=Stage)
+        # if Stage is not None:
+        #     queryset = queryset.filter(Stage__id=Stage)
         if is_manager:
             queryset = queryset
         else:

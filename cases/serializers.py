@@ -154,9 +154,9 @@ class FoldersSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     court = serializers.SlugRelatedField(slug_field='name',queryset=court.objects.all())
     priority = serializers.SlugRelatedField(slug_field='priority',queryset=priorities.objects.all())
     folder_type = serializers.SlugRelatedField(slug_field='type',queryset=case_type.objects.all())
-    client_position = serializers.SlugRelatedField(slug_field='name',queryset=client_position.objects.all())
-    opponent_position = serializers.SlugRelatedField(slug_field='position',queryset=opponent_position.objects.all())
-    Stage = serializers.SlugRelatedField(slug_field='name',queryset=stages.objects.all())
+    # client_position = serializers.SlugRelatedField(slug_field='name',queryset=client_position.objects.all())
+    # opponent_position = serializers.SlugRelatedField(slug_field='position',queryset=opponent_position.objects.all())
+    # Stage = serializers.SlugRelatedField(slug_field='name',queryset=stages.objects.all())
     assignee = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all())
     comments = commentsSerializer(many=True,read_only=True)
     documents = documentsSerializer(many=True,read_only=True)
@@ -196,6 +196,6 @@ class FoldersSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     class Meta:
         model = Folder
 #        list_serializer_class = FilteredListSerializer
-        fields = [ 'id', 'name','description','folder_category','priority','shared_with','court','ImportantDevelopment','folder_type','folder_status','judge','detective','client_position','opponent_position','assignee','Stage','internal_ref_number','comments','tasks','documents','paths','hearing','start_time','end_time','created_by','created_at']
+        fields = [ 'id', 'name','description','folder_category','priority','shared_with','court','ImportantDevelopment','folder_type','folder_status','assignee','internal_ref_number','comments','tasks','documents','paths','hearing','start_time','end_time','created_by','created_at']
         http_method_names = ['get', 'post', 'head','put']
 
