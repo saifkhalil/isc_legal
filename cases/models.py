@@ -364,8 +364,8 @@ class Folder(models.Model):
     name = models.CharField(max_length=500, blank=False, null=False, verbose_name=_('Title'))
     description   = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Subject'))
     folder_category = models.CharField(max_length=500,choices=case_categories,default='Public', blank=False, null=False, verbose_name=_('Folder Category'))
-    judge = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Judge Name'))
-    detective = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Detective'))
+    # judge = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Judge Name'))
+    # detective = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Detective'))
     folder_type = models.ForeignKey('case_type', on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Folder type'))
     court = models.ForeignKey(court, on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Court name'))
     documents = models.ManyToManyField(documents, blank=True, verbose_name=_('Documents'))
@@ -374,9 +374,9 @@ class Folder(models.Model):
     # client_type = models.ForeignKey('client_type', on_delete=models.CASCADE, blank=False,null=False, verbose_name=_('Client type'))
     # company = models.ForeignKey('company', on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Company'))
     # person = models.ForeignKey('persons',related_name='%(class)s_person', on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Person'))
-    client_position = models.ForeignKey('client_position', on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Client Position'))
+    # client_position = models.ForeignKey('client_position', on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Client Position'))
     # opponent = models.ForeignKey('persons',related_name='%(class)s_opponent', on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Opponent'))
-    opponent_position = models.ForeignKey('opponent_position', on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Opponent Position'))
+    # opponent_position = models.ForeignKey('opponent_position', on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Opponent Position'))
     # assigned_team = models.ForeignKey(Group, on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Assigned Team'))
     assignee = models.ForeignKey(User, related_name='%(class)s_assignee', on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Assignee'))
     shared_with = models.ManyToManyField(User, related_name='%(class)s_shared_with', blank=True,verbose_name=_('Shared With'))
@@ -384,7 +384,7 @@ class Folder(models.Model):
     # due_date = models.DateField(verbose_name=_('Due date'), null=True, blank=True)
     internal_ref_number = models.CharField(max_length=50, blank=True,null=True, verbose_name=_('Internal Ref Number'))    
     priority = models.ForeignKey(priorities,  on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Matter Priority'))
-    Stage = models.ForeignKey('stages',  on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Stage'))
+    # Stage = models.ForeignKey('stages',  on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Stage'))
     ImportantDevelopment = models.ManyToManyField(ImportantDevelopment, related_name='%(class)s_ImportantDevelopment', blank=True,verbose_name=_('Important Development'))
     # requested_by = models.ForeignKey(User, related_name='%(class)s_requested_by', on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Requested By'))
     # case_status = models.ForeignKey('case_status', related_name='%(class)s_case_status', on_delete=models.CASCADE, null=False, blank=False,verbose_name=_('Case Status'),default=case_status.get_default)
@@ -412,7 +412,7 @@ class Folder(models.Model):
     class Meta:
         verbose_name = _('Folder')
         verbose_name_plural = _('Folders')
-        indexes = [ models.Index(fields=['id','name','Stage','folder_type','folder_category','assignee','court','description']),]
+        indexes = [ models.Index(fields=['id','name','folder_type','folder_category','assignee','court','description']),]
     @property
     def get_html_url(self):
         url = reverse('folders:folder_edit', args=(self.id,))
