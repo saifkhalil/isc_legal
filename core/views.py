@@ -42,7 +42,7 @@ from django.http.response import JsonResponse
 from rest_api.api_view_mixins import ExternalObjectAPIViewMixin
 
 from rest_api import generics
-
+from rest_framework import generics as rest_framework_generics
 
 
 
@@ -501,7 +501,7 @@ class APIDocumentPathListView(
     external_object_pk_url_kwarg = 'document_id'
 
     def get_source_queryset(self):
-        return self.get_external_object().Paths.all().filter(is_deleted=False)
+        return self.get_external_object().Paths.all()
 
 
 class APIPathListView(generics.ListCreateAPIView):
@@ -512,8 +512,9 @@ class APIPathListView(generics.ListCreateAPIView):
 
     ordering_fields = ('id', 'name')
     serializer_class = PathSerializer
-    source_queryset = Path.objects.all().filter(is_deleted=False)
-
+    source_queryset = Path.objects.all()
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = ['id','case_id']
     # def get_instance_extra_data(self):
     #     return {
     #         '_event_actor': self.request.user
@@ -539,7 +540,7 @@ class APIPathListView(generics.ListCreateAPIView):
 
         try:
             obj = Path.objects.get(parent=req_parent, name=req_name)
-            return Response(data={"detail":f"اسم المجلد موجود {req_name} مسبقا"},status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"detail":f"اسم المجلد '{req_name}' موجود مسبقا"},status=status.HTTP_400_BAD_REQUEST)
         except ObjectDoesNotExist:
             if not req_parent in ('',None):
                 req_parent = get_object_or_404(Path, pk=req_parent)
@@ -567,7 +568,7 @@ class APIPathListView(generics.ListCreateAPIView):
         return super().perform_create(serializer)
 
 
-class APIPathView(generics.RetrieveUpdateDestroyAPIView):
+class APIPathView(rest_framework_generics.RetrieveUpdateDestroyAPIView):
     """
     delete: Delete the selected Path.
     get: Returns the details of the selected Path.
@@ -577,7 +578,9 @@ class APIPathView(generics.RetrieveUpdateDestroyAPIView):
     lookup_url_kwarg = 'path_id'
 
     serializer_class = PathSerializer
-    source_queryset = Path.objects.all().filter(is_deleted=False)
+    queryset = Path.objects.all()
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = ['case_id']
 
     def get_instance_extra_data(self):
         return {
@@ -602,7 +605,7 @@ class APIPathView(generics.RetrieveUpdateDestroyAPIView):
             paths.folder_id = None
             paths.save()
         paths.documents.all().update(is_deleted=True,modified_by=request.user,modified_at=timezone.now(),path_id=None)
-        path.update(is_deleted=True,modified_by=request.user,modified_at=timezone.now())
+        path.delete()
         return Response(data={"detail":f"Path is deleted{case_msg}{folder_msg}"},status=status.HTTP_200_OK)
 
 class APIPathDocumentAddView(generics.ObjectActionAPIView):
@@ -612,7 +615,7 @@ class APIPathDocumentAddView(generics.ObjectActionAPIView):
     lookup_url_kwarg = 'path_id'
 
     serializer_class = PathDocumentAddSerializer
-    source_queryset = Path.objects.all().filter(is_deleted=False)
+    source_queryset = Path.objects.all()
 
     def object_action(self, obj, request, serializer):
         document = serializer.validated_data['document']
@@ -626,7 +629,7 @@ class APIPathDocumentRemoveView(generics.ObjectActionAPIView):
     lookup_url_kwarg = 'path_id'
 
     serializer_class = PathDocumentRemoveSerializer
-    source_queryset = Path.objects.all().filter(is_deleted=False)
+    source_queryset = Path.objects.all()
 
     def object_action(self, obj, request, serializer):
         document = serializer.validated_data['document']

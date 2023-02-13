@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.reverse import reverse
 from rest_api.relations import FilteredPrimaryKeyRelatedField
 from django.shortcuts import get_object_or_404
+from rest_framework.validators import UniqueTogetherValidator
 
 # from rest_framework_recursive.fields import RecursiveField
 # class FilteredListSerializer(serializers.ListSerializer):
@@ -126,9 +127,11 @@ class EventsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
         # list_serializer_class = FilteredListSerializer
         fields = ['pgh_diff',]
 
+
 class PathSerializer(serializers.ModelSerializer):
-    children = RecursiveField(
-        help_text=_('List of children paths.'), label=_('Children'),
+    case_name = serializers.SerializerMethodField('get_case_name')
+    subPaths = RecursiveField(
+        help_text=_('List of Sub-paths.'), label=_('SubPaths'),
         many=True, read_only=True,source='active_path'
     )
     # documents_url = serializers.HyperlinkedIdentityField(
@@ -167,6 +170,16 @@ class PathSerializer(serializers.ModelSerializer):
     #         result = path.documents.all().filter(is_deleted=False).values()
     #         return result
 
+    def get_case_name(self, obj):
+        if obj.case_id:
+            try:
+                case =  LitigationCases.objects.get(id=obj.case_id).name
+            except LitigationCases.DoesNotExist:
+                case = None
+            return case
+        else:
+            return None
+
 
     class Meta:
         extra_kwargs = {
@@ -176,14 +189,21 @@ class PathSerializer(serializers.ModelSerializer):
                 'view_name': 'path-detail'
             }
         }
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Path.objects.all(),
+                fields=('name', 'parent'),
+                message="اسم المجلد موجود مسبقا"
+            )
+        ]
         fields = (
-            'children', 'id', 'name','parent', 'case_id','folder_id',
+            'subPaths', 'id', 'name','parent', 'case_id','case_name','folder_id',
             'parent_id','documents'
             # 'parent_url', 'url','full_path', 'documents_url',
         )
         model = Path
         read_only_fields = (
-            'children', 'id',
+            'subPaths', 'id','case_name',
             'parent_id',
              'parent_url', 'url', 'full_path', 'documents_url','documents'
         )

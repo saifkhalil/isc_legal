@@ -157,7 +157,7 @@ class FoldersSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     # client_position = serializers.SlugRelatedField(slug_field='name',queryset=client_position.objects.all())
     # opponent_position = serializers.SlugRelatedField(slug_field='position',queryset=opponent_position.objects.all())
     # Stage = serializers.SlugRelatedField(slug_field='name',queryset=stages.objects.all())
-    assignee = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all())
+    assignee = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(), required=False)
     comments = commentsSerializer(many=True,read_only=True)
     documents = documentsSerializer(many=True,read_only=True)
     paths = PathSerializer(many=True,read_only=True )

@@ -16,6 +16,7 @@ from .events import (
 from django.core.exceptions import ValidationError,NON_FIELD_ERRORS
 from .model_mixins import ExtraDataModelMixin,HooksModelMixin
 from .classes import EventManagerMethodAfter, EventManagerSave
+from django.core.exceptions import NON_FIELD_ERRORS
 
 
 
@@ -168,7 +169,12 @@ class documents(ExtraDataModelMixin,HooksModelMixin,models.Model):
 
 @pghistory.track(pghistory.Snapshot())
 class Path(MPTTModel):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, 
+    # unique=True,
+    # error_messages ={
+    #                 "unique":"The Geeks Field you entered is not unique."
+    #                 }
+                    )
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
     documents = models.ManyToManyField(
         blank=True, related_name='paths', to=documents,
@@ -176,7 +182,7 @@ class Path(MPTTModel):
     )
     case_id = models.IntegerField(blank=True,null=True, verbose_name=_('Litigation Case'))
     folder_id = models.IntegerField(blank=True,null=True, verbose_name=_('Folder'))
-    is_deleted = models.BooleanField(default=False,verbose_name=_("Is Deleted"))
+    # is_deleted = models.BooleanField(default=False,verbose_name=_("Is Deleted"))
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
     created_by = models.ForeignKey(
@@ -197,10 +203,15 @@ class Path(MPTTModel):
         unique_together = ('parent', 'name')
         verbose_name = _('Path')
         verbose_name_plural = _('Paths')
+        # error_messages = {
+        #      NON_FIELD_ERRORS: {
+        #          'unique_together': "%(model_name)s's %(field_labels)s are not unique. This means that the same parking plot is already booked during time period!",
+        #      }
+        #  }
 
     @property
     def active_path(self):
-        return self.children.filter(is_deleted=False)
+        return self.children
 
     # def __str__(self):
     #     return self.get_full_path()
