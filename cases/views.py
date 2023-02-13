@@ -32,6 +32,8 @@ from django.utils import timezone
 # from rest_framework_tracking.mixins import LoggingMixin
 from rest_framework_word_filter import FullWordSearchFilter
 from core.models import priorities
+from core.classes import StandardResultsSetPagination
+
 
 # def get_cases_from_cache():
 #     if 'all_cases' in cache:
@@ -96,12 +98,15 @@ def case(request, case_id=None):
         return HttpResponseRedirect(reverse('cal:calendar'))
     return render(request, 'cases/case.html', {'form': form})
 
+
+
 class LitigationCasesEventViewSet(viewsets.ReadOnlyModelViewSet):
     
     model = LitigationCasesEvent
     queryset = LitigationCasesEvent.objects.all().order_by('-created_by')
     serializer_class = LitigationCasesEventSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
+    pagination_class = StandardResultsSetPagination
     permission_classes = [
         permissions.IsAuthenticated,
         #  MyPermission
@@ -114,12 +119,15 @@ class LitigationCasesEventViewSet(viewsets.ReadOnlyModelViewSet):
           ]
     filterset_fields = ['id', ]
 
+
+
 class LitigationCasesViewSet(viewsets.ModelViewSet):
     
     model = LitigationCases
     queryset = LitigationCases.objects.all().order_by('-created_by')
     serializer_class = LitigationCasesSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
+    pagination_class = StandardResultsSetPagination
     permission_classes = [
         permissions.IsAuthenticated,
         #  MyPermission

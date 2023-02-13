@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 # from actstream import action
+from rest_framework.pagination import LimitOffsetPagination
 
 from .class_mixins import AppsModuleLoaderMixin
 # from mayan.apps.common.menus import menu_list_facet
@@ -522,3 +523,10 @@ class ModelEventType:
     @classmethod
     def register_inheritance(cls, model, related):
         cls._inheritances[model] = related
+
+
+
+class StandardResultsSetPagination(LimitOffsetPagination):
+    default_limit = 10
+    limit_query_param = 'limit'
+    max_limit = 100
