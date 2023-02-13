@@ -515,6 +515,8 @@ class APIPathListView(generics.ListCreateAPIView):
     source_queryset = Path.objects.all()
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filterset_fields = ['id','case_id']
+    ordering_fields = ['created_at', 'id','modified_at']
+    ordering = ['-id']
     # def get_instance_extra_data(self):
     #     return {
     #         '_event_actor': self.request.user
@@ -581,6 +583,8 @@ class APIPathView(rest_framework_generics.RetrieveUpdateDestroyAPIView):
     queryset = Path.objects.all()
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filterset_fields = ['case_id']
+    ordering_fields = ['created_at', 'id','modified_at']
+    ordering = ['-id']
 
     def get_instance_extra_data(self):
         return {
