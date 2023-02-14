@@ -43,7 +43,7 @@ from rest_api.api_view_mixins import ExternalObjectAPIViewMixin
 
 from rest_api import generics
 from rest_framework import generics as rest_framework_generics
-
+from core.classes import StandardResultsSetPagination
 
 
 # from rest_framework_tracking.mixins import LoggingMixin
@@ -119,6 +119,7 @@ class commentsViewSet(viewsets.ModelViewSet):
     queryset = comments.objects.all().order_by('-id').filter(is_deleted=False)
     serializer_class = commentsSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
+    pagination_class = StandardResultsSetPagination
     perm_slug = "core.comments"
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filterset_fields = ['id','case_id','task_id','hearing_id']
@@ -179,6 +180,7 @@ class repliesViewSet(viewsets.ModelViewSet):
     queryset = replies.objects.all().order_by('-created_at').filter(is_deleted=False)
     serializer_class = repliesSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
+    pagination_class = StandardResultsSetPagination
     perm_slug = "core.replies"
 
     def create(self, request):
@@ -228,6 +230,7 @@ class contractsViewSet(viewsets.ModelViewSet):
     queryset = contracts.objects.all().order_by('-created_by').filter(is_deleted=False)
     serializer_class = contractsSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
+    pagination_class = StandardResultsSetPagination
     filter_backends = [
         DjangoFilterBackend,
          SearchFilter,

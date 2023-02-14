@@ -4,7 +4,7 @@ from .models import task,hearing
 from core.models import court,Status
 from accounts.models import User
 from cases.models import LitigationCases,Folder
-
+import datetime
 
 # class task_typeSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
 #     class Meta:
@@ -27,7 +27,7 @@ class taskSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
     created_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     modified_by = serializers.SlugRelatedField(slug_field='username',queryset=User.objects.all(),required=False, allow_null=True)
     case_name = serializers.SerializerMethodField('get_case_name')
-
+    
     class Meta:
         model = task
         fields = ['id', 'title','description','assignee','due_date','comments','case_id','case_name','folder_id','task_status','created_by','created_at','modified_by','modified_at']
