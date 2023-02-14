@@ -21,6 +21,7 @@ import django_filters.rest_framework
 from datetime import datetime
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from core.classes import StandardResultsSetPagination
 from django.db.models import Q
 # from rest_framework_tracking.mixins import LoggingMixin
 from accounts.models import User
@@ -101,6 +102,7 @@ class taskViewSet(viewsets.ModelViewSet):
     queryset = task.objects.all().order_by('-id').filter(is_deleted=False)
     serializer_class = taskSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
+    pagination_class = StandardResultsSetPagination
     permission_classes = [
         permissions.IsAuthenticated,
     #  MyPermission
@@ -237,6 +239,7 @@ class hearingViewSet(viewsets.ModelViewSet):
     serializer_class = hearingSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated, MyPermission]
+    pagination_class = StandardResultsSetPagination
     perm_slug = "activities.hearing" 
     filter_backends = [
         DjangoFilterBackend,
