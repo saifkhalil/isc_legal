@@ -27,9 +27,16 @@ from .models import LitigationCases, stages, case_type, court, client_position, 
     Folder, ImportantDevelopment, Status
 # CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 from .permissions import MyPermission
+from cases.permissions import Manager_SuperUser
 from .serializers import LitigationCasesSerializer, stagesSerializer, case_typeSerializer, courtSerializer, \
     client_positionSerializer, opponent_positionSerializer, LitigationCasesEventSerializer, FoldersSerializer, \
     ImportantDevelopmentsSerializer
+
+def manager_superuser_check(request):
+    return Response(data={"detail": "انت غير مصرح بالمسح"}, status=status.HTTP_401_UNAUTHORIZED)
+    current_user = User.objects.get(id=request.user.id)
+    if not (current_user.is_manager or current_user.is_superuser):
+        return Response(data={"detail": "انت غير مصرح بالمسح"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 # def get_cases_from_cache():
@@ -122,7 +129,7 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
     permission_classes = [
         permissions.IsAuthenticated,
-        #  MyPermission
+        Manager_SuperUser
     ]
 
     filter_backends = [
@@ -196,7 +203,7 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
         cases.hearing.all().update(is_deleted=True, modified_by=request.user, modified_at=timezone.now())
         cases.documents.all().update(is_deleted=True, modified_by=request.user, modified_at=timezone.now())
         case.update(is_deleted=True, modified_by=request.user, modified_at=timezone.now())
-        return Response(data={"detail": "Record is deleted"}, status=status.HTTP_200_OK)
+        return Response(data={"detail": "تم مسح الدعوى بنجاح"}, status=status.HTTP_200_OK)
 
     # @action(detail=True)
     # def get_comments(self, request,pk=None):
@@ -238,7 +245,7 @@ class FoldersViewSet(viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
     permission_classes = [
         permissions.IsAuthenticated,
-        #  MyPermission
+        Manager_SuperUser
     ]
 
     filter_backends = [
@@ -248,7 +255,7 @@ class FoldersViewSet(viewsets.ModelViewSet):
         #   FullWordSearchFilter,
     ]
     # perm_slug = "folders.Folder"
-    filterset_fields = ['id', 'folder_type', 'folder_category', 'assignee', 'court']
+    filterset_fields = ['id', 'record_type', 'folder_category', 'assignee', 'court']
     # word_fields = ('name','description')
     search_fields = ['@name', '@internal_ref_number', '=id']
     ordering_fields = ['created_at', 'id', 'modified_at']
