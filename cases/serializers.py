@@ -202,7 +202,7 @@ class FoldersSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     class Meta:
         model = Folder
         #        list_serializer_class = FilteredListSerializer
-        fields = ['id', 'name', 'description', 'folder_category', 'priority', 'shared_with', 'court',
+        fields = ['id', 'name', 'description', 'folder_category','record_type', 'priority', 'shared_with', 'court',
                   'ImportantDevelopment', 'folder_type', 'folder_status', 'assignee', 'internal_ref_number', 'comments',
                   'tasks', 'documents', 'paths', 'hearing', 'start_time', 'end_time', 'created_by', 'created_at']
         http_method_names = ['get', 'post', 'head', 'put']

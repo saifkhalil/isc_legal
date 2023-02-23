@@ -357,9 +357,20 @@ def LitigationCases_sharedwith_send_email(sender, instance, action, reverse, pk_
                 send_html_mail(email_subject, email_body, [cuser.email])
 
 
+
+
+
+
 @pghistory.track(pghistory.Snapshot())
 class Folder(models.Model):
+
+    record_types = (
+    ("Folder", _("Folder")),
+    ("Administrative_investigations", _("Administrative investigations")),
+    ("Notation", _("Notation")),
+)
     id = models.AutoField(primary_key=True, )
+    record_type = models.CharField(max_length=100,choices=record_types,default='Folder',blank=False,null=False, verbose_name=_('Record Type'))
     # cid = models.CharField(max_length=20, blank=True, null=True, verbose_name=_('Folder ID'),editable=False)
     name = models.CharField(max_length=500, blank=False, null=False, verbose_name=_('Title'))
     description = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Subject'))
