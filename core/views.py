@@ -35,11 +35,15 @@ from .serializers import (
     PathDocumentAddSerializer, PathDocumentRemoveSerializer,
     PathSerializer
 )
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework.parsers import JSONParser 
+from django.http.response import JsonResponse
+
 from rest_api.api_view_mixins import ExternalObjectAPIViewMixin
 
 from rest_api import generics
-
-
+from rest_framework import generics as rest_framework_generics
+from core.classes import StandardResultsSetPagination
 
 
 # from rest_framework_tracking.mixins import LoggingMixin
@@ -115,6 +119,7 @@ class commentsViewSet(viewsets.ModelViewSet):
     queryset = comments.objects.all().order_by('-id').filter(is_deleted=False)
     serializer_class = commentsSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
+    pagination_class = StandardResultsSetPagination
     perm_slug = "core.comments"
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filterset_fields = ['id','case_id','task_id','hearing_id']
@@ -175,6 +180,7 @@ class repliesViewSet(viewsets.ModelViewSet):
     queryset = replies.objects.all().order_by('-created_at').filter(is_deleted=False)
     serializer_class = repliesSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
+    pagination_class = StandardResultsSetPagination
     perm_slug = "core.replies"
 
     def create(self, request):
@@ -224,6 +230,7 @@ class contractsViewSet(viewsets.ModelViewSet):
     queryset = contracts.objects.all().order_by('-created_by').filter(is_deleted=False)
     serializer_class = contractsSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
+    pagination_class = StandardResultsSetPagination
     filter_backends = [
         DjangoFilterBackend,
          SearchFilter,
@@ -303,45 +310,72 @@ class documentsViewSet(viewsets.ModelViewSet):
     search_fields = ['@name','=id']
     ordering_fields = ['created_at', 'id','modified_at']
 
-    def create(self,request):
-        req_name = None
-        req_attachement = None
-        req_case_id = request.data.get('case_id')
-        req_path_id = request.data.get('path_id')
-        req_folder_id = request.data.get('folder_id')
-        req_name = request.data['name']
+    def create(self,request): 
+        req_case_id = request.data.get('case_id') if request.data.get('case_id') != '' else None
+        req_path_id = request.data.get('path_id') if request.data.get('path_id') != '' else None
+        req_folder_id = request.data.get('folder_id') if request.data.get('folder_id') != '' else None
+        req_name = request.data.get('name')
         req_attachement = request.FILES.get('attachment')
+        document = documents(id=None,name=req_name,case_id=req_case_id,path_id=req_path_id,folder_id=req_folder_id,attachment=req_attachement,created_by=request.user)
+        document.save()
         if req_attachement in ('',None):
             return Response(data={"detail":"Please select Document to upload"},status=status.HTTP_400_BAD_REQUEST)
         if not req_case_id in ('',None):
-            document = documents(id=None,name=req_name,case_id=req_case_id,attachment=req_attachement,created_by=request.user)
-            document.save()
             case = get_object_or_404(LitigationCases,pk=req_case_id)
             case.documents.add(document)
         if not req_path_id in ('',None):
-            document = documents(id=None,name=req_name,path_id=req_path_id,attachment=req_attachement,created_by=request.user)
-            document.save()
             path = get_object_or_404(Path,pk=req_path_id)
             path.documents.add(document)
         if not req_folder_id in ('',None):
-            document = documents(id=None,name=req_name,folder_id=req_folder_id,attachment=req_attachement,created_by=request.user)
-            document.save()
             path = get_object_or_404(Folder,pk=req_folder_id)
             path.documents.add(document)
-        else:
-            document = documents(id=None,name=req_name,attachment=req_attachement,created_by=request.user)
-            document.save()
+        # else:
+        #     document = documents(id=None,name=req_name,attachment=req_attachement,created_by=request.user)
+        #     document.save()
         serializer = self.get_serializer(document)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
-        case = documents.objects.filter(id=pk)
-        case.update(is_deleted=True)
-        case.update(modified_by=request.user)
-        case.update(modified_at=timezone.now())
-        return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
+        docs = documents.objects.filter(id=pk)
+        docs.update(is_deleted=True)
+        docs.update(modified_by=request.user)
+        docs.update(modified_at=timezone.now())
+        case_msg,path_msg,folder_msg ='','',''
+        doc = documents.objects.get(id=pk)
+        if doc.case_id:
+            case = get_object_or_404(LitigationCases,pk=doc.case_id)
+            case.documents.remove(doc)
+            case_msg = f' and deleted from Case #{doc.case_id}'
+            doc.case_id = None
+            doc.save()
+        if doc.path_id:
+            path = get_object_or_404(Path,pk=doc.path_id)
+            path.documents.remove(doc)
+            path_msg = f' and deleted from Path #{doc.path_id}'
+            doc.path_id = None
+            doc.save()
+        if doc.folder_id:
+            folder = get_object_or_404(Folder,pk=doc.folder_id)
+            folder.documents.remove(doc)
+            folder_msg = f' and deleted from Folder #{doc.folder_id}'
+            doc.folder_id = None
+            doc.save()
+        return Response(data={"detail":f"Document is deleted {folder_msg}{path_msg}{case_msg}"},status=status.HTTP_200_OK)
 
     
+    # def update(self, request, pk=None):
+        
+
+
+
+    def retrieve(self, request, pk=None):
+        queryset = documents.objects.filter(is_deleted=False).order_by('-created_by')
+        if request.user.is_manager == False:
+            queryset = queryset.filter(created_by=request.user)
+        document = get_object_or_404(queryset, pk=pk)
+        serializer = self.get_serializer(document)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
     # def list(self, request):
     #     queryset = documents.objects.all().filter(is_deleted=False).order_by('-created_by')
     #     if request.user.is_manager == False:
@@ -352,15 +386,6 @@ class documentsViewSet(viewsets.ModelViewSet):
     #         return self.get_paginated_response(serializer.data)
     #     serializer = self.get_serializer(page,many=True)
     #     return Response(serializer.data,status=status.HTTP_200_OK)
-
-
-    def retrieve(self, request, pk=None):
-        queryset = documents.objects.filter(is_deleted=False).order_by('-created_by')
-        if request.user.is_manager == False:
-            queryset = queryset.filter(created_by=request.user)
-        document = get_object_or_404(queryset, pk=pk)
-        serializer = self.get_serializer(document)
-        return Response(serializer.data,status=status.HTTP_200_OK)
 
     # def initial(self, request, *args, **kwargs):
     #     """
@@ -491,8 +516,10 @@ class APIPathListView(generics.ListCreateAPIView):
     ordering_fields = ('id', 'name')
     serializer_class = PathSerializer
     source_queryset = Path.objects.all()
-    
-
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = ['id','case_id']
+    ordering_fields = ['created_at', 'id','modified_at']
+    ordering = ['-id']
     # def get_instance_extra_data(self):
     #     return {
     #         '_event_actor': self.request.user
@@ -510,9 +537,35 @@ class APIPathListView(generics.ListCreateAPIView):
     #     else:
     #         return self.mayan_view_permissions.get(request.method, None)
 
+    def create(self, request):
+        req_name = request.data.get('name')
+        req_parent = request.data.get('parent')
+        req_case_id = request.data.get('case_id') if request.data.get('case_id') != '' else None
+        req_folder_id = request.data.get('folder_id') if request.data.get('folder_id') != '' else None
+
+        try:
+            obj = Path.objects.get(parent=req_parent, name=req_name)
+            return Response(data={"detail":f"اسم المجلد '{req_name}' موجود مسبقا"},status=status.HTTP_400_BAD_REQUEST)
+        except ObjectDoesNotExist:
+            if not req_parent in ('',None):
+                req_parent = get_object_or_404(Path, pk=req_parent)
+            path = Path(name=req_name,parent=req_parent,case_id=req_case_id,folder_id=req_folder_id)
+            path.save()
+            if not req_case_id in ('',None):
+                case = get_object_or_404(LitigationCases, pk=req_case_id)
+                case.paths.add(path)
+            if not req_folder_id in ('',None):
+                folder = get_object_or_404(Folder, pk=req_folder_id)
+                folder.paths.add(path)
+            serializer = self.get_serializer(path)
+            return Response( serializer.data, status=status.HTTP_201_CREATED) 
+
     def perform_create(self, serializer):
         parent = serializer.validated_data['parent']
-
+        # case_id = serializer.validated_data['case_id']
+        # if case_id:
+        #     case = get_object_or_404(LitigationCases, pk=case_id)
+        #     case.Paths.add()
         if parent:
             queryset=self.get_source_queryset()
             get_object_or_404(Path, pk=parent.pk)
@@ -520,7 +573,7 @@ class APIPathListView(generics.ListCreateAPIView):
         return super().perform_create(serializer)
 
 
-class APIPathView(generics.RetrieveUpdateDestroyAPIView):
+class APIPathView(rest_framework_generics.RetrieveUpdateDestroyAPIView):
     """
     delete: Delete the selected Path.
     get: Returns the details of the selected Path.
@@ -530,13 +583,37 @@ class APIPathView(generics.RetrieveUpdateDestroyAPIView):
     lookup_url_kwarg = 'path_id'
 
     serializer_class = PathSerializer
-    source_queryset = Path.objects.all()
+    queryset = Path.objects.all()
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = ['case_id']
+    ordering_fields = ['created_at', 'id','modified_at']
+    ordering = ['-id']
 
     def get_instance_extra_data(self):
         return {
             '_event_actor': self.request.user
         }
 
+    def destroy(self, request, *args, **kwargs):
+        path_id = kwargs['path_id']
+        path = Path.objects.filter(id=path_id)
+        paths = Path.objects.get(id=path_id)
+        case_msg,folder_msg ='',''
+        if paths.case_id:
+            case = get_object_or_404(LitigationCases,pk=paths.case_id)
+            case.paths.remove(paths)
+            case_msg = f' and deleted from Case #{paths.case_id}'
+            paths.case_id = None
+            paths.save()
+        if paths.folder_id:
+            folder = get_object_or_404(Folder,pk=paths.folder_id)
+            folder.paths.remove(paths)
+            folder_msg = f' and deleted from Folder #{paths.folder_id}'
+            paths.folder_id = None
+            paths.save()
+        paths.documents.all().update(is_deleted=True,modified_by=request.user,modified_at=timezone.now(),path_id=None)
+        path.delete()
+        return Response(data={"detail":f"Path is deleted{case_msg}{folder_msg}"},status=status.HTTP_200_OK)
 
 class APIPathDocumentAddView(generics.ObjectActionAPIView):
     """
@@ -576,7 +653,7 @@ class APIPathDocumentListView(
     external_object_pk_url_kwarg = 'path_id'
 
     serializer_class = documentsSerializer
-    source_queryset = documents.objects.all()
+    # source_queryset = documents.objects.all()
 
     def get_source_queryset(self):
         return documents.objects.filter(

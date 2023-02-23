@@ -174,10 +174,10 @@ class ExternalObjectBaseMixin:
 
     def get_external_object_queryset_filtered(self):
         queryset = self.get_external_object_queryset()
-        permission = self.get_external_object_permission()
+        # permission = self.get_external_object_permission()
 
-        if permission:
-             queryset=queryset
+        # if permission:
+        #      queryset=queryset
 
         return queryset
 

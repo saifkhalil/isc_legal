@@ -102,12 +102,12 @@ class ExternalObjectAPIViewMixin(ExternalObjectBaseMixin):
             **self.get_pk_url_kwargs()
         )
 
-    def get_external_object_permission(self):
-        return getattr(
-            self, 'mayan_external_object_permissions', {}
-        ).get(
-            self.request.method, (None,)
-        )[0]
+    # def get_external_object_permission(self):
+    #     return getattr(
+    #         self, 'mayan_external_object_permissions', {}
+    #     ).get(
+    #         self.request.method, (None,)
+    #     )[0]
 
     def get_serializer_extra_context(self):
         """

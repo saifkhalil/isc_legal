@@ -1,7 +1,7 @@
 from accounts.models import User
 from django.contrib.auth.models import Group
 from rest_framework import serializers
-from cases.models import Group
+from django.contrib.auth.models import Group
 from core.models import comments,replies,priorities,contracts,documents,Status,Path
 from drf_dynamic_fields import DynamicFieldsMixin
 from pghistory.models import Events
@@ -10,7 +10,8 @@ from rest_framework_recursive.fields import RecursiveField
 from django.utils.translation import gettext_lazy as _
 from rest_framework.reverse import reverse
 from rest_api.relations import FilteredPrimaryKeyRelatedField
-
+from django.shortcuts import get_object_or_404
+from rest_framework.validators import UniqueTogetherValidator
 
 # from rest_framework_recursive.fields import RecursiveField
 # class FilteredListSerializer(serializers.ListSerializer):
@@ -126,10 +127,12 @@ class EventsSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
         # list_serializer_class = FilteredListSerializer
         fields = ['pgh_diff',]
 
+
 class PathSerializer(serializers.ModelSerializer):
-    children = RecursiveField(
-        help_text=_('List of children paths.'), label=_('Children'),
-        many=True, read_only=True
+    case_name = serializers.SerializerMethodField('get_case_name')
+    subPaths = RecursiveField(
+        help_text=_('List of Sub-paths.'), label=_('SubPaths'),
+        many=True, read_only=True,source='active_path'
     )
     # documents_url = serializers.HyperlinkedIdentityField(
     #     help_text=_(
@@ -140,7 +143,7 @@ class PathSerializer(serializers.ModelSerializer):
     # )
 
     documents = documentsSerializer(many=True,read_only=True)
-
+    # documents = serializers.SerializerMethodField('get_documents')
     # full_path = serializers.SerializerMethodField(
     #     help_text=_(
     #         'The name of this path level appended to the names of its '
@@ -161,6 +164,23 @@ class PathSerializer(serializers.ModelSerializer):
     # DEPRECATION: Version 5.0, remove 'parent' fields from GET request as
     # it is replaced by 'parent_id'.
 
+    # def get_documents(self,obj):
+    #     if obj.id:
+    #         path = get_object_or_404(Path,pk=obj.id)
+    #         result = path.documents.all().filter(is_deleted=False).values()
+    #         return result
+
+    def get_case_name(self, obj):
+        if obj.case_id:
+            try:
+                case =  LitigationCases.objects.get(id=obj.case_id).name
+            except LitigationCases.DoesNotExist:
+                case = None
+            return case
+        else:
+            return None
+
+
     class Meta:
         extra_kwargs = {
             'url': {
@@ -169,14 +189,21 @@ class PathSerializer(serializers.ModelSerializer):
                 'view_name': 'path-detail'
             }
         }
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Path.objects.all(),
+                fields=('name', 'parent'),
+                message="اسم المجلد موجود مسبقا"
+            )
+        ]
         fields = (
-            'children', 'id', 'name','parent', 
+            'subPaths', 'id', 'name','parent', 'case_id','case_name','folder_id',
             'parent_id','documents'
             # 'parent_url', 'url','full_path', 'documents_url',
         )
         model = Path
         read_only_fields = (
-            'children', 'id',
+            'subPaths', 'id','case_name',
             'parent_id',
              'parent_url', 'url', 'full_path', 'documents_url','documents'
         )

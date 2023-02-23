@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-22 11:41+0300\n"
-"PO-Revision-Date: 2022-11-16 00:38+0300\n"
-"Last-Translator: Anonymous User <saif.ibrahim@qi.iq>\n"
+"PO-Revision-Date: 2022-11-22 11:47+0300\n"
+"Last-Translator: Saif AlKhateb <saif.ibrahim@qi.iq>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -18,6 +18,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Translated-Using: django-rosetta 0.9.8\n"
+
+
+msgid "This password is too short. It must contain at least 8 characters."
+msgstr "كلمة المرور هذه قصيرة جدًا. يجب أن يحتوي على 8 أحرف على الأقل."
+
+
+msgid "This password is too short."
+msgstr "كلمة المرور هذه قصيرة جدًا."
+
+msgid "It must contain at least 8 characters."
+msgstr "يجب أن يحتوي على 8 أحرف على الأقل."
+
+msgid "This password is too common."
+msgstr "كلمة المرور هذه شائعة جدًا."
+
+msgid "This password is entirely numeric."
+msgstr "يجب ادخال احرف مع الارقام في كلمة المرور الجديدة"
+
 
 #: .\accounts\apps.py:8
 msgid "Accounts"
@@ -167,8 +185,8 @@ msgstr ""
 
 #: .\accounts\views.py:87
 msgid ""
-"User registered successfully, verification email has been sent, please check "
-"it "
+"User registered successfully, verification email has been sent, please check"
+" it "
 msgstr ""
 
 #: .\accounts\views.py:122
@@ -529,10 +547,9 @@ msgid "You are receiving this because you registered on Legal app"
 msgstr "أنت تتلقى هذا البريد الالكتروني لأنك سجلت في التطبيق القانوني"
 
 #: .\templates\cases\emailnew.html:189
-#, fuzzy
 #| msgid "Case Type:"
 msgid "Case Number:"
-msgstr "نوع الدعوى:"
+msgstr "رقم الدعوى:"
 
 #: .\templates\index.html:11
 msgid "Welcome to ISC Legal App"
