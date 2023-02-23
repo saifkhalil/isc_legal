@@ -1,17 +1,12 @@
-from email.policy import default
-from statistics import mode
-from tabnanny import verbose
 from django.db import models
-import uuid
-from django.utils.translation import gettext_lazy as _
-from ckeditor.fields import RichTextField
-from accounts.models import User
-from core.models import priorities,comments,court,Status
-from django.core.validators import FileExtensionValidator
-from django.utils import timezone
-from django.dispatch import receiver
-from django.db.models.signals import post_save
 import pghistory
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+from accounts.models import User
+from core.models import comments, court, Status
+
+
 # Create your models here.
 
 # class hearing_type(models.Model):
@@ -29,19 +24,20 @@ import pghistory
 #         verbose_name_plural = _('Hearing Types')
 @pghistory.track(pghistory.Snapshot())
 class hearing(models.Model):
-    id = models.AutoField(primary_key=True,)
+    id = models.AutoField(primary_key=True, )
     # hid = models.CharField(max_length=20, blank=False, null=False, verbose_name=_('Hearing ID'))
-    name = models.CharField(max_length=250, blank=True, null=True,verbose_name=_('Name'))
-    case_id = models.IntegerField(blank=True,null=True, verbose_name=_('Litigation Case'))
-    folder_id = models.IntegerField(blank=True,null=True, verbose_name=_('Folder'))
+    name = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('Name'))
+    case_id = models.IntegerField(blank=True, null=True, verbose_name=_('Litigation Case'))
+    folder_id = models.IntegerField(blank=True, null=True, verbose_name=_('Folder'))
     hearing_date = models.DateTimeField(verbose_name=_('Hearing Date'))
-    assignee = models.ForeignKey(User, on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Assignee'))
+    assignee = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, verbose_name=_('Assignee'))
     # time_spent = models.TimeField(verbose_name=_('Time Spent'))
-    comments = models.ManyToManyField(comments,verbose_name="Comments", blank=True)
-    court = models.ForeignKey(court, on_delete=models.CASCADE, blank=True,null=True, verbose_name=_('Court name'))
-    comments_by_lawyer = models.TextField(max_length=250, blank=True, null=True,verbose_name=_('Summary by lawyer'))
-    is_deleted = models.BooleanField(default=False,verbose_name=_("Is Deleted"))
-    hearing_status = models.ForeignKey(Status, related_name='%(class)s_hearing_status', on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Hearing Status'))
+    comments = models.ManyToManyField(comments, verbose_name="Comments", blank=True)
+    court = models.ForeignKey(court, on_delete=models.CASCADE, blank=True, null=True, verbose_name=_('Court name'))
+    comments_by_lawyer = models.TextField(max_length=250, blank=True, null=True, verbose_name=_('Summary by lawyer'))
+    is_deleted = models.BooleanField(default=False, verbose_name=_("Is Deleted"))
+    hearing_status = models.ForeignKey(Status, related_name='%(class)s_hearing_status', on_delete=models.CASCADE,
+                                       null=True, blank=True, verbose_name=_('Hearing Status'))
     # attachment = models.FileField(upload_to='hearing/%Y/%m/%d/', verbose_name='Attachment', validators=[FileExtensionValidator(['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'gif'])])
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
@@ -61,7 +57,6 @@ class hearing(models.Model):
         verbose_name_plural = _('Hearings')
 
 
-
 # class task_type(models.Model):
 #     id = models.AutoField(primary_key=True,)
 #     type = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('Task Type'))
@@ -78,27 +73,29 @@ class hearing(models.Model):
 
 @pghistory.track(pghistory.Snapshot())
 class task(models.Model):
-    id = models.AutoField(primary_key=True,)
+    id = models.AutoField(primary_key=True, )
     # tid = models.CharField(max_length=20, blank=False, null=False, verbose_name=_('Task ID'))
-    title = models.CharField(max_length=250, blank=False, null=False,verbose_name=_('title'))
+    title = models.CharField(max_length=250, blank=False, null=False, verbose_name=_('title'))
     # task_type = models.ForeignKey('task_type', on_delete=models.CASCADE, blank=False,null=False, verbose_name=_('Task Type'))
-    description = models.CharField(max_length=250,default='', blank=False, null=False, verbose_name=_('Task Description'))
-    assignee = models.ForeignKey(User, related_name='%(class)s_assigned_to', on_delete=models.CASCADE, null=False, blank=False,verbose_name=_('Assigned to'))
+    description = models.CharField(max_length=250, default='', blank=False, null=False,
+                                   verbose_name=_('Task Description'))
+    assignee = models.ForeignKey(User, related_name='%(class)s_assigned_to', on_delete=models.CASCADE, null=False,
+                                 blank=False, verbose_name=_('Assigned to'))
     # requested_by = models.ForeignKey(User, related_name='%(class)s_requested_by', on_delete=models.CASCADE, null=False, blank=False,verbose_name=_('Requested By'))
     # priority = models.ForeignKey(priorities,  on_delete=models.CASCADE, null=False, blank=False,verbose_name=_('Matter Priority'))
-    task_status = models.ForeignKey(Status, related_name='%(class)s_task_status', on_delete=models.CASCADE, null=True, blank=True,verbose_name=_('Task Status'))
-    case_id = models.IntegerField(blank=True,null=True, verbose_name=_('Litigation Case'))
-    folder_id = models.IntegerField(blank=True,null=True, verbose_name=_('Folder'))
+    task_status = models.ForeignKey(Status, related_name='%(class)s_task_status', on_delete=models.CASCADE, null=True,
+                                    blank=True, verbose_name=_('Task Status'))
+    case_id = models.IntegerField(blank=True, null=True, verbose_name=_('Litigation Case'))
+    folder_id = models.IntegerField(blank=True, null=True, verbose_name=_('Folder'))
     due_date = models.DateField(verbose_name=_('Due date'))
-    comments = models.ManyToManyField(comments,verbose_name="Comments", blank=True)
-    is_deleted = models.BooleanField(default=False,verbose_name=_("Is Deleted"))
+    comments = models.ManyToManyField(comments, verbose_name="Comments", blank=True)
+    is_deleted = models.BooleanField(default=False, verbose_name=_("Is Deleted"))
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
     created_by = models.ForeignKey(
         User, related_name='%(class)s_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
     modified_by = models.ForeignKey(
-        User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False)    
-
+        User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False)
 
     def __str__(self):
         return self.title
@@ -122,7 +119,7 @@ class task(models.Model):
 #         else:
 #             current_comment = comments.objects.create(comment="This Task modified by " + str(instance.created_by) )
 #             instance.comments.add(current_comment)
-    
+
 
 # class event_type(models.Model):
 #     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

@@ -21,6 +21,7 @@ import django_filters.rest_framework
 from datetime import datetime
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from core.classes import StandardResultsSetPagination
 from django.db.models import Q
 # from rest_framework_tracking.mixins import LoggingMixin
 from accounts.models import User
@@ -101,6 +102,7 @@ class taskViewSet(viewsets.ModelViewSet):
     queryset = task.objects.all().order_by('-id').filter(is_deleted=False)
     serializer_class = taskSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
+    pagination_class = StandardResultsSetPagination
     permission_classes = [
         permissions.IsAuthenticated,
     #  MyPermission
@@ -135,7 +137,7 @@ class taskViewSet(viewsets.ModelViewSet):
             case = get_object_or_404(LitigationCases,pk=req_case_id)
             case.tasks.add(instance)
         if not req_folder_id in ('',None):
-            folder = get_object_or_404(Folder,pk=req_case_id)
+            folder = get_object_or_404(Folder,pk=req_folder_id)
             folder.tasks.add(instance)
         serializer = self.get_serializer(instance)    
         return rest_response(serializer.data,status=status.HTTP_200_OK)
@@ -178,11 +180,23 @@ class taskViewSet(viewsets.ModelViewSet):
             return rest_response(serializer.data,status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
-        case = task.objects.filter(id=pk)
-        case.update(is_deleted=True)
-        case.update(modified_by=request.user)
-        case.update(modified_at=timezone.now())
-        return rest_response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
+        Task = task.objects.filter(id=pk)
+        case_msg,folder_msg ='',''
+        tasks = task.objects.get(id=pk)
+        if tasks.case_id:
+            case = get_object_or_404(LitigationCases,pk=tasks.case_id)
+            case.tasks.remove(tasks)
+            case_msg = f' and deleted from Case #{tasks.case_id}'
+            tasks.case_id = None
+            tasks.save()
+        if tasks.folder_id:
+            folder = get_object_or_404(Folder,pk=tasks.folder_id)
+            folder.tasks.remove(tasks)
+            folder_msg = f' and deleted from Folder #{tasks.folder_id}'
+            tasks.folder_id = None
+            tasks.save()
+        Task.update(is_deleted=True,modified_by=request.user,modified_at=timezone.now())
+        return rest_response(data={"detail":f"Task is deleted {case_msg}{folder_msg}"},status=status.HTTP_200_OK)
 
     def get_queryset(self):
         req_due_date = self.request.query_params.get('due_date')
@@ -225,6 +239,7 @@ class hearingViewSet(viewsets.ModelViewSet):
     serializer_class = hearingSerializer
     authentication_classes = [TokenAuthentication,SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated, MyPermission]
+    pagination_class = StandardResultsSetPagination
     perm_slug = "activities.hearing" 
     filter_backends = [
         DjangoFilterBackend,
@@ -250,10 +265,10 @@ class hearingViewSet(viewsets.ModelViewSet):
         req_folder_id = request.data.get('folder_id')
         if not req_case_id in ('',None):
             case = get_object_or_404(LitigationCases,pk=req_case_id)
-            case.tasks.add(instance)
+            case.hearing.add(instance)
         if not req_folder_id in ('',None):
-            folder = get_object_or_404(Folder,pk=req_case_id)
-            folder.tasks.add(instance)
+            folder = get_object_or_404(Folder,pk=req_folder_id)
+            folder.hearing.add(instance)
         serializer = self.get_serializer(instance)    
         return rest_response(serializer.data,status=status.HTTP_200_OK)
 
@@ -297,11 +312,25 @@ class hearingViewSet(viewsets.ModelViewSet):
             return rest_response(serializer.data,status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
-        case = hearing.objects.filter(id=pk)
-        case.update(is_deleted=True)
-        case.update(modified_by=request.user)
-        case.update(modified_at=timezone.now())
-        return rest_response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
+        hearings = hearing.objects.filter(id=pk)
+        hearings.update(is_deleted=True)
+        hearings.update(modified_by=request.user)
+        hearings.update(modified_at=timezone.now())
+        case_msg,folder_msg ='',''
+        hear = hearing.objects.get(id=pk)
+        if hear.case_id:
+            case = get_object_or_404(LitigationCases,pk=hear.case_id)
+            case.hearing.remove(hear)
+            case_msg = f' and deleted from Case #{hear.case_id}'
+            hear.case_id = None
+            hear.save()
+        if hear.folder_id:
+            folder = get_object_or_404(Folder,pk=hear.folder_id)
+            folder.hearing.remove(hear)
+            folder_msg = f' and deleted from Folder #{hear.folder_id}'
+            hear.folder_id = None
+            hear.save()
+        return rest_response(data={"detail":f"Hearing is deleted {case_msg}{folder_msg}"},status=status.HTTP_200_OK)
 
     def get_queryset(self):
         req_hearing_date = self.request.query_params.get('hearing_date')

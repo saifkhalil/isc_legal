@@ -32,9 +32,11 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
+    'material',
+    'material.admin',
     'pghistory.admin',
-    'django.contrib.admin',
+    # 'jazzmin',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -64,7 +66,7 @@ INSTALLED_APPS = [
     'core',
     'cases',
     'activities',
-    'tabular_permissions',
+    # 'tabular_permissions',
     'crispy_forms',
     'slick_reporting',
     'logentry_admin',
@@ -232,6 +234,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
+    'max_limit':100,
+    'default_limit':10,
 
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     
@@ -240,7 +244,7 @@ REST_FRAMEWORK = {
 SPECTACULAR_SETTINGS = {
     'TITLE': 'ISC Legal App',
     'DESCRIPTION': 'ISC Legal App',
-    'VERSION': '0.3',
+    'VERSION': '0.9.1',
     'SERVE_INCLUDE_SCHEMA': False,
     'CONTACT': {"name":"Saif AlKhateeb","email":"saif.ibrahim@qi.iq"},
 }
@@ -388,4 +392,26 @@ JAZZMIN_UI_TWEAKS = {
         "danger": "btn-outline-danger",
         "success": "btn-outline-success"
     }
+}
+
+
+class Messages(object):
+    INVALID_CREDENTIALS_ERROR = "البريد او كلمة المرور غير صحيحة"
+    INACTIVE_ACCOUNT_ERROR = "اسم المستخدم متوقف"
+    INVALID_TOKEN_ERROR = "خطا في التوكن"
+    INVALID_UID_ERROR = "Invalid user id or user doesn't exist."
+    STALE_TOKEN_ERROR = "Stale token for given user."
+    PASSWORD_MISMATCH_ERROR = "كلمة المرور غير متوافقة"
+    USERNAME_MISMATCH_ERROR = "The two {0} fields didn't match."
+    INVALID_PASSWORD_ERROR = "كلمة المرور الحالية غير صحيحة"
+    EMAIL_NOT_FOUND = "البريد الالكتروني غير متوفر"
+    CANNOT_CREATE_USER_ERROR = "لا يمكن تكوين الحساب"
+
+DJOSER = {
+    'LOGOUT_ON_PASSWORD_CHANGE' : True, 
+    'SEND_ACTIVATION_EMAIL':False,
+    'SEND_CONFIRMATION_EMAIL':False,
+    'CONSTANTS': {
+    'messages': 'core.settings.Messages'
+}
 }
