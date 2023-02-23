@@ -19,9 +19,26 @@ class MyPermission(BasePermission):
         return perm
 
     def has_permission(self, request, view):
-        perm = self._get_permission(
-            method=request.method, perm_slug=view.perm_slug
-        )
-        if request.user.has_perm(perm):
+        # perm = self._get_permission(
+        #     method=request.method, perm_slug=view.perm_slug
+        # )
+        # if request.user.has_perm(perm):
+        #     return True
+        # return False
+        if request.method == "DELETE":
+            if request.user.is_manager or request.user.is_superuser:
+                return True
+            else:
+                return False
+
+class Manager_SuperUser(BasePermission):
+    message = "ليس لديك صلاحية للقيام بهذه العملية"
+
+    def has_permission(self, request,view):
+        if request.method == "DELETE":
+            if request.user.is_manager or request.user.is_superuser:
+                return True
+            else:
+                return False
+        else:
             return True
-        return False

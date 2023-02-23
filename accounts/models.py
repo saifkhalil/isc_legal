@@ -12,6 +12,8 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 import uuid
 from django.utils.translation import gettext_lazy as _
+import pghistory
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, username, password=None):
@@ -57,7 +59,7 @@ class Department(models.Model):
         verbose_name = _('Department')
         verbose_name_plural = _('Departments')
 
-
+@pghistory.track(pghistory.Snapshot())
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True,)    
     phone = PhoneNumberField()
@@ -132,6 +134,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return str(self.username)
+
+    def full_name(self):
+        return str(self.firstname + " " + self.lastname)
 
     # For checking permissions. to keep it simple all admin have ALL permissons
 

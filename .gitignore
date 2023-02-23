@@ -1,4 +1,0 @@
-# ignore generated venv files
-/venv
-/.vscode
-*.pyc

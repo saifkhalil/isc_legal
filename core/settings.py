@@ -32,8 +32,11 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
-    'django.contrib.admin',
+    'material',
+    'material.admin',
+    'pghistory.admin',
+    # 'jazzmin',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -44,7 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_word_filter',
-
+    # 'channels',
     'djoser',
     'phonenumber_field',
     'import_export',
@@ -63,7 +66,7 @@ INSTALLED_APPS = [
     'core',
     'cases',
     'activities',
-    'tabular_permissions',
+    # 'tabular_permissions',
     'crispy_forms',
     'slick_reporting',
     'logentry_admin',
@@ -71,6 +74,11 @@ INSTALLED_APPS = [
     'django_celery_beat',   
     'django_celery_results',
     # 'rest_framework_tracking',
+    'django_extensions',
+    'pghistory',
+    'pgtrigger',
+    'mptt',
+    'furl',
 ]
 
 MIDDLEWARE = [
@@ -109,6 +117,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+# ASGI_APPLICATION = 'core.wsgi.application' #routing.py will handle the ASGI
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': "channels.layers.InMemoryChannelLayer"
+#         }
+#     }
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -220,6 +234,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
+    'max_limit':100,
+    'default_limit':10,
 
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     
@@ -228,7 +244,7 @@ REST_FRAMEWORK = {
 SPECTACULAR_SETTINGS = {
     'TITLE': 'ISC Legal App',
     'DESCRIPTION': 'ISC Legal App',
-    'VERSION': '0.3',
+    'VERSION': '0.9.1',
     'SERVE_INCLUDE_SCHEMA': False,
     'CONTACT': {"name":"Saif AlKhateeb","email":"saif.ibrahim@qi.iq"},
 }
@@ -318,5 +334,84 @@ DEFAULT_FROM_EMAIL = 'Legal Application <legal.app@qi.iq>'
 CELERY_TIMEZONE = 'Asia/Baghdad'
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
-
 CELERY_RESULT_BACKEND = 'django-db'
+
+
+# PGHISTORY_ADMIN_LIST_DISPLAY = ['user',]
+
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Legal Software Admin",
+    "site_header": "Legal Software Admin",
+    "site_brand": "Legal Software Admin",
+    "welcome_sign": "Welcome to the Legal Software",
+    "copyright": "ISC",
+    "site_icon": None,
+        "icons": {
+        "accounts": "fas fa-users-cog",
+        "accounts.user": "fas fa-user",
+        "accounts.department": "fa fa-building",
+        "auth.group": "fa fa-users",
+        "activities.hearing": "fa fa-university",
+        "activities.task": "fa fa-tasks",
+        "authtoken.tokenproxy": "fa fa-magic",
+        "cases.case_type": "fa fa-trello",
+        "cases.client_position": "fa fa-user",
+        "auth.group": "fa fa-users",
+        "admin.logentry": "fa fa-file-text",
+        
+    },
+}
+
+JAZZMIN_UI_TWEAKS = {
+
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "accent": "accent-navy",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-warning",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-outline-primary",
+        "secondary": "btn-outline-secondary",
+        "info": "btn-outline-info",
+        "warning": "btn-outline-warning",
+        "danger": "btn-outline-danger",
+        "success": "btn-outline-success"
+    }
+}
+
+
+class Messages(object):
+    INVALID_CREDENTIALS_ERROR = "البريد او كلمة المرور غير صحيحة"
+    INACTIVE_ACCOUNT_ERROR = "اسم المستخدم متوقف"
+    INVALID_TOKEN_ERROR = "خطا في التوكن"
+    INVALID_UID_ERROR = "Invalid user id or user doesn't exist."
+    STALE_TOKEN_ERROR = "Stale token for given user."
+    PASSWORD_MISMATCH_ERROR = "كلمة المرور غير متوافقة"
+    USERNAME_MISMATCH_ERROR = "The two {0} fields didn't match."
+    INVALID_PASSWORD_ERROR = "كلمة المرور الحالية غير صحيحة"
+    EMAIL_NOT_FOUND = "البريد الالكتروني غير متوفر"
+    CANNOT_CREATE_USER_ERROR = "لا يمكن تكوين الحساب"
+
+DJOSER = {
+    'LOGOUT_ON_PASSWORD_CHANGE' : True, 
+    'SEND_ACTIVATION_EMAIL':False,
+    'SEND_CONFIRMATION_EMAIL':False,
+    'CONSTANTS': {
+    'messages': 'core.settings.Messages'
+}
+}
