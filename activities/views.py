@@ -293,9 +293,10 @@ class hearingViewSet(viewsets.ModelViewSet):
             h_status = Status.objects.get(pk=1)
         if not req_case_id in ('',None):
             case = get_object_or_404(LitigationCases,pk=req_case_id)
-            hearings = hearing(id=None,court=req_court,hearing_status=h_status,name=req_name,case_id=req_case_id,hearing_date=req_hearing_date,comments_by_lawyer=req_comments_by_lawyer,created_by=request.user,assignee=req_assignee_user)
+            hearings = hearing(id=None,latset=True,court=req_court,hearing_status=h_status,name=req_name,case_id=req_case_id,hearing_date=req_hearing_date,comments_by_lawyer=req_comments_by_lawyer,created_by=request.user,assignee=req_assignee_user)
             hearings.save()
-            serializer = self.get_serializer(hearings)    
+            serializer = self.get_serializer(hearings)
+            case.hearing.all().update(latset=False)    
             case.hearing.add(hearings)
             return rest_response(serializer.data,status=status.HTTP_201_CREATED)
         if not req_folder_id in ('',None):

@@ -201,7 +201,7 @@ class LitigationCasesViewSet(viewsets.ModelViewSet):
         cases = LitigationCases.objects.get(id=pk)
         cases.tasks.all().update(is_deleted=True, modified_by=request.user, modified_at=timezone.now())
         cases.hearing.all().update(is_deleted=True, modified_by=request.user, modified_at=timezone.now())
-        cases.documents.all().update(is_deleted=True, modified_by=request.user, modified_at=timezone.now())
+        cases.paths.all().update(is_deleted=True, modified_by=request.user, modified_at=timezone.now())
         case.update(is_deleted=True, modified_by=request.user, modified_at=timezone.now())
         return Response(data={"detail": "تم مسح الدعوى بنجاح"}, status=status.HTTP_200_OK)
 
