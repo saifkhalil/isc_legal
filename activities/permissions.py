@@ -1,5 +1,6 @@
-from rest_framework.permissions import BasePermission
 from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.permissions import BasePermission
+
 
 class MyPermission(BasePermission):
     message = "ليس لديك صلاحية للقيام بهذه العملية"

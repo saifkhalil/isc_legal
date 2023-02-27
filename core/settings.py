@@ -13,9 +13,9 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 from django.utils.translation import gettext_lazy as _
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -28,15 +28,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
     'material',
     'material.admin',
     'pghistory.admin',
-    # 'jazzmin',
-    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -47,7 +44,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_word_filter',
-    # 'channels',
     'djoser',
     'phonenumber_field',
     'import_export',
@@ -66,14 +62,12 @@ INSTALLED_APPS = [
     'core',
     'cases',
     'activities',
-    # 'tabular_permissions',
     'crispy_forms',
     'slick_reporting',
     'logentry_admin',
     'celery',
-    'django_celery_beat',   
+    'django_celery_beat',
     'django_celery_results',
-    # 'rest_framework_tracking',
     'django_extensions',
     'pghistory',
     'pgtrigger',
@@ -84,11 +78,9 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware', 
-    # 'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.cache.FetchFromCacheMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'core.current_user.RequestMiddleware',
@@ -117,34 +109,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# ASGI_APPLICATION = 'core.wsgi.application' #routing.py will handle the ASGI
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': "channels.layers.InMemoryChannelLayer"
-#         }
-#     }
-
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': os.environ.get('MYSQL_DATABASE', 'isc_legal'),
-#         'USER': os.environ.get('MYSQL_USER', 'isc_legal'),
-#         'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'Isc@L3gal'),
-#         'HOST': os.environ.get('MYSQL_DATABASE_HOST', 'localhost'),
-#         'PORT': os.environ.get('MYSQL_DATABASE_PORT', 3306),
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -172,7 +136,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -211,7 +174,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-
 AUTH_USER_MODEL = 'accounts.User'
 
 LOGIN_REDIRECT_URL = 'home'
@@ -227,18 +189,16 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissions',
-        
+
     ],
-    # 'DEFAULT_CONTENT_NEGOTIATION_CLASS': 'core.negotiation.IgnoreClientContentNegotiation',
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
-    'max_limit':100,
-    'default_limit':10,
+    'max_limit': 100,
+    'default_limit': 10,
 
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    
+
 }
 
 SPECTACULAR_SETTINGS = {
@@ -246,62 +206,46 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'ISC Legal App',
     'VERSION': '0.9.1',
     'SERVE_INCLUDE_SCHEMA': False,
-    'CONTACT': {"name":"Saif AlKhateeb","email":"saif.ibrahim@qi.iq"},
+    'CONTACT': {"name": "Saif AlKhateeb", "email": "saif.ibrahim@qi.iq"},
 }
 
 SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': False,
 }
 
-
 PARLER_LANGUAGES = {
     None: (
-        {'code': 'en',},
-        {'code': 'ar',},
+        {'code': 'en', },
+        {'code': 'ar', },
     ),
     'default': {
-        'fallback': 'en',             # defaults to PARLER_DEFAULT_LANGUAGE_CODE
-        'hide_untranslated': False,   # the default; let .active_translations() return fallbacks too.
+        'fallback': 'en',  # defaults to PARLER_DEFAULT_LANGUAGE_CODE
+        'hide_untranslated': False,  # the default; let .active_translations() return fallbacks too.
     }
 }
 
 PARLER_DEFAULT_LANGUAGE_CODE = 'en'
 
-
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-#         'LOCATION': 'redis://' + os.environ.get('REDIS_HOST', 'localhost') + ':6379',
-#     }
-# }
-
-
-# CACHE_MIDDLEWARE_ALIAS = 'default'  # The cache alias to use for storage and 'default' is **local-memory cache**.
-# CACHE_MIDDLEWARE_SECONDS = 3600
-# CACHE_MIDDLEWARE_KEY_PREFIX = ''    # This is used when cache is shared across multiple sites that
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 99999
 
-
-CORS_ALLOW_ALL_ORIGINS = True # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
+CORS_ALLOW_ALL_ORIGINS = True  # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'https://localhost:3000',
-] # If this is used, then not need to use `CORS_ALLOW_ALL_ORIGINS = True`
+]  # If this is used, then not need to use `CORS_ALLOW_ALL_ORIGINS = True`
 CORS_ALLOWED_ORIGIN_REGEXES = [
     'http://localhost:3000',
     'https://localhost:3000',
 ]
 
-
 JAZZMIN_SETTINGS = {
-    "show_ui_builder" : True
+    "show_ui_builder": True
 }
 JAZZMIN_UI_TWEAKS = {
     "theme": "flatly",
     "dark_mode_theme": "darkly",
 }
-
 
 TABULAR_PERMISSIONS_CONFIG = {
     'template': 'tabular_permissions/admin/tabular_permissions.html',
@@ -309,7 +253,7 @@ TABULAR_PERMISSIONS_CONFIG = {
         'override': False,
         'apps': [],
         'models': [],
-        'function':'tabular_permissions.helpers.dummy_permissions_exclude'
+        'function': 'tabular_permissions.helpers.dummy_permissions_exclude'
     },
     'auto_implement': True,
     'use_for_concrete': False,
@@ -320,7 +264,6 @@ TABULAR_PERMISSIONS_CONFIG = {
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-
 #### SMTP CONFIGURATION ####
 
 EMAIL_HOST = 'smtp.office365.com'
@@ -330,12 +273,10 @@ EMAIL_HOST_USER = 'legal.app@qi.iq'
 EMAIL_HOST_PASSWORD = 'Bog91158'
 DEFAULT_FROM_EMAIL = 'Legal Application <legal.app@qi.iq>'
 
-
 CELERY_TIMEZONE = 'Asia/Baghdad'
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_RESULT_BACKEND = 'django-db'
-
 
 # PGHISTORY_ADMIN_LIST_DISPLAY = ['user',]
 
@@ -347,7 +288,7 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Welcome to the Legal Software",
     "copyright": "ISC",
     "site_icon": None,
-        "icons": {
+    "icons": {
         "accounts": "fas fa-users-cog",
         "accounts.user": "fas fa-user",
         "accounts.department": "fa fa-building",
@@ -359,7 +300,7 @@ JAZZMIN_SETTINGS = {
         "cases.client_position": "fa fa-user",
         "auth.group": "fa fa-users",
         "admin.logentry": "fa fa-file-text",
-        
+
     },
 }
 
@@ -407,11 +348,12 @@ class Messages(object):
     EMAIL_NOT_FOUND = "البريد الالكتروني غير متوفر"
     CANNOT_CREATE_USER_ERROR = "لا يمكن تكوين الحساب"
 
+
 DJOSER = {
-    'LOGOUT_ON_PASSWORD_CHANGE' : True, 
-    'SEND_ACTIVATION_EMAIL':False,
-    'SEND_CONFIRMATION_EMAIL':False,
+    'LOGOUT_ON_PASSWORD_CHANGE': True,
+    'SEND_ACTIVATION_EMAIL': False,
+    'SEND_CONFIRMATION_EMAIL': False,
     'CONSTANTS': {
-    'messages': 'core.settings.Messages'
-}
+        'messages': 'core.settings.Messages'
+    }
 }

@@ -29,5 +29,7 @@ def method_event(event_manager_class, **event_manager_kwargs):
                 event_manager.commit()
 
             return result
+
         return wrapper
+
     return decorator

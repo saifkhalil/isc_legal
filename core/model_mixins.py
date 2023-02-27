@@ -1,6 +1,3 @@
-
-
-
 class ExtraDataModelMixin:
     def __init__(self, *args, **kwargs):
         _instance_extra_data = kwargs.pop('_instance_extra_data', {})
@@ -9,6 +6,7 @@ class ExtraDataModelMixin:
             setattr(self, key, value)
 
         return result
+
 
 class HooksModelMixin:
     @classmethod

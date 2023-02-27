@@ -1,5 +1,5 @@
-from importlib import import_module
 import logging
+from importlib import import_module
 
 from django.apps import apps
 

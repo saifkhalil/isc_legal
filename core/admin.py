@@ -1,33 +1,36 @@
 from django.contrib import admin
-from .models import comments,priorities,replies,court,contracts,documents,Status,Path
 from import_export.admin import ImportExportModelAdmin
 from mptt.admin import MPTTModelAdmin
 
+from .models import comments, priorities, replies, court, contracts, documents, Status, Path
 
-class commentsAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    list_display = ('id', 'comment','case_id','task_id','hearing_id','is_deleted')
 
-class courtAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class commentsAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    list_display = ('id', 'comment', 'case_id', 'task_id', 'hearing_id', 'is_deleted')
+
+
+class courtAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ('id', 'name')
 
-class repliesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'reply','is_deleted')
 
-class prioritiesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class repliesAdmin(admin.ModelAdmin):
+    list_display = ('id', 'reply', 'is_deleted')
+
+
+class prioritiesAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ('id', 'priority')
 
+
 class contractsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name','attachment','is_deleted')
+    list_display = ('id', 'name', 'attachment', 'is_deleted')
+
 
 class documentsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name','attachment','is_deleted')
+    list_display = ('id', 'name', 'attachment', 'is_deleted')
 
-
-# class directorysAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'name',)
 
 class StatusAdmin(admin.ModelAdmin):
-    list_display = ('id','status')
+    list_display = ('id', 'status')
 
 
 class PathModelAdmin(MPTTModelAdmin):
@@ -40,7 +43,6 @@ admin.site.register(Status, StatusAdmin)
 admin.site.register(priorities, prioritiesAdmin)
 admin.site.register(contracts, contractsAdmin)
 admin.site.register(documents, documentsAdmin)
-# admin.site.register(directory, directorysAdmin)
 admin.site.register(court, courtAdmin)
 admin.site.register(comments, commentsAdmin)
 admin.site.register(replies, repliesAdmin)
