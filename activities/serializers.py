@@ -85,5 +85,5 @@ class hearingSerializer(DynamicFieldsMixin,serializers.ModelSerializer):
 
     class Meta:
         model = hearing
-        fields = ['id', 'name','hearing_date','latset','assignee','court','comments_by_lawyer','case_id','folder_id','folder_name','hearing_status','case_name','created_by','created_at','modified_by','modified_at']
+        fields = ['id', 'name','hearing_date','latest','assignee','court','comments_by_lawyer','case_id','folder_id','folder_name','hearing_status','case_name','created_by','created_at','modified_by','modified_at']
         extra_kwargs = {'created_by': {'required': False},'modified_by': {'required': False}}
