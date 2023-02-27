@@ -1,6 +1,7 @@
 from rest_framework.permissions import BasePermission
 from rest_framework.exceptions import MethodNotAllowed
 
+
 class MyPermission(BasePermission):
     message = "ليس لديك صلاحية للقيام بهذه العملية"
     permission_map = {
@@ -25,17 +26,13 @@ class MyPermission(BasePermission):
         # if request.user.has_perm(perm):
         #     return True
         # return False
-        # if request.method == "DELETE":
-        #     if request.user.is_manager or request.user.is_superuser:
-        #         return True
-        #     else:
-        #         return False
         return True
+
 
 class Manager_SuperUser(BasePermission):
     message = "ليس لديك صلاحية للقيام بهذه العملية"
 
-    def has_permission(self, request,view):
+    def has_permission(self, request, view):
         if request.method == "DELETE":
             if request.user.is_manager or request.user.is_superuser:
                 return True

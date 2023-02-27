@@ -6,7 +6,6 @@ namespace = EventTypeNamespace(
     label=_('Paths'), name='paths'
 )
 
-
 event_path_created = namespace.add_event_type(
     label=_('Path created'), name='path_created'
 )

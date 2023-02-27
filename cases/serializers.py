@@ -1,4 +1,3 @@
-# from core.serializers import FilteredListSerializer
 from django.shortcuts import get_object_or_404
 from drf_dynamic_fields import DynamicFieldsMixin
 from rest_framework import serializers
@@ -16,17 +15,6 @@ class case_typeSerializer(serializers.ModelSerializer):
         fields = ['id', 'type']
 
 
-# class companySerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = company
-#         fields = ['id', 'full_name','name','foreign_name','category_id','sub_category_id','company_legal_type_id','company_group_id','reference']
-
-# class personsSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = persons
-#         fields = ['id', 'name']
-
-
 class client_positionSerializer(serializers.ModelSerializer):
     class Meta:
         model = client_position
@@ -37,12 +25,6 @@ class opponent_positionSerializer(serializers.ModelSerializer):
     class Meta:
         model = opponent_position
         fields = ['id', 'position']
-
-
-# class opponentSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = client_position
-#         fields = ['id', 'name']
 
 
 class opponent_positionSerializer(serializers.ModelSerializer):
@@ -56,11 +38,6 @@ class courtSerializer(serializers.ModelSerializer):
         model = court
         fields = ['id', 'name']
 
-
-# class assigned_teamSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Group
-#         fields = ['id', 'name']
 
 class stagesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -95,20 +72,11 @@ class LitigationCasesSerializer(DynamicFieldsMixin, serializers.ModelSerializer)
     documents = serializers.SerializerMethodField()
     paths = PathSerializer(many=True, read_only=True)
     tasks = serializers.SerializerMethodField('get_tasks')
-    # tasks = taskSerializer(task.objects.filter(is_deleted=True).order_by('-id'), many=True,read_only=True)
     ImportantDevelopment = ImportantDevelopmentsSerializer(many=True, read_only=True)
     hearing = serializers.SerializerMethodField()
     start_time = serializers.DateTimeField(format="%Y-%m-%d", required=False)
     end_time = serializers.DateTimeField(format="%Y-%m-%d", required=False)
     created_by = serializers.StringRelatedField(default=serializers.CurrentUserDefault(), read_only=True)
-
-    # company = companySerializer()
-    # person = personsSerializer()
-    # client_position = client_positionSerializer()
-    # opponent = opponentSerializer()
-    # opponent_position = opponent_positionSerializer()
-    # assigned_team = assigned_teamSerializer()
-    # Stage = stagesSerializer()
 
     def get_tasks(self, obj):
         if obj.id:
@@ -140,15 +108,8 @@ class LitigationCasesSerializer(DynamicFieldsMixin, serializers.ModelSerializer)
             result = case.comments.all().filter(is_deleted=False).values()
             return result
 
-    # def get_paths(self,obj):
-    #     if obj.id:
-    #         case = get_object_or_404(LitigationCases,pk=obj.id)
-    #         result = case.paths.all().filter(is_deleted=False).values()
-    #         return result
-
     class Meta:
         model = LitigationCases
-        #        list_serializer_class = FilteredListSerializer
         fields = ['id', 'name', 'description', 'case_category', 'priority', 'shared_with', 'court',
                   'ImportantDevelopment', 'case_type', 'case_status', 'judge', 'detective', 'client_position',
                   'opponent_position', 'assignee', 'Stage', 'internal_ref_number', 'comments', 'tasks', 'documents',
@@ -160,9 +121,6 @@ class FoldersSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     court = serializers.SlugRelatedField(slug_field='name', queryset=court.objects.all())
     priority = serializers.SlugRelatedField(slug_field='priority', queryset=priorities.objects.all())
     folder_type = serializers.SlugRelatedField(slug_field='type', queryset=case_type.objects.all())
-    # client_position = serializers.SlugRelatedField(slug_field='name',queryset=client_position.objects.all())
-    # opponent_position = serializers.SlugRelatedField(slug_field='position',queryset=opponent_position.objects.all())
-    # Stage = serializers.SlugRelatedField(slug_field='name',queryset=stages.objects.all())
     assignee = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all(), required=False)
     comments = commentsSerializer(many=True, read_only=True)
     documents = documentsSerializer(many=True, read_only=True)
@@ -172,14 +130,6 @@ class FoldersSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     ImportantDevelopment = ImportantDevelopmentsSerializer(many=True, read_only=True)
     start_time = serializers.DateTimeField(format="%Y-%m-%d", required=False)
     end_time = serializers.DateTimeField(format="%Y-%m-%d", required=False)
-
-    # company = companySerializer()
-    # person = personsSerializer()
-    # client_position = client_positionSerializer()
-    # opponent = opponentSerializer()
-    # opponent_position = opponent_positionSerializer()
-    # assigned_team = assigned_teamSerializer()
-    # Stage = stagesSerializer()
 
     def get_tasks(self, obj):
         if obj.id:
@@ -193,16 +143,9 @@ class FoldersSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             result = folder.hearing.all().filter(is_deleted=False).values()
             return result
 
-    # def get_paths(self,obj):
-    #     if obj.id:
-    #         folder = get_object_or_404(Folder,pk=obj.id)
-    #         result = folder.paths.all().filter(is_deleted=False).values()
-    #         return result
-
     class Meta:
         model = Folder
-        #        list_serializer_class = FilteredListSerializer
-        fields = ['id', 'name', 'description', 'folder_category','record_type', 'priority', 'shared_with', 'court',
+        fields = ['id', 'name', 'description', 'folder_category', 'record_type', 'priority', 'shared_with', 'court',
                   'ImportantDevelopment', 'folder_type', 'folder_status', 'assignee', 'internal_ref_number', 'comments',
                   'tasks', 'documents', 'paths', 'hearing', 'start_time', 'end_time', 'created_by', 'created_at']
         http_method_names = ['get', 'post', 'head', 'put']
