@@ -39,6 +39,7 @@ class hearing(models.Model):
     hearing_status = models.ForeignKey(Status, related_name='%(class)s_hearing_status', on_delete=models.CASCADE,
                                        null=True, blank=True, verbose_name=_('Hearing Status'))
     # attachment = models.FileField(upload_to='hearing/%Y/%m/%d/', verbose_name='Attachment', validators=[FileExtensionValidator(['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'gif'])])
+    latset = models.BooleanField(verbose_name='Latest',default=True,null=False,blank=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
     created_by = models.ForeignKey(

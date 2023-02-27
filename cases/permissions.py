@@ -25,11 +25,12 @@ class MyPermission(BasePermission):
         # if request.user.has_perm(perm):
         #     return True
         # return False
-        if request.method == "DELETE":
-            if request.user.is_manager or request.user.is_superuser:
-                return True
-            else:
-                return False
+        # if request.method == "DELETE":
+        #     if request.user.is_manager or request.user.is_superuser:
+        #         return True
+        #     else:
+        #         return False
+        return True
 
 class Manager_SuperUser(BasePermission):
     message = "ليس لديك صلاحية للقيام بهذه العملية"
