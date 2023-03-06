@@ -11,8 +11,6 @@ from cases.models import LitigationCases, Folder
 from core.models import comments, replies, priorities, contracts, documents, Status, Path
 from .serializers import EventsSerializer, GroupSerializer, commentsSerializer, repliesSerializer, prioritiesSerializer, \
     contractsSerializer, documentsSerializer, StatusSerializer
-
-CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 from datetime import datetime, timedelta
 from cases.utils import Calendar
 from django.utils.safestring import mark_safe

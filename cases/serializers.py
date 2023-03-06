@@ -118,7 +118,7 @@ class LitigationCasesSerializer(DynamicFieldsMixin, serializers.ModelSerializer)
 
 
 class FoldersSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    court = serializers.SlugRelatedField(slug_field='name', queryset=court.objects.all())
+    court = serializers.SlugRelatedField(slug_field='name', queryset=court.objects.all(), required=False)
     priority = serializers.SlugRelatedField(slug_field='priority', queryset=priorities.objects.all())
     folder_type = serializers.SlugRelatedField(slug_field='type', queryset=case_type.objects.all())
     assignee = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all(), required=False)
