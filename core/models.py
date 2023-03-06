@@ -3,7 +3,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import connection, models, transaction
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
-
+import pghistory
 from accounts.models import User
 from .classes import EventManagerMethodAfter
 from .decorators import method_event

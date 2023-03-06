@@ -309,7 +309,7 @@ def LitigationCases_send_email(sender, instance, created, *args, **kwargs):
 
 
 @receiver(m2m_changed, sender=LitigationCases.shared_with.through)
-def LitigationCases_sharedwith_send_email(instance, action, pk_set):
+def LitigationCases_sharedwith_send_email(instance, action, pk_set, *args, **kwargs):
     current_case = instance
     case = LitigationCases.objects.get(id=current_case.id)
     if action == 'post_add':
