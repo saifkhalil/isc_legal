@@ -1,132 +1,21 @@
-import csv
 import logging
-
-from furl import furl
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
-from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
-
-# from actstream import action
 from rest_framework.pagination import LimitOffsetPagination
 
 from .class_mixins import AppsModuleLoaderMixin
-# from mayan.apps.common.menus import menu_list_facet
-# from mayan.apps.common.settings import setting_project_url
-# from mayan.apps.common.utils import return_attrib
-
 from .literals import (
-    DEFAULT_EVENT_LIST_EXPORT_FILENAME, EVENT_MANAGER_ORDER_AFTER,
-    EVENT_TYPE_NAMESPACE_NAME, EVENT_EVENTS_CLEARED_NAME,
-    EVENT_EVENTS_EXPORTED_NAME
+    EVENT_MANAGER_ORDER_AFTER
 )
-# from .links import (
-#     link_object_event_list, link_object_event_type_user_subscription_list
-# )
-# from .permissions import (
-#     permission_events_clear, permission_events_export, permission_events_view
-# )
 
 logger = logging.getLogger(name=__name__)
-
 
 DEFAULT_ACTION_EXPORTER_FIELD_NAMES = (
     'timestamp', 'id', 'actor_content_type', 'actor_object_id', 'actor',
     'target_content_type', 'target_object_id', 'target', 'verb',
     'action_object_content_type', 'action_object_object_id', 'action_object'
 )
-
-
-# class ActionExporter:
-#     def __init__(self, queryset, field_names=None):
-#         self.field_names = field_names or DEFAULT_ACTION_EXPORTER_FIELD_NAMES
-#         self.queryset = queryset
-
-#     def export(self, file_object, user=None):
-#         AccessControlList = apps.get_model(
-#             app_label='acls', model_name='AccessControlList'
-#         )
-#         if user:
-#             self.queryset = AccessControlList.objects.restrict_queryset(
-#                 queryset=self.queryset,
-#                 permission=permission_events_export,
-#                 user=user
-#             )
-
-#         writer = csv.writer(
-#             file_object, delimiter=',', quotechar='"',
-#             quoting=csv.QUOTE_MINIMAL
-#         )
-#         file_object.write(
-#             ','.join(
-#                 self.field_names + ('\n',)
-#             )
-#         )
-
-#         for entry in self.queryset.iterator():
-#             row = [
-#                 str(
-#                     getattr(entry, field_name)
-#                 ) for field_name in self.field_names
-#             ]
-#             writer.writerow(row)
-
-#     def export_to_download_file(self, user=None):
-#         event_type_namespace = EventTypeNamespace.get(
-#             name=EVENT_TYPE_NAMESPACE_NAME
-#         )
-#         event_events_exported = event_type_namespace.get_event(
-#             name=EVENT_EVENTS_EXPORTED_NAME
-#         )
-
-#         DownloadFile = apps.get_model(
-#             app_label='storage', model_name='DownloadFile'
-#         )
-#         Message = apps.get_model(
-#             app_label='messaging', model_name='Message'
-#         )
-
-#         download_file = DownloadFile(
-#             filename=DEFAULT_EVENT_LIST_EXPORT_FILENAME,
-#             label=_('Event list export to CSV'), user=user
-#         )
-#         download_file._event_actor = user
-#         download_file.save()
-
-#         with download_file.open(mode='w') as file_object:
-#             self.export(file_object=file_object, user=user)
-
-#         event_events_exported.commit(
-#             actor=user, target=download_file
-#         )
-
-#         if user:
-#             download_list_url = furl(setting_project_url.value).join(
-#                 reverse(
-#                     viewname='storage:download_file_list'
-#                 )
-#             ).tostr()
-#             download_url = furl(setting_project_url.value).join(
-#                 reverse(
-#                     viewname='storage:download_file_download',
-#                     kwargs={'download_file_id': download_file.pk}
-#                 )
-#             ).tostr()
-
-#             Message.objects.create(
-#                 sender_object=download_file,
-#                 user=user,
-#                 subject=_('Events exported.'),
-#                 body=_(
-#                     'The event list has been exported and is available '
-#                     'for download using the link: %(download_url)s or from '
-#                     'the downloads area (%(download_list_url)s).'
-#                 ) % {
-#                     'download_list_url': download_list_url,
-#                     'download_url': download_url
-#                 }
-#             )
 
 
 class EventManager:
@@ -235,75 +124,6 @@ class EventManagerSave(EventManager):
 
     def prepare(self):
         self.created = not self.instance.pk
-
-
-# class EventModelRegistry:
-#     _registry = set()
-
-#     @classmethod
-#     def register(
-#         cls, model, acl_bind_link=True, bind_events_link=True,
-#         bind_subscription_link=True, exclude=None, menu=None,
-#         register_permissions=True
-#     ):
-#         # Hidden imports.
-#         # from actstream import registry
-#         # from mayan.apps.acls.classes import ModelPermission
-
-#         event_type_namespace = EventTypeNamespace.get(
-#             name=EVENT_TYPE_NAMESPACE_NAME
-#         )
-#         event_events_cleared = event_type_namespace.get_event(
-#             name=EVENT_EVENTS_CLEARED_NAME
-#         )
-#         event_events_exported = event_type_namespace.get_event(
-#             name=EVENT_EVENTS_EXPORTED_NAME
-#         )
-
-        # if model not in cls._registry:
-        #     cls._registry.add(model)
-        #     # These need to happen only once.
-        #     registry.register(model)
-
-            # menu = menu or menu_list_facet
-
-            # if bind_events_link:
-            #     menu.bind_links(
-            #         exclude=exclude,
-            #         links=(
-            #             link_object_event_list,
-            #         ), sources=(model,)
-            #     )
-
-            # if bind_subscription_link:
-            #     menu.bind_links(
-            #         exclude=exclude,
-            #         links=(
-            #             link_object_event_type_user_subscription_list,
-            #         ), sources=(model,)
-            #     )
-
-            # AccessControlList = apps.get_model(
-            #     app_label='acls', model_name='AccessControlList'
-            # )
-            # StoredPermission = apps.get_model(
-            #     app_label='permissions', model_name='StoredPermission'
-            # )
-
-            # if register_permissions and not issubclass(model, (AccessControlList, StoredPermission)):
-            #     ModelPermission.register(
-            #         exclude=exclude,
-            #         model=model, permissions=(
-            #             permission_events_clear, permission_events_export,
-            #             permission_events_view
-            #         ), bind_link=acl_bind_link
-            #     )
-
-                # ModelEventType.register(
-                #     event_types=(
-                #         event_events_cleared, event_events_exported
-                #     ), model=model
-                # )
 
 
 class EventTypeNamespace(AppsModuleLoaderMixin):
@@ -525,8 +345,38 @@ class ModelEventType:
         cls._inheritances[model] = related
 
 
-
 class StandardResultsSetPagination(LimitOffsetPagination):
     default_limit = 10
     limit_query_param = 'limit'
     max_limit = 100
+
+def GetUniqueDictionaries(listofDicts):
+    """Get a List unique dictionaries
+    List to contain unique dictionaries"""
+    listOfUniqueDicts = []
+    # A set object
+    setOfValues = set()
+    # iterate over all dictionaries in list
+    for dictObj in listofDicts:
+        list_Of_tuples = []
+        # For each dictionary, iterate over all key
+        # and append that to a list as tuples
+        for key, value in dictObj.items():
+            list_Of_tuples.append((key, value))
+        strValue = ""
+        # convert list of tuples to a string
+        for key, value in sorted(list_Of_tuples):
+            # sort list of tuples, and iterate over them
+            # append each pair to string
+            strValue += str(key) + "_" + str(value) + "_"
+        # Add string to set if not already exist in set
+        if strValue not in setOfValues:
+            # If string is not in set, then it means
+            # this dictionary is unique
+            setOfValues.add(strValue)
+            listOfUniqueDicts.append(dictObj)
+    return listOfUniqueDicts
+
+def dict_item(id,name):
+    return_item: dict = {'id': id, 'name': name}
+    return return_item

@@ -13,24 +13,26 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path, include, re_path
-from django.views.static import serve
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required
+from django.urls import path, include
+from rest_framework import routers
 from accounts.views import (
     registration_view,
-    logout_view,
-    login_view,
     account_view,
     active_user,
     must_authenticate_view,
     send_active,
     block_user,
     unblock_user,
+    UserSetPasswordView,
+    EmployeesViewSet,
+    SearchEmployeesAPIView,
+    SearchEmployeeAPIView
 )
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import views as auth_views
-from django.utils.translation import gettext_lazy as _
-from django.conf.urls.i18n import i18n_patterns
-from django.shortcuts import render
+from django.views.decorators.cache import cache_page
+router = routers.DefaultRouter()
+router.register(r'employees', EmployeesViewSet, "employees")
 
 urlpatterns = [
     # path('after', views.after, name='after'),
@@ -38,10 +40,9 @@ urlpatterns = [
     path('block_user/<uuid:userid>', block_user, name="block_user"),
     path('unblock_user/<uuid:userid>', unblock_user, name="unblock_user"),
     path('register/', registration_view, name="register"),
-    path('login/', login_view, name="login"),
-    path('logout/', logout_view, name="logout"),
     path('profile/', login_required(account_view), name="account"),
     path('activate_user/<uidb64>/<token>', active_user, name='active'),
+    path('<int:user_id>/set_password/',name='user_set_password', view=UserSetPasswordView.as_view()),
     path('must_authenticate/', must_authenticate_view, name="must_authenticate"),
     path('password_change/done/', auth_views.PasswordChangeDoneView.as_view(
         template_name='registration/password_change_done.html'), name='password_change_done'),
@@ -55,4 +56,8 @@ urlpatterns = [
          name='password_reset'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(
         template_name='registration/password_reset_complete.html'), name='password_reset_complete'),
+    path('', include(router.urls)),
+    path('searchs/', SearchEmployeesAPIView.as_view({'get': 'list'}), name='search-employees'),
+
+
 ]

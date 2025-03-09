@@ -1,75 +1,71 @@
-from ast import literal_eval
-from audioop import reverse
-from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy
-from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth.models import Group
-from rest_framework import viewsets,status
-from rest_framework import permissions
-from rest_framework.decorators import action
-from rest_framework.response import Response
-# from cases.views import get_cases_from_cache
-from core.models import comments,replies,priorities,contracts,documents,Status,Path
-from .serializers import EventsSerializer, GroupSerializer, commentsSerializer,  repliesSerializer,prioritiesSerializer,contractsSerializer,documentsSerializer,StatusSerializer
-from cases.models import LitigationCases,Folder
-from activities.models import task,hearing
-from django.views.decorators.cache import cache_page
-from django.views.decorators.cache import never_cache
-from django.core.cache import cache
-from django.conf import settings
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
-from django.utils import translation
-CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
-from datetime import datetime, timedelta
-from cases.utils import Calendar
-from django.utils.safestring import mark_safe
 import calendar
 from datetime import date
-from .permissions import MyPermission
+from datetime import datetime, timedelta
+from accounts.models import User
+from django.db.models import Q
 import django_filters.rest_framework
+from auditlog.models import LogEntry
+from django.contrib.auth.models import Group
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
-from pghistory.models import Events
+from django.utils.safestring import mark_safe
+from django.views.decorators.cache import never_cache
 from django_filters.rest_framework import DjangoFilterBackend
+from pghistory.models import Events
+from rest_framework import generics as rest_framework_generics
+from rest_framework import permissions
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.response import Response
+from django.contrib.contenttypes.models import ContentType
+from activities.models import task, hearing
+from cases.models import LitigationCases, Folder, AdministrativeInvestigation, Notation
+from cases.permissions import Manager_SuperUser
+from cases.utils import Calendar
+from contract.models import Contract
+from core.classes import StandardResultsSetPagination
+from core.models import comments, replies, priorities, contracts, documents, Status, Path, Notification
+from rest_api import generics
+from rest_api.api_view_mixins import ExternalObjectAPIViewMixin
+from .permissions import MyPermission
+from .serializers import (
+    EventsSerializer, GroupSerializer, commentsSerializer, repliesSerializer, prioritiesSerializer,
+    contractsSerializer, documentsSerializer, StatusSerializer, NotificationSerializer, LogEntrySerializer,
+    YourMPTTModelSerializer
+)
 from .serializers import (
     PathDocumentAddSerializer, PathDocumentRemoveSerializer,
     PathSerializer
 )
-from django.core.exceptions import ObjectDoesNotExist
-from rest_framework.parsers import JSONParser 
-from django.http.response import JsonResponse
 
-from rest_api.api_view_mixins import ExternalObjectAPIViewMixin
+from django.core.cache import cache
+from rest_framework.exceptions import NotFound
 
-from rest_api import generics
-from rest_framework import generics as rest_framework_generics
-from core.classes import StandardResultsSetPagination
+from django.views.decorators.vary import vary_on_cookie
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.core.cache import cache
 
+def setCache(key,query):
+    cache_data = cache.get(key)
+    if cache_data:
+        result = cache_data
+    else:
+        result = query
+        cache.set(key, result, timeout=600)
+    return result
 
-# from rest_framework_tracking.mixins import LoggingMixin
-## CALENDAR VIEW
-
-# def get_comments_from_cache():
-#     if 'all_comments' in cache:
-#         return cache.get('all_comments')
-#     else:
-#         all_comments = comments.objects.all().order_by('-created_at')
-#         cache.set('all_comments', all_comments)
-#     return all_comments
-
-# def get_replies_from_cache():
-#     if 'all_replies' in cache:
-#         return cache.get('all_replies')
-#     else:
-#         all_replies = replies.objects.all().order_by('-created_at')
-#         cache.set('all_replies', all_replies)
-#     return all_replies
 
 def prev_month(d):
     first = d.replace(day=1)
     prev_month = first - timedelta(days=1)
     month = 'month=' + str(prev_month.year) + '-' + str(prev_month.month)
     return month
+
 
 def next_month(d):
     days_in_month = calendar.monthrange(d.year, d.month)[1]
@@ -78,15 +74,16 @@ def next_month(d):
     month = 'month=' + str(next_month.year) + '-' + str(next_month.month)
     return month
 
+
 def get_date(req_day):
     if req_day:
         year, month = (int(x) for x in req_day.split('-'))
         return date(year, month, day=1)
     return datetime.today()
 
+
 @never_cache
 def myhome(request):
-    
     d = get_date(request.GET.get('month', None))
     pre_month = prev_month(d)
     nex_month = next_month(d)
@@ -94,17 +91,51 @@ def myhome(request):
     html_cal = cal.formatmonth(withyear=True)
     cases = LitigationCases.objects.all().order_by('-created_at')
     context = {
-        'cases':cases,
-        'calendar':mark_safe(html_cal),
-        'prev_month':pre_month,
-        'next_month':nex_month
-        }
+        'cases': cases,
+        'calendar': mark_safe(html_cal),
+        'prev_month': pre_month,
+        'next_month': nex_month
+    }
     return render(request, 'index.html', context=context)
 
 
 @never_cache
 def about(request):
     return render(request, 'about.html')
+
+
+def notifications(request):
+    return render(request, 'notification.html')
+
+
+class LogsViewSet(viewsets.ReadOnlyModelViewSet):
+    pagination_class = StandardResultsSetPagination
+    queryset = LogEntry.objects.all()
+    serializer_class = LogEntrySerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [
+        DjangoFilterBackend,
+        OrderingFilter,
+    ]
+
+    ordering_fields = ['timestamp', ]
+    ordering = ['-timestamp']
+
+    def get_queryset(self):
+        queryset = setCache('LogEntry_queryset',LogEntry.objects.all())
+        req_model = self.request.query_params.get('model', None)
+        req_object_id = self.request.query_params.get('object_id', None)
+        if req_model not in (None, ''):
+            queryset = queryset.filter(content_type__model=req_model)
+        if req_object_id not in (None, ''):
+            queryset = queryset.filter(object_id=req_object_id)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(actor=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(modified_by=self.request.user)
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -118,107 +149,141 @@ class commentsViewSet(viewsets.ModelViewSet):
     # pagination_class = None
     queryset = comments.objects.all().order_by('-id').filter(is_deleted=False)
     serializer_class = commentsSerializer
-    permission_classes = [permissions.IsAuthenticated, MyPermission]
+    permission_classes = [permissions.IsAuthenticated, ]
     pagination_class = StandardResultsSetPagination
     perm_slug = "core.comments"
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
-    filterset_fields = ['id','case_id','task_id','hearing_id']
+    filterset_fields = ['id', 'case_id', 'task_id', 'hearing_id', 'contract_id']
 
     def create(self, request):
         comment = []
         serializer = []
-        if "case_id" in request.data:
-            req_case_id = request.data['case_id']
-            comment = comments(id=None,case_id=req_case_id,comment=request.data['comment'],created_by=request.user)
+        req_case_id = request.data.get('case_id')
+        req_folder_id = request.data.get('folder_id')
+        req_task_id = request.data.get('task_id')
+        req_hearing_id = request.data.get('hearing_id')
+        req_notation_id = request.data.get('notation_id')
+        req_contract_id = request.data.get('contract_id')
+        if req_case_id not in (None, ''):
+            comment = comments(id=None, case_id=req_case_id,
+                               comment=request.data['comment'], created_by=request.user)
             comment.save()
             LitigationCases.objects.get(id=req_case_id).comments.add(comment)
             serializer = self.get_serializer(comment)
-        if "folder_id" in request.data:
-            req_folder_id = request.data['folder_id']
-            comment = comments(id=None,folder_id=req_folder_id,comment=request.data['comment'],created_by=request.user)
+        elif req_folder_id not in (None, ''):
+            comment = comments(id=None, folder_id=req_folder_id, comment=request.data['comment'],
+                               created_by=request.user)
             comment.save()
             Folder.objects.get(id=req_folder_id).comments.add(comment)
             serializer = self.get_serializer(comment)
-        # if "event_id" in request.data:
-        #     event_id = request.data['event_id']
-        #     event.objects.get(id=event_id).comments.add(comment)
-        if "task_id" in request.data:
-            req_task_id = request.data['task_id']
-            comment = comments(id=None,task_id=req_task_id,comment=request.data['comment'],created_by=request.user)
+        elif req_task_id not in (None, ''):
+            comment = comments(id=None, task_id=req_task_id,
+                               comment=request.data['comment'], created_by=request.user)
             comment.save()
             task.objects.get(id=req_task_id).comments.add(comment)
             serializer = self.get_serializer(comment)
-        if "hearing_id" in request.data:
-            req_hearing_id = request.data['hearing_id']
-            comment = comments(id=None,hearing_id=req_hearing_id,comment=request.data['comment'],created_by=request.user)
+        elif req_hearing_id not in (None, ''):
+            comment = comments(id=None, hearing_id=req_hearing_id, comment=request.data['comment'],
+                               created_by=request.user)
             comment.save()
             hearing.objects.get(id=req_hearing_id).comments.add(comment)
             serializer = self.get_serializer(comment)
-        return Response(serializer.data,status=status.HTTP_201_CREATED)
-
-    # def list(self, request):
-    #     queryset = comments.objects.all().order_by('-id').filter(is_deleted=False)
-    #     serializer = self.get_serializer(queryset)
-    #     return Response(serializer.data,status=status.HTTP_200_OK)
+        elif req_notation_id not in (None, ''):
+            comment = comments(id=None, notation_id=req_notation_id, comment=request.data['comment'],
+                               created_by=request.user)
+            comment.save()
+            Notation.objects.get(id=req_notation_id).comments.add(comment)
+            serializer = self.get_serializer(comment)
+        elif req_contract_id not in (None, ''):
+            comment = comments(id=None, contract_id=req_contract_id, comment=request.data['comment'],
+                               created_by=request.user)
+            comment.save()
+            Contract.objects.get(id=req_contract_id).comments.add(comment)
+            serializer = self.get_serializer(comment)
+        else:
+            return Response({'error_message': 'Please select one of Ids to add comment'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        cache.delete("comments_queryset")
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
         comment = comments.objects.filter(id=pk)
         comment.update(is_deleted=True)
         comment.update(modified_by=request.user)
         comment.update(modified_at=timezone.now())
-        return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
+        cache.delete("comments_queryset")
+        return Response(data={"detail": "Record is deleted"}, status=status.HTTP_200_OK)
 
-    # def retrieve(self, request, pk=None):
-        
-    #     comment_queryset = comments.objects.filter(id=pk,replies__is_deleted=False,is_deleted=False).
-    #     serializer = self.get_serializer(comment_queryset)
-    #     return Response(serializer.data,status=status.HTTP_200_OK)
+    def perform_update(self, serializer):
+        cache.delete("comments_queryset")
+        serializer.save(modified_by=self.request.user)
 
+    def get_queryset(self):
+        cache_key = "comments_queryset"
+        cached_queryset = cache.get(cache_key)
+        if cached_queryset:
+            queryset = cached_queryset
+        else:
+            queryset = comments.objects.all().order_by('-id').filter(is_deleted=False)
+            cache.set(cache_key,queryset,timeout=600)
+        return queryset
 
 class repliesViewSet(viewsets.ModelViewSet):
     # pagination_class = None
-    queryset = replies.objects.all().order_by('-created_at').filter(is_deleted=False)
+    queryset = replies.objects.all().order_by(
+        '-created_at').filter(is_deleted=False)
     serializer_class = repliesSerializer
-    permission_classes = [permissions.IsAuthenticated, MyPermission]
+    permission_classes = [permissions.IsAuthenticated, ]
     pagination_class = StandardResultsSetPagination
     perm_slug = "core.replies"
 
     def create(self, request):
         if "reply" in request.data:
-            reply = replies(id=None,reply=request.data['reply'],comment_id=int(request.data['comment_id']),created_by=request.user)
+            reply = replies(id=None, reply=request.data['reply'], comment_id=int(request.data['comment_id']),
+                            created_by=request.user)
             reply.save()
             serializer = self.get_serializer(reply)
             if "comment_id" in request.data:
                 comment_id = request.data['comment_id']
                 comments.objects.get(id=comment_id).replies.add(reply)
-                return Response(serializer.data,status=status.HTTP_201_CREATED)
+                cache.delete("replies_queryset")
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
-                return Response({'error':'no comment id'},status=status.HTTP_201_CREATED)
+                return Response({'error': 'no comment id'}, status=status.HTTP_201_CREATED)
         else:
-            return Response({'error':'no reply'},status=status.HTTP_201_CREATED)
-
-
+            return Response({'error': 'no reply'}, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
         reply = replies.objects.filter(id=pk)
-        # commentList = replies.comments_set.get(id=pk)
-        # for comm in commentList:
-        #     print(comm.id)
-        #     comm.replies.remove(reply)
         reply.update(is_deleted=True)
         reply.update(modified_by=request.user)
         reply.update(modified_at=timezone.now())
-        return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
+        cache.delete("replies_queryset")
+        return Response(data={"detail": "Record is deleted"}, status=status.HTTP_200_OK)
+
+    def perform_update(self, serializer):
+        cache.delete("replies_queryset")
+        serializer.save(modified_by=self.request.user)
+
+    def get_queryset(self):
+        cache_key = "replies_queryset"
+        cached_queryset = cache.get(cache_key)
+        if cached_queryset:
+            queryset = cached_queryset
+        else:
+            queryset = replies.objects.all().order_by('-created_at').filter(is_deleted=False)
+            cache.set(cache_key, queryset, timeout=600)
+        return queryset
+    
 
 class prioritiesViewSet(viewsets.ModelViewSet):
-    # pagination_class = None
     queryset = priorities.objects.all().order_by('priority')
     serializer_class = prioritiesSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "core.priorities"
 
+
 class StatusViewSet(viewsets.ModelViewSet):
-    # pagination_class = None
     queryset = Status.objects.all().order_by('status')
     serializer_class = StatusSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
@@ -226,273 +291,211 @@ class StatusViewSet(viewsets.ModelViewSet):
 
 
 class contractsViewSet(viewsets.ModelViewSet):
-    
-    queryset = contracts.objects.all().order_by('-created_by').filter(is_deleted=False)
+    queryset = contracts.objects.all().order_by(
+        '-created_by').filter(is_deleted=False)
     serializer_class = contractsSerializer
-    permission_classes = [permissions.IsAuthenticated, MyPermission]
+    permission_classes = [permissions.IsAuthenticated, Manager_SuperUser]
     pagination_class = StandardResultsSetPagination
     filter_backends = [
         DjangoFilterBackend,
-         SearchFilter,
-          OrderingFilter,
+        SearchFilter,
+        OrderingFilter,
         #   FullWordSearchFilter,
-          ]
+    ]
     perm_slug = "core.contracts"
-    search_fields = ['@name','=id']
-    ordering_fields = ['created_at', 'id','modified_at']
-    
-    def create(self,request):
-            req_name = request.data['name']
-            req_attachement = request.FILES.get('attachment')
-            contract = contracts(id=None,name=req_name,attachment=req_attachement,created_by=request.user)
-            contract.save()
-            serializer = self.get_serializer(contract)
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
+    search_fields = ['@name', '=id']
+    ordering_fields = ['created_at', 'id', 'modified_at']
+
+    def create(self, request):
+        req_name = request.data['name']
+        req_attachement = request.FILES.get('attachment')
+        contract = contracts(id=None, name=req_name,
+                             attachment=req_attachement, created_by=request.user)
+        contract.save()
+        serializer = self.get_serializer(contract)
+        cache.delete("contracts_queryset")
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
         contract = contracts.objects.filter(id=pk)
         contract.update(is_deleted=True)
         contract.update(modified_by=request.user)
         contract.update(modified_at=timezone.now())
-        return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
-
-    # def list(self, request):
-    #     queryset = contracts.objects.all().filter(is_deleted=False).order_by('-created_by')
-    #     if request.user.is_manager == False:
-    #         queryset = queryset.filter(created_by=request.user)
-    #     page = self.paginate_queryset(queryset)
-    #     if page is not None:
-    #         serializer = self.get_serializer(page, many=True)
-    #         return self.get_paginated_response(serializer.data)
-    #     serializer = self.get_serializer(page,many=True)
-    #     return Response(serializer.data,status=status.HTTP_200_OK)
-
+        cache.delete("contracts_queryset")
+        return Response(data={"detail": "Record is deleted"}, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
-        queryset = contracts.objects.filter(is_deleted=False).order_by('-created_by')
-        if request.user.is_manager == False:
+        queryset = contracts.objects.filter(
+            is_deleted=False).order_by('-created_by')
+        if request.user.is_manager == False or self.request.user.is_superuser == False:
             queryset = queryset.filter(created_by=request.user)
         contract = get_object_or_404(queryset, pk=pk)
         serializer = self.get_serializer(contract)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    # def initial(self, request, *args, **kwargs):
-    #     """
-    #     Runs anything that needs to occur prior to calling the method handler.
-    #     """
-    #     self.format_kwarg = self.get_format_suffix(**kwargs)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    #     # Perform content negotiation and store the accepted info on the request
-    #     neg = self.perform_content_negotiation(request)
-    #     request.accepted_renderer, request.accepted_media_type = neg
+    def get_queryset(self):
+        cache_key = "contracts_queryset"
+        cached_queryset = cache.get(cache_key)
+        if cached_queryset:
+            queryset = cached_queryset
+        else:
+            queryset = contracts.objects.filter(is_deleted=False).order_by('-created_by')
+            cache.set(cache_key, queryset, timeout=600)
+        current_user = self.request.user
+        if current_user.is_contract_manager or current_user.is_superuser or current_user.is_manager:
+            queryset = queryset
+        else:
+            queryset.filter(created_by=current_user)
 
-    #     # Determine the API version, if versioning is in use.
-    #     version, scheme = self.determine_version(request, *args, **kwargs)
-    #     request.version, request.versioning_scheme = version, scheme
+    def perform_update(self, serializer):
+        cache.delete("contracts_queryset")
+        serializer.save(modified_by=self.request.user)
 
-    #     # Ensure that the incoming request is permitted
-    #     self.perform_authentication(request)
-    #     self.check_permissions(request)
-    #     self.check_throttles(request)
 
 class documentsViewSet(viewsets.ModelViewSet):
-
-    queryset = documents.objects.all().order_by('-created_by').filter(is_deleted=False)
+    queryset = documents.objects.all().order_by(
+        '-created_by').filter(is_deleted=False)
     serializer_class = documentsSerializer
-    permission_classes = [permissions.IsAuthenticated, MyPermission]
+    permission_classes = [permissions.IsAuthenticated, Manager_SuperUser]
     perm_slug = "core.documents"
     filter_backends = [
         DjangoFilterBackend,
-         SearchFilter,
-          OrderingFilter,
+        SearchFilter,
+        OrderingFilter,
         #   FullWordSearchFilter,
-          ]
-    filterset_fields = ['id','name','case_id','path_id']
-    search_fields = ['@name','=id']
-    ordering_fields = ['created_at', 'id','modified_at']
+    ]
+    filterset_fields = ['id', 'name', 'case_id', 'path_id']
+    search_fields = ['@name', '=id']
+    ordering_fields = ['created_at', 'id', 'modified_at']
 
-    def create(self,request): 
-        req_case_id = request.data.get('case_id') if request.data.get('case_id') != '' else None
-        req_path_id = request.data.get('path_id') if request.data.get('path_id') != '' else None
-        req_folder_id = request.data.get('folder_id') if request.data.get('folder_id') != '' else None
+    # @method_decorator(vary_on_cookie)
+    # @method_decorator(cache_page(60 * 60))
+    # def dispatch(self, *args, **kwargs):
+    #     return super(documentsViewSet, self).dispatch(*args, **kwargs)
+
+    def create(self, request):
+        req_case_id = request.data.get(
+            'case_id') if request.data.get('case_id') != '' else None
+        req_path_id = request.data.get(
+            'path_id') if request.data.get('path_id') != '' else None
+        req_folder_id = request.data.get(
+            'folder_id') if request.data.get('folder_id') != '' else None
+        req_task_id = request.data.get(
+            'task_id') if request.data.get('task_id') != '' else None
+        req_hearing_id = request.data.get(
+            'hearing_id') if request.data.get('hearing_id') != '' else None
         req_name = request.data.get('name')
         req_attachement = request.FILES.get('attachment')
-        document = documents(id=None,name=req_name,case_id=req_case_id,path_id=req_path_id,folder_id=req_folder_id,attachment=req_attachement,created_by=request.user)
+        document = documents(id=None, name=req_name, case_id=req_case_id, path_id=req_path_id, folder_id=req_folder_id,
+                             task_id=req_task_id, hearing_id=req_hearing_id, attachment=req_attachement,
+                             created_by=request.user)
         document.save()
-        if req_attachement in ('',None):
-            return Response(data={"detail":"Please select Document to upload"},status=status.HTTP_400_BAD_REQUEST)
-        if not req_case_id in ('',None):
-            case = get_object_or_404(LitigationCases,pk=req_case_id)
+        if req_attachement in ('', None):
+            return Response(data={"detail": "Please select Document to upload"}, status=status.HTTP_400_BAD_REQUEST)
+        if req_case_id not in ('', None):
+            case = get_object_or_404(LitigationCases, pk=req_case_id)
             case.documents.add(document)
-        if not req_path_id in ('',None):
-            path = get_object_or_404(Path,pk=req_path_id)
+        if req_path_id not in ('', None):
+            path = get_object_or_404(Path, pk=req_path_id)
             path.documents.add(document)
-        if not req_folder_id in ('',None):
-            path = get_object_or_404(Folder,pk=req_folder_id)
+        if req_folder_id not in ('', None):
+            path = get_object_or_404(Folder, pk=req_folder_id)
             path.documents.add(document)
-        # else:
-        #     document = documents(id=None,name=req_name,attachment=req_attachement,created_by=request.user)
-        #     document.save()
+        if req_task_id not in ('', None):
+            Task = get_object_or_404(task, pk=req_task_id)
+            Task.documents.add(document)
+        if req_hearing_id not in ('', None):
+            Hearing = get_object_or_404(hearing, pk=req_hearing_id)
+            Hearing.documents.add(document)
         serializer = self.get_serializer(document)
-        return Response(serializer.data,status=status.HTTP_201_CREATED)
+        print(req_task_id)
+        cache.delete("documents_queryset")
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
         docs = documents.objects.filter(id=pk)
         docs.update(is_deleted=True)
         docs.update(modified_by=request.user)
         docs.update(modified_at=timezone.now())
-        case_msg,path_msg,folder_msg ='','',''
+        case_msg, path_msg, folder_msg = '', '', ''
         doc = documents.objects.get(id=pk)
         if doc.case_id:
-            case = get_object_or_404(LitigationCases,pk=doc.case_id)
+            case = get_object_or_404(LitigationCases, pk=doc.case_id)
             case.documents.remove(doc)
             case_msg = f' and deleted from Case #{doc.case_id}'
             doc.case_id = None
             doc.save()
         if doc.path_id:
-            path = get_object_or_404(Path,pk=doc.path_id)
+            path = get_object_or_404(Path, pk=doc.path_id)
             path.documents.remove(doc)
             path_msg = f' and deleted from Path #{doc.path_id}'
             doc.path_id = None
             doc.save()
         if doc.folder_id:
-            folder = get_object_or_404(Folder,pk=doc.folder_id)
+            folder = get_object_or_404(Folder, pk=doc.folder_id)
             folder.documents.remove(doc)
             folder_msg = f' and deleted from Folder #{doc.folder_id}'
             doc.folder_id = None
             doc.save()
-        return Response(data={"detail":f"Document is deleted {folder_msg}{path_msg}{case_msg}"},status=status.HTTP_200_OK)
-
-    
-    # def update(self, request, pk=None):
-        
-
-
+        for manager in User.objects.filter(is_manager=True):
+            Notification.objects.create_notification(action='delete',
+                                                     content_type=ContentType.objects.get_for_model(doc),
+                                                     object_id=doc.id, object_name=doc.name, action_by=request.user,
+                                                     user=manager,
+                                                     role='manager')
+        cache.delete("documents_queryset")
+        return Response(data={"detail": f"Document is deleted {folder_msg}{path_msg}{case_msg}"},
+                        status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
-        queryset = documents.objects.filter(is_deleted=False).order_by('-created_by')
-        if request.user.is_manager == False:
+        queryset = documents.objects.filter(
+            is_deleted=False).order_by('-created_by')
+        if not request.user.is_manager and not request.user.is_superuser:
             queryset = queryset.filter(created_by=request.user)
         document = get_object_or_404(queryset, pk=pk)
         serializer = self.get_serializer(document)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+        cache.delete("documents_queryset")
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # def list(self, request):
-    #     queryset = documents.objects.all().filter(is_deleted=False).order_by('-created_by')
-    #     if request.user.is_manager == False:
-    #         queryset = queryset.filter(created_by=request.user)
-    #     page = self.paginate_queryset(queryset)
-    #     if page is not None:
-    #         serializer = self.get_serializer(page, many=True)
-    #         return self.get_paginated_response(serializer.data)
-    #     serializer = self.get_serializer(page,many=True)
-    #     return Response(serializer.data,status=status.HTTP_200_OK)
+    def perform_update(self, serializer):
+        serializer.save(modified_by=self.request.user)
 
-    # def initial(self, request, *args, **kwargs):
-    #     """
-    #     Runs anything that needs to occur prior to calling the method handler.
-    #     """
-    #     self.format_kwarg = self.get_format_suffix(**kwargs)
-
-    #     # Perform content negotiation and store the accepted info on the request
-    #     neg = self.perform_content_negotiation(request)
-    #     request.accepted_renderer, request.accepted_media_type = neg
-
-    #     # Determine the API version, if versioning is in use.
-    #     version, scheme = self.determine_version(request, *args, **kwargs)
-    #     request.version, request.versioning_scheme = version, scheme
-
-    #     # Ensure that the incoming request is permitted
-    #     self.perform_authentication(request)
-    #     self.check_permissions(request)
-    #     self.check_throttles(request)
-        
-        
+    def get_queryset(self):
+        cache_key = "documents_queryset"
+        cached_queryset = cache.get(cache_key)
+        if cached_queryset:
+            queryset = cached_queryset
+        else:
+            queryset = documents.objects.all().order_by('-created_by').filter(is_deleted=False)
+            cache.set(cache_key, queryset, timeout=600)
+        return queryset
 
 class eventsViewSet(viewsets.ReadOnlyModelViewSet):
-
     queryset = Events.objects.all().exclude(pgh_diff='')
     serializer_class = EventsSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
-    filterset_fields = ['pgh_obj_model','pgh_obj_id',]    
+    filterset_fields = ['pgh_obj_model', 'pgh_obj_id', ]
 
 
 class caseseventsViewSet(viewsets.ReadOnlyModelViewSet):
-
-    queryset = Events.objects.all().exclude(pgh_diff='').filter(pgh_obj_model='cases.LitigationCases')
+    queryset = Events.objects.all().exclude(pgh_diff='').filter(
+        pgh_obj_model='cases.LitigationCases')
     serializer_class = EventsSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
-    filterset_fields = ['pgh_obj_model','pgh_obj_id',]           
-
-
-
-
-# class directoriesViewSet(viewsets.ModelViewSet):
-
-#     queryset = directory.objects.all().order_by('-created_by').filter(is_deleted=False)
-#     serializer_class = directoriesSerializer
-#     permission_classes = [permissions.IsAuthenticated, MyPermission]
-#     perm_slug = "core.directory"
-#     filter_backends = [
-#         DjangoFilterBackend,
-#          SearchFilter,
-#           OrderingFilter,
-#         #   FullWordSearchFilter,
-#           ]
-#     filterset_fields = ['id','name',]
-#     search_fields = ['@name','=id']
-#     ordering_fields = ['created_at', 'id','modified_at']
-
-    # def create(self,request):
-    #     req_name = None
-    #     req_attachement = None
-    #     req_case_id = None
-    #     req_name = request.data['name']
-    #     req_attachement = request.FILES.get('attachment')
-    #     if "case_id" in request.data:
-    #         req_case_id = request.data['case_id']
-    #         if req_case_id != "":
-    #             document = documents(id=None,name=req_name,case_id=req_case_id,attachment=req_attachement,created_by=request.user)
-    #             document.save()
-    #             case = get_object_or_404(LitigationCases,pk=req_case_id)
-    #             case.documents.add(document)
-    #         else:
-    #             document = documents(id=None,name=req_name,attachment=req_attachement,created_by=request.user)
-    #             document.save()
-    #     else:
-    #         document = documents(id=None,name=req_name,attachment=req_attachement,created_by=request.user)
-    #         document.save()
-    #     serializer = self.get_serializer(document)
-    #     return Response(serializer.data,status=status.HTTP_201_CREATED)
+    filterset_fields = ['pgh_obj_model', 'pgh_obj_id', ]
 
     def destroy(self, request, pk=None):
         case = documents.objects.filter(id=pk)
         case.update(is_deleted=True)
         case.update(modified_by=request.user)
         case.update(modified_at=timezone.now())
-        return Response(data={"detail":"Record is deleted"},status=status.HTTP_200_OK)
+        return Response(data={"detail": "Record is deleted"}, status=status.HTTP_200_OK)
 
-    
-    # def list(self, request):
-    #     queryset = documents.objects.all().filter(is_deleted=False).order_by('-created_by')
-    #     if request.user.is_manager == False:
-    #         queryset = queryset.filter(created_by=request.user)
-    #     page = self.paginate_queryset(queryset)
-    #     if page is not None:
-    #         serializer = self.get_serializer(page, many=True)
-    #         return self.get_paginated_response(serializer.data)
-    #     serializer = self.get_serializer(page,many=True)
-    #     return Response(serializer.data,status=status.HTTP_200_OK)
+    def perform_update(self, serializer):
+        serializer.save(modified_by=self.request.user)
 
-
-    # def retrieve(self, request, pk=None):
-    #     queryset = documents.objects.filter(is_deleted=False).order_by('-created_by')
-    #     if request.user.is_manager == False:
-    #         queryset = queryset.filter(created_by=request.user)
-    #     document = get_object_or_404(queryset, pk=pk)
-    #     serializer = self.get_serializer(document)
-    #     return Response(serializer.data,status=status.HTTP_200_OK)
 
 class APIDocumentPathListView(
     ExternalObjectAPIViewMixin, generics.ListAPIView
@@ -506,6 +509,12 @@ class APIDocumentPathListView(
     def get_source_queryset(self):
         return self.get_external_object().Paths.all()
 
+    # @method_decorator(vary_on_cookie)
+    # @method_decorator(cache_page(60 * 60))
+    # def dispatch(self, *args, **kwargs):
+    #     return super(APIDocumentPathListView, self).dispatch(*args, **kwargs)
+
+
 
 class APIPathListView(generics.ListCreateAPIView):
     """
@@ -514,80 +523,154 @@ class APIPathListView(generics.ListCreateAPIView):
     """
 
     ordering_fields = ('id', 'name')
+    pagination_class = StandardResultsSetPagination
     serializer_class = PathSerializer
     source_queryset = Path.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
-    filterset_fields = ['id','case_id']
-    ordering_fields = ['created_at', 'id','modified_at']
+    filterset_fields = ['id', 'case_id']
+    ordering_fields = ['created_at', 'id', 'modified_at']
     ordering = ['-id']
-    # def get_instance_extra_data(self):
-    #     return {
-    #         '_event_actor': self.request.user
-    #     }
 
-    # def get_mayan_view_permissions(self, request, view):
-    #     if request.method == 'POST':
-    #         serializer = self.get_serializer(data=request.data)
-    #         serializer.is_valid(raise_exception=True)
-
-    #         if serializer.validated_data['parent']:
-    #             return ()
-    #         else:
-    #             return self.mayan_view_permissions.get(request.method, None)
-    #     else:
-    #         return self.mayan_view_permissions.get(request.method, None)
+    # @method_decorator(vary_on_cookie)
+    # @method_decorator(cache_page(60 * 60))
+    # def dispatch(self, *args, **kwargs):
+    #     return super(APIPathListView, self).dispatch(*args, **kwargs)
 
     def create(self, request):
         req_name = request.data.get('name')
-        req_parent = request.data.get('parent')
-        req_case_id = request.data.get('case_id') if request.data.get('case_id') != '' else None
-        req_folder_id = request.data.get('folder_id') if request.data.get('folder_id') != '' else None
-
+        req_parent = request.data.get('parent') if request.data.get('parent') not in ('', None) else None
+        req_case_id = request.data.get('case_id') if request.data.get('case_id') not in ('', None) else None
+        req_folder_id = request.data.get('folder_id') if request.data.get('folder_id') not in ('', None) else None
+        req_admin_id = request.data.get('admin_id') if request.data.get('admin_id') not in ('', None) else None
+        req_notation_id = request.data.get('notation_id') if request.data.get('notation_id') not in ('', None) else None
+        req_contract_id = request.data.get('contract_id') if request.data.get('contract_id') not in ('', None) else None
         try:
             obj = Path.objects.get(parent=req_parent, name=req_name)
-            return Response(data={"detail":f"اسم المجلد '{req_name}' موجود مسبقا"},status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"detail": f"اسم المجلد '{req_name}' موجود مسبقا"}, status=status.HTTP_400_BAD_REQUEST)
         except ObjectDoesNotExist:
-            if not req_parent in ('',None):
+            if req_parent not in ('', None):
                 req_parent = get_object_or_404(Path, pk=req_parent)
-            path = Path(name=req_name,parent=req_parent,case_id=req_case_id,folder_id=req_folder_id)
+            path = Path(name=req_name, parent=req_parent,
+                        case_id=req_case_id, folder_id=req_folder_id, notation_id=req_notation_id,
+                        contract_id= req_contract_id, admin_id=req_admin_id, created_by=request.user,
+                        created_at=timezone.now())
             path.save()
-            if not req_case_id in ('',None):
+            if req_case_id:
                 case = get_object_or_404(LitigationCases, pk=req_case_id)
                 case.paths.add(path)
-            if not req_folder_id in ('',None):
+            if req_folder_id:
                 folder = get_object_or_404(Folder, pk=req_folder_id)
                 folder.paths.add(path)
+            if req_admin_id:
+                admin = get_object_or_404(AdministrativeInvestigation, pk=req_admin_id)
+                admin.paths.add(path)
+            if req_notation_id:
+                notation = get_object_or_404(Notation, pk=req_notation_id)
+                notation.paths.add(path)
+            if req_contract_id:
+                contract = get_object_or_404(Contract, pk=req_contract_id)
+                contract.paths.add(path)
             serializer = self.get_serializer(path)
-            return Response( serializer.data, status=status.HTTP_201_CREATED) 
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def perform_create(self, serializer):
         parent = serializer.validated_data['parent']
-        # case_id = serializer.validated_data['case_id']
-        # if case_id:
-        #     case = get_object_or_404(LitigationCases, pk=case_id)
-        #     case.Paths.add()
         if parent:
-            queryset=self.get_source_queryset()
+            queryset = self.get_source_queryset()
             get_object_or_404(Path, pk=parent.pk)
 
         return super().perform_create(serializer)
 
+## APIPathView OLD START
 
-class APIPathView(rest_framework_generics.RetrieveUpdateDestroyAPIView):
-    """
-    delete: Delete the selected Path.
-    get: Returns the details of the selected Path.
-    patch: Edit the selected Path.
-    put: Edit the selected Path.
-    """
+## The old APIPathView Start ##
+# class APIPathView(rest_framework_generics.RetrieveUpdateDestroyAPIView):
+#
+#     lookup_url_kwarg = 'path_id'
+#     permission_classes = [permissions.IsAuthenticated]
+#     serializer_class = PathSerializer
+#     queryset = Path.objects.all()
+#     pagination_class = StandardResultsSetPagination
+#     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+#     filterset_fields = ['case_id']
+#     ordering_fields = ['created_at', 'id', 'modified_at']
+#     ordering = ['-id']
+#     authentication_classes = [TokenAuthentication, SessionAuthentication]
+#
+#     def get_instance_extra_data(self):
+#         return {
+#             '_event_actor': self.request.user
+#         }
+#
+#     def destroy(self, request, *args, **kwargs):
+#         path_id = kwargs['path_id']
+#         path = Path.objects.filter(id=path_id)
+#         paths = Path.objects.get(id=path_id)
+#         case_msg, folder_msg = '', ''
+#         paths.documents.all().update(is_deleted=True, modified_by=request.user, modified_at=timezone.now(),
+#                                      path_id=None)
+#         path.delete()
+#         for manager in User.objects.filter(is_manager=True):
+#             Notification.objects.create_notification(action='delete',
+#                                                      content_type=ContentType.objects.get_for_model(paths),
+#                                                      object_id=paths.id, object_name=paths.name, action_by=request.user,
+#                                                      user=manager,
+#                                                      role='manager')
+#         return Response(data={"detail": f"Path is deleted{case_msg}{folder_msg}"}, status=status.HTTP_200_OK)
+#
+#     def perform_update(self, serializer):
+#         serializer.save(modified_by=self.request.user)
+#
+#     def get_object(self):
+#         parent_id = self.kwargs['path_id']  # Assuming the URL parameter is named 'pk'
+#         parent_node = Path.objects.get(id=parent_id)  # Replace with your actual model
+#
+#         current_user = self.request.user
+#         children = parent_node.get_children()
+#         if current_user.is_manager or current_user.is_superuser:
+#             children = parent_node.get_children()
+#         elif current_user.is_contract_manager and parent_id == '24':
+#             children = parent_node.get_children()
+#         else:
+#             filter_query = Q(assignee__exact=current_user) | Q(
+#                 created_by__exact=current_user) | Q(shared_with__exact=current_user)
+#             cases = LitigationCases.objects.filter(filter_query).distinct()
+#             admins = AdministrativeInvestigation.objects.filter(filter_query).distinct()
+#             notations = Notation.objects.filter(filter_query).distinct()
+#             contracts = Contract.objects.filter(filter_query).distinct()
+#             folders = Folder.objects.filter(filter_query).distinct()
+#             cases_ids = cases.values_list('id', flat=True)
+#             admins_ids = admins.values_list('id', flat=True)
+#             notations_ids = notations.values_list('id', flat=True)
+#             contract_ids = contracts.values_list('id', flat=True)
+#             folders_ids = folders.values_list('id', flat=True)
+#             child_filter_query = (Q(created_by__exact=current_user) | Q(case_id__in=cases_ids) | Q(
+#                 admin_id__in=admins_ids) | Q(notation_id__in=notations_ids) | Q(folder_id__in=folders_ids) |
+#                                   Q(contract_id__in=contract_ids))
+#             children = parent_node.get_children().filter(child_filter_query).distinct()
+#         current_user = self.request.user
+#         parent_node.filtered_children = children
+#         parent_node.current_user = current_user
+#         return parent_node
+
+## The old APIPathView End ##
+
+## APIPathView OLD END
+
+
+class APIPathView_old(rest_framework_generics.RetrieveUpdateDestroyAPIView):
     lookup_url_kwarg = 'path_id'
-
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = PathSerializer
     queryset = Path.objects.all()
+    pagination_class = StandardResultsSetPagination
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filterset_fields = ['case_id']
-    ordering_fields = ['created_at', 'id','modified_at']
+    ordering_fields = ['created_at', 'id', 'modified_at']
     ordering = ['-id']
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_instance_extra_data(self):
         return {
@@ -598,22 +681,150 @@ class APIPathView(rest_framework_generics.RetrieveUpdateDestroyAPIView):
         path_id = kwargs['path_id']
         path = Path.objects.filter(id=path_id)
         paths = Path.objects.get(id=path_id)
-        case_msg,folder_msg ='',''
-        if paths.case_id:
-            case = get_object_or_404(LitigationCases,pk=paths.case_id)
-            case.paths.remove(paths)
-            case_msg = f' and deleted from Case #{paths.case_id}'
-            paths.case_id = None
-            paths.save()
-        if paths.folder_id:
-            folder = get_object_or_404(Folder,pk=paths.folder_id)
-            folder.paths.remove(paths)
-            folder_msg = f' and deleted from Folder #{paths.folder_id}'
-            paths.folder_id = None
-            paths.save()
-        paths.documents.all().update(is_deleted=True,modified_by=request.user,modified_at=timezone.now(),path_id=None)
+        case_msg, folder_msg = '', ''
+        paths.documents.all().update(is_deleted=True, modified_by=request.user, modified_at=timezone.now(),
+                                     path_id=None)
         path.delete()
-        return Response(data={"detail":f"Path is deleted{case_msg}{folder_msg}"},status=status.HTTP_200_OK)
+        for manager in User.objects.filter(is_manager=True):
+            Notification.objects.create_notification(action='delete',
+                                                     content_type=ContentType.objects.get_for_model(paths),
+                                                     object_id=paths.id, object_name=paths.name, action_by=request.user,
+                                                     user=manager,
+                                                     role='manager')
+        cache.delete(f"path_{path}_queryset")
+        return Response(data={"detail": f"Path is deleted{case_msg}{folder_msg}"}, status=status.HTTP_200_OK)
+
+    def perform_update(self, serializer):
+        serializer.save(modified_by=self.request.user)
+
+
+    def get_object(self):
+        # Retrieve the parent node dynamically based on the ID in the URL
+        parent_id = self.kwargs['path_id']  # Assuming the URL parameter is named 'pk'
+        cache_key = f"path_{parent_id}_queryset"
+        cached_queryset = cache.get(cache_key)
+        if cached_queryset:
+            parent_node = cached_queryset
+        else:
+            parent_node = Path.objects.get(id=parent_id)
+            cache.set(cache_key, parent_node, timeout=600)
+        # Filter the children nodes of the parent node created by the current user
+        current_user = self.request.user
+        children = parent_node.get_children()
+        if current_user.is_manager or current_user.is_superuser:
+            children = parent_node.get_children()
+        elif current_user.is_contract_manager and parent_id == '24':
+            children = parent_node.get_children()
+        else:
+            filter_query = Q(assignee__exact=current_user) | Q(
+                created_by__exact=current_user) | Q(shared_with__exact=current_user)
+            cases_cache_key = f"case_{filter_query}"
+            cases_cached_queryset = cache.get(cases_cache_key)
+            if cases_cached_queryset:
+                cases = cases_cached_queryset
+            else:
+                cases = LitigationCases.objects.filter(filter_query).distinct()
+                cache.set(cache_key, cases, timeout=600)
+
+            admins_cache_key = f"admins_{filter_query}"
+            admins_cached_queryset = cache.get(admins_cache_key)
+            if admins_cache_key:
+                admins = admins_cache_key
+            else:
+                admins = AdministrativeInvestigation.objects.filter(filter_query).distinct()
+                cache.set(admins_cache_key, admins, timeout=600)
+            notations = Notation.objects.filter(filter_query).distinct()
+            folders = Folder.objects.filter(filter_query).distinct()
+            cases_ids = cases.values_list('id', flat=True)
+            admins_ids = admins.values_list('id', flat=True)
+            notations_ids = notations.values_list('id', flat=True)
+            folders_ids = folders.values_list('id', flat=True)
+            child_filter_query = Q(created_by__exact=current_user) | Q(case_id__in=cases_ids) | Q(
+                admin_id__in=admins_ids) | Q(notation_id__in=notations_ids) | Q(folder_id__in=folders_ids)
+            # queryset = queryset.filter(filter_query).distinct()
+            children = parent_node.get_children().filter(child_filter_query).distinct()
+        # parent_node.children.set(children)
+        current_user = self.request.user
+        parent_node.filtered_children = children
+        parent_node.current_user = current_user
+        # Include both the parent object and its children in the response
+        return parent_node
+
+
+class APIPathView(rest_framework_generics.RetrieveUpdateDestroyAPIView):
+    lookup_url_kwarg = 'path_id'
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PathSerializer
+    queryset = Path.objects.all()
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_fields = ['case_id']
+    ordering_fields = ['created_at', 'id', 'modified_at']
+    ordering = ['-id']
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    def get_object(self):
+        """Retrieve the cached parent node dynamically."""
+        path_id = self.kwargs["path_id"]
+        cache_key = f"path_{path_id}_queryset"
+        parent_node = cache.get(cache_key)
+
+        if parent_node is None:
+            parent_node = Path.objects.select_related("parent").get(id=path_id)
+            cache.set(cache_key, parent_node, timeout=600)
+
+        current_user = self.request.user
+        children_cache_key = f"path_{path_id}_children_{current_user.id}"
+        cached_children = cache.get(children_cache_key)
+
+        if cached_children is None:
+            children_query = parent_node.get_children()
+
+            if not current_user.is_superuser and not current_user.is_manager:
+                filter_query = Q(created_by=current_user) | Q(shared_with=current_user) | Q(assignee=current_user)
+                cases = LitigationCases.objects.filter(filter_query).values_list("id", flat=True)
+                child_filter_query = Q(created_by=current_user) | Q(case_id__in=cases)
+                children_query = children_query.filter(child_filter_query).distinct()
+
+            cached_children = children_query
+            cache.set(children_cache_key, cached_children, timeout=600)
+
+        parent_node.filtered_children = cached_children
+        return parent_node
+
+    def destroy(self, request, *args, **kwargs):
+        """Delete a path and update the cache."""
+        path_id = kwargs["path_id"]
+        path = Path.objects.filter(id=path_id).first()
+
+        if not path:
+            return Response({"detail": "Path not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        path.documents.update(
+            is_deleted=True, modified_by=request.user, modified_at=timezone.now(), path_id=None
+        )
+        path.delete()
+
+        # Send notifications to managers
+        for manager in User.objects.filter(is_manager=True):
+            Notification.objects.create_notification(
+                action="delete",
+                content_type=ContentType.objects.get_for_model(Path),
+                object_id=path_id,
+                object_name=path.name,
+                action_by=request.user,
+                user=manager,
+                role="manager",
+            )
+
+        # Delete cache entries
+        cache.delete(f"path_{path_id}_queryset")
+        cache.delete(f"path_{path_id}_children_{request.user.id}")
+
+        return Response({"detail": "Path deleted successfully."}, status=status.HTTP_200_OK)
+
+    def perform_update(self, serializer):
+        serializer.save(modified_by=self.request.user)
 
 class APIPathDocumentAddView(generics.ObjectActionAPIView):
     """
@@ -649,13 +860,229 @@ class APIPathDocumentListView(
     """
     get: Returns a list of all the documents contained in a particular Path.
     """
+    pagination_class = StandardResultsSetPagination
     external_object_class = Path
     external_object_pk_url_kwarg = 'path_id'
-
     serializer_class = documentsSerializer
-    # source_queryset = documents.objects.all()
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_source_queryset(self):
         return documents.objects.filter(
             pk__in=self.get_external_object().documents.only('pk')
         )
+
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    permission_classes = [
+        permissions.IsAuthenticated,
+        Manager_SuperUser
+    ]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    queryset = Notification.objects.all().order_by('-action_at').filter(is_deleted=False)
+    serializer_class = NotificationSerializer
+    pagination_class = LimitOffsetPagination
+    ordering_fields = ['action_at', 'id', ]
+
+    # @method_decorator(vary_on_cookie)
+    # @method_decorator(cache_page(60 * 60))
+    # def dispatch(self, *args, **kwargs):
+    #     return super(NotificationViewSet, self).dispatch(*args, **kwargs)
+
+    @action(methods=['post'], detail=True, serializer_class=None)
+    def read(self, request, pk):
+        notification = self.get_object()
+        notification.is_read = True
+        notification.browser_read = True
+        notification.save()
+        return Response(status=status.HTTP_200_OK, data={'details': 'done'})
+
+    @action(methods=['post'], detail=True, serializer_class=None)
+    def browser_read(self, request, pk):
+        notification = self.get_object()
+        notification.browser_read = True
+        notification.save()
+        return Response(status=status.HTTP_200_OK, data={'details': 'done'})
+
+    @action(methods=['post'], detail=True, serializer_class=None)
+    def unread(self, request, pk):
+        notification = self.get_object()
+        notification.is_read = False
+        notification.save()
+        return Response(status=status.HTTP_200_OK, data={'details': 'done'})
+
+    @action(methods=['post'], detail=True, serializer_class=None)
+    def delete(self, request, pk):
+        notification = self.get_object()
+        notification.is_deleted = True
+        notification.save()
+        return Response(status=status.HTTP_200_OK, data={'details': 'done'})
+
+    @action(methods=['post'], detail=False, serializer_class=None)
+    def read_all(self, request):
+        Notification.objects.filter(
+            is_deleted=False, user=request.user).update(is_read=True, browser_read=True)
+        return Response(status=status.HTTP_200_OK, data={'details': 'done'})
+
+    @action(methods=['post'], detail=False, serializer_class=None)
+    def unread_all(self, request):
+        Notification.objects.filter(
+            is_deleted=False, is_read=True).update(is_read=False)
+        return Response(status=status.HTTP_200_OK, data={'details': 'done'})
+
+    @action(methods=['post'], detail=False, serializer_class=None)
+    def delete_all(self, request):
+        notifications = Notification.objects.filter(
+            is_deleted=False, user=request.user).update(is_deleted=True)
+        return Response(status=status.HTTP_200_OK, data={'details': 'done'})
+
+    def get_queryset(self):
+        current_user_id = self.request.user.id
+        # cuser = User.objects.get(id=current_user_id)
+        # is_manager = cuser.is_manager
+        # is_superuser = cuser.is_superuser
+        queryset = Notification.objects.filter(
+            is_deleted=False, user=current_user_id).order_by('-action_at')
+        # if is_manager or is_superuser:
+        #     queryset = queryset
+        # else:
+        #     queryset = []
+        return queryset
+
+    # def list(self, request):
+    #     unread_count = self.get_queryset().filter(is_read=False).count()
+    #     qs = self.get_queryset()
+    #     serializer = self.get_serializer(qs,many=True)
+    #     count = self.get_queryset().count()
+    #     paginator = LimitOffsetPagination()
+    #     paginator_response = paginator.paginate_queryset(serializer.data,request)
+    #     # count = paginator_response.get_count
+    #     print('count',count)
+    #     response_data = OrderedDict([
+    #             # ('count', count),
+    #             ('results', paginator_response),
+    #             ('unread_count', unread_count),
+    #         ])
+    #     return self.get_paginated_response(serializer.data)
+    #     # return Response(response_data, status=status.HTTP_200_OK)
+
+    def alter_response_data(self, _json_response):
+        json_response = _json_response.copy()
+        results = []
+        next_ = json_response['next']
+        previous_ = json_response['previous']
+        unread_count = self.get_queryset().filter(is_read=False).count()
+        json_response['unseen_count'] = unread_count
+        for item in json_response['results']:
+            item.update({'next': next_, 'previous': previous_})
+            results.append(item)
+        json_response['results'] = results
+        return json_response
+
+    def dispatch(self, request, *args, **kwargs):
+        http_response = super().dispatch(request, *args, **kwargs)
+        json_response = http_response.data
+
+        if 'next' in json_response and 'previous' in json_response:
+            http_response.data = self.alter_response_data(json_response)
+
+        return http_response
+
+
+# def get_nested_children(path):
+#     children = Path.objects.filter(parent=path)
+#     serialized_children = []
+#     for child in children:
+#         child_data = YourMPTTModelSerializer(child).data
+#         child_data['children'] = get_nested_children(child)
+#         serialized_children.append(child_data)
+#     return serialized_children
+#
+#
+# from rest_framework.decorators import api_view
+#
+# @api_view(['GET'])
+# def selected_path_children(request, pk):
+#     selected_path = get_object_or_404(Path, pk=pk)
+#     serialized_tree = YourMPTTModelSerializer(selected_path).data
+#     serialized_tree['children'] = get_nested_children(selected_path)
+#     return Response(serialized_tree, status=status.HTTP_200_OK)
+
+
+class IsSuperOrManager(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return not request.user.is_superuser and not request.user.is_manager
+
+class IsContractManager(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        # Check if the user is a contract manager
+        return request.user.is_contract_manager
+
+class HasRelatedModelPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        if isinstance(obj, LitigationCases):
+            # Check if the user is in 'assignee', 'created_by', or 'shared_with' fields
+            return (
+                user in obj.assignee.all() or
+                user == obj.created_by or
+                user in obj.shared_with.all()
+            )
+        elif isinstance(obj, AdministrativeInvestigation):
+            # Check if the user is in 'assignee', 'created_by', or 'shared_with' fields
+            return (
+                user in obj.assignee.all() or
+                user == obj.created_by or
+                user in obj.shared_with.all()
+            )
+        elif isinstance(obj, Notation):
+            # Check if the user is in 'assignee', 'created_by', or 'shared_with' fields
+            return (
+                user in obj.assignee.all() or
+                user == obj.created_by or
+                user in obj.shared_with.all()
+            )
+        elif isinstance(obj, Folder):
+            # Check if the user is in 'assignee', 'created_by', or 'shared_with' fields
+            return (
+                user in obj.assignee.all() or
+                user == obj.created_by or
+                user in obj.shared_with.all()
+            )
+        return False  # Return False for other objects
+
+
+class SelectedPathChildren(generics.RetrieveAPIView):
+    serializer_class = YourMPTTModelSerializer
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    permission_classes = [HasRelatedModelPermission,]
+    pagination_class = StandardResultsSetPagination
+
+
+    def get_source_queryset(self):
+        return Path.objects.all()
+
+    def retrieve(self, request, pk=None):
+        selected_path = Path.objects.get(pk=pk)  # Retrieve the selected Path
+
+        # Extract the 'limit' and 'skip' query parameters
+        limit = int(request.query_params.get('limit', 10))  # Default to 10 if not specified
+        skip = int(request.query_params.get('skip', 0))  # Default to 0 if not specified
+
+
+        def get_nested_children(path):
+            path_id = None
+            if isinstance(path, dict):
+                path_id = path['id']
+            else:
+                path_id = path.id
+            children = Path.objects.filter(parent=path_id)
+            children = children[skip:skip + limit]
+            serialized_children = YourMPTTModelSerializer(children, many=True).data
+            for child in serialized_children:
+                child['subPaths'] = get_nested_children(child)
+            return serialized_children
+
+        serialized_tree = YourMPTTModelSerializer(selected_path).data
+        serialized_tree['subPaths'] = get_nested_children(selected_path)
+
+        return Response(serialized_tree)

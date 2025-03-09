@@ -1,23 +1,20 @@
 import base64
-from collections import namedtuple
 import io
 import json
-
-from furl import furl
+from collections import namedtuple
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.request import QueryDict
+from django.template import Context, Engine, Template as DjangoTemplate
 from django.template import Variable, VariableDoesNotExist
 from django.test.client import MULTIPART_CONTENT
 from django.urls import resolve
 from django.urls.exceptions import Resolver404
 from django.utils.encoding import force_bytes, force_str
-from django.template import Context, Engine, Template as DjangoTemplate
+from furl import furl
 
 
 # from mayan.apps.organizations.settings import setting_organization_url_base_path
-
-from .literals import API_VERSION
 
 
 class Template:

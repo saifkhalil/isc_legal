@@ -9,45 +9,66 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
+import environ
+import os
+env = environ.Env(
+
+)
 
 from pathlib import Path
-import os
+
 from django.utils.translation import gettext_lazy as _
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
+# sentry settings
+
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="http://3db22fa7fc91b72e22ce86f5bc1bd314@172.18.223.12:9000/2",
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'cw#703dwo68e^5nl^t=i*7s4pr3aas6ztgmak!jua1w!^c&^ah'
+SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
 
+
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
 INSTALLED_APPS = [
-    'material',
-    'material.admin',
+    'daphne',
+    # 'material',
+    # 'material.admin',
     'pghistory.admin',
-    # 'jazzmin',
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
+    'django.contrib.sites',
+    'django.contrib.admindocs',
+    'mptt',
     'rest_framework_swagger',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_word_filter',
-    # 'channels',
+    'channels',
     'djoser',
     'phonenumber_field',
     'import_export',
@@ -62,39 +83,42 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'django_filters',
     'corsheaders',
+    'haystack',
+    # 'django-environ',
     'accounts',
     'core',
     'cases',
     'activities',
-    # 'tabular_permissions',
-    'crispy_forms',
-    'slick_reporting',
+    'contract',
     'logentry_admin',
     'celery',
-    'django_celery_beat',   
+    'django_celery_beat',
     'django_celery_results',
-    # 'rest_framework_tracking',
     'django_extensions',
     'pghistory',
     'pgtrigger',
-    'mptt',
+    'dbbackup',
+    'drf_api_logger',
     'furl',
+    'auditlog'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware', 
-    # 'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.cache.FetchFromCacheMiddleware',
+    # 'core.middleware.CurrentUserMiddleware',
+    # 'core.middleware.AutoUpdateFieldsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'core.current_user.RequestMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
+    # 'drf_api_logger.middleware.api_logger_middleware.APILoggerMiddleware',
+    'core.middleware.AuditlogMiddleware',
+    'django.contrib.admindocs.middleware.XViewMiddleware'
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -117,44 +141,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# ASGI_APPLICATION = 'core.wsgi.application' #routing.py will handle the ASGI
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': "channels.layers.InMemoryChannelLayer"
-#         }
-#     }
-
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': os.environ.get('MYSQL_DATABASE', 'isc_legal'),
-#         'USER': os.environ.get('MYSQL_USER', 'isc_legal'),
-#         'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'Isc@L3gal'),
-#         'HOST': os.environ.get('MYSQL_DATABASE_HOST', 'localhost'),
-#         'PORT': os.environ.get('MYSQL_DATABASE_PORT', 3306),
-#     }
-# }
+ASGI_APPLICATION = 'core.asgi.application'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('MYSQL_DATABASE', 'isc_legal'),
-        'USER': os.environ.get('MYSQL_USER', 'isc_legal'),
-        'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'Isc@L3gal'),
-        'HOST': os.environ.get('MYSQL_DATABASE_HOST', 'localhost'),
-        'PORT': os.environ.get('MYSQL_DATABASE_PORT', 5432),
+        'NAME':  env('PG_DATABASE'),
+        'USER': env('PG_USER'),
+        'PASSWORD': env('PG_PASSWORD'),
+        'HOST':  env('PG_DATABASE_HOST'),
+        'PORT':  env('PG_DATABASE_PORT'),
     }
 }
+
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -172,7 +171,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -202,7 +200,7 @@ LOCALE_PATHS = [
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
@@ -210,7 +208,6 @@ MEDIA_URL = '/media/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-
 
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -224,21 +221,39 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+
     ],
+    # 'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.AcceptHeaderVersioning',
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissions',
-        
+
     ],
-    # 'DEFAULT_CONTENT_NEGOTIATION_CLASS': 'core.negotiation.IgnoreClientContentNegotiation',
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
-    'max_limit':100,
-    'default_limit':10,
+    'max_limit': 100,
+    'default_limit': 10,
 
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    
+    'DEFAULT_CACHE_BACKEND': 'django.core.cache.backends.redis.RedisCache',
+    'DEFAULT_CACHE_KEY_FUNC': 'core.utils.cache_key_func',  # Replace with your own cache key function
+    'DEFAULT_CACHE_TIMEOUT': 60 * 15,  # Cache timeout in seconds (e.g., 15 minutes)
+    # 'DEFAULT_THROTTLE_CLASSES': [
+    #     'rest_framework.throttling.AnonRateThrottle',
+    #     'rest_framework.throttling.UserRateThrottle'
+    # ],
+    # 'DEFAULT_THROTTLE_RATES': {
+    #     'anon': '10/minute',
+    #     'user': '10/minute'
+    # }
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',  # Replace with your Redis server address
+
+    }
 }
 
 SPECTACULAR_SETTINGS = {
@@ -246,62 +261,46 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'ISC Legal App',
     'VERSION': '0.9.1',
     'SERVE_INCLUDE_SCHEMA': False,
-    'CONTACT': {"name":"Saif AlKhateeb","email":"saif.ibrahim@qi.iq"},
+    'CONTACT': {"name": "Saif AlKhateeb", "email": "saif.ibrahim@qi.iq"},
 }
 
 SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': False,
 }
 
-
 PARLER_LANGUAGES = {
     None: (
-        {'code': 'en',},
-        {'code': 'ar',},
+        {'code': 'en', },
+        {'code': 'ar', },
     ),
     'default': {
-        'fallback': 'en',             # defaults to PARLER_DEFAULT_LANGUAGE_CODE
-        'hide_untranslated': False,   # the default; let .active_translations() return fallbacks too.
+        'fallback': 'en',  # defaults to PARLER_DEFAULT_LANGUAGE_CODE
+        'hide_untranslated': False,  # the default; let .active_translations() return fallbacks too.
     }
 }
 
 PARLER_DEFAULT_LANGUAGE_CODE = 'en'
 
-
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-#         'LOCATION': 'redis://' + os.environ.get('REDIS_HOST', 'localhost') + ':6379',
-#     }
-# }
-
-
-# CACHE_MIDDLEWARE_ALIAS = 'default'  # The cache alias to use for storage and 'default' is **local-memory cache**.
-# CACHE_MIDDLEWARE_SECONDS = 3600
-# CACHE_MIDDLEWARE_KEY_PREFIX = ''    # This is used when cache is shared across multiple sites that
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 99999
 
-
-CORS_ALLOW_ALL_ORIGINS = True # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
+CORS_ALLOW_ALL_ORIGINS = True  # If this is used then `CORS_ALLOWED_ORIGINS` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'https://localhost:3000',
-] # If this is used, then not need to use `CORS_ALLOW_ALL_ORIGINS = True`
+]  # If this is used, then not need to use `CORS_ALLOW_ALL_ORIGINS = True`
 CORS_ALLOWED_ORIGIN_REGEXES = [
     'http://localhost:3000',
     'https://localhost:3000',
 ]
 
-
 JAZZMIN_SETTINGS = {
-    "show_ui_builder" : True
+    "show_ui_builder": True
 }
 JAZZMIN_UI_TWEAKS = {
     "theme": "flatly",
     "dark_mode_theme": "darkly",
 }
-
 
 TABULAR_PERMISSIONS_CONFIG = {
     'template': 'tabular_permissions/admin/tabular_permissions.html',
@@ -309,7 +308,7 @@ TABULAR_PERMISSIONS_CONFIG = {
         'override': False,
         'apps': [],
         'models': [],
-        'function':'tabular_permissions.helpers.dummy_permissions_exclude'
+        'function': 'tabular_permissions.helpers.dummy_permissions_exclude'
     },
     'auto_implement': True,
     'use_for_concrete': False,
@@ -320,21 +319,32 @@ TABULAR_PERMISSIONS_CONFIG = {
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
+### SMTP CONFIGURATION ####
 
-#### SMTP CONFIGURATION ####
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_USE_TLS = env('EMAIL_USE_TLS')
+EMAIL_PORT = env('EMAIL_PORT')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 
-EMAIL_HOST = 'smtp.office365.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'legal.app@qi.iq'
-EMAIL_HOST_PASSWORD = 'Bog91158'
-DEFAULT_FROM_EMAIL = 'Legal Application <legal.app@qi.iq>'
+# timezone = 'Asia/Baghdad'
+# CELERY_TASK_TRACK_STARTED = True
+# CELERY_TASK_TIME_LIMIT = 30 * 60
+# result_backend = 'django-db'
+# CELERY_broker_url = "redis://localhost:6379"
+# result_backend = "redis://localhost:6379"
+# CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+accept_content = ['application/json']
+result_serializer = 'json'
+task_serializer = 'json'
+result_backend = 'django-db'
+timezone = 'Asia/Baghdad'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
-CELERY_TIMEZONE = 'Asia/Baghdad'
-CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 30 * 60
-CELERY_RESULT_BACKEND = 'django-db'
 
 
 # PGHISTORY_ADMIN_LIST_DISPLAY = ['user',]
@@ -347,7 +357,7 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Welcome to the Legal Software",
     "copyright": "ISC",
     "site_icon": None,
-        "icons": {
+    "icons": {
         "accounts": "fas fa-users-cog",
         "accounts.user": "fas fa-user",
         "accounts.department": "fa fa-building",
@@ -359,7 +369,7 @@ JAZZMIN_SETTINGS = {
         "cases.client_position": "fa fa-user",
         "auth.group": "fa fa-users",
         "admin.logentry": "fa fa-file-text",
-        
+
     },
 }
 
@@ -407,11 +417,178 @@ class Messages(object):
     EMAIL_NOT_FOUND = "البريد الالكتروني غير متوفر"
     CANNOT_CREATE_USER_ERROR = "لا يمكن تكوين الحساب"
 
+
 DJOSER = {
-    'LOGOUT_ON_PASSWORD_CHANGE' : True, 
-    'SEND_ACTIVATION_EMAIL':False,
-    'SEND_CONFIRMATION_EMAIL':False,
+    'LOGOUT_ON_PASSWORD_CHANGE': True,
+    'SEND_ACTIVATION_EMAIL': False,
+    'SEND_CONFIRMATION_EMAIL': False,
+    'PASSWORD_RESET_CONFIRM_URL': 'account/reset/{uid}/{token}/',
+    # 'USERNAME_RESET_CONFIRM_URL': 'accounts/reset/{uid}/{token}/',
+    # 'ACTIVATION_URL': '#/activate/{uid}/{token}',
     'CONSTANTS': {
-    'messages': 'core.settings.Messages'
+        'messages': 'core.settings.Messages'
+    }
 }
+
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("localhost", 6379)],
+#         },
+#     },
+# }
+
+MPTT_DEFAULT_LEVEL_INDICATOR = "---"
+DEFAULT_LEVEL_INDICATOR = "---"
+
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': 'db_backup/'}
+
+## DRF API LOGGER SETTINGS ##
+
+DRF_API_LOGGER_DATABASE = True
+
+# Sensitive data will be replaced with "***FILTERED***".
+DRF_API_LOGGER_EXCLUDE_KEYS = ['password', 'token', 'access', 'refresh']
+# AUDITLOG_EXCLUDE_TRACKING_FIELDS = (
+#     "created_by",
+#     "modified_by"
+# )
+# AUDITLOG_INCLUDE_ALL_MODELS = True
+
+# AUDITLOG_EXCLUDE_TRACKING_MODELS = (
+#     'accounts',
+#     'django'
+# )
+
+# AUDITLOG_MODEL = 'core.LogEntry'
+
+
+ZOHO = {
+    'login_host': env('ZOHO_LOGIN_HOST'),
+    'get_employees_url': env('ZOHO_EMPLOYEE_URL'),
+    'refresh_token': env('ZOHO_REFRESH_TOKEN'),
+    'client_id': env('ZOHO_CLIENT_ID'),
+    'client_secret': env('ZOHO_CLIENT_SECRET'),
+    'grant_type': env('ZOHO_GRANT_TYPE')
+}
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch7_backend.Elasticsearch7SearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'employees',
+        'INCLUDE_SPELLING': True,
+        'BATCH_SIZE': 100,
+    },
+    'autocomplete': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': 'core/search/whoosh_index',
+        'STORAGE': 'file',
+        'POST_LIMIT': 128 * 1024 * 1024,
+        'INCLUDE_SPELLING': True,
+        'BATCH_SIZE': 100,
+    },
+}
+
+HAYSTACK_SIGNAL_PROCESSOR = 'accounts.signals.EmployeesSignalProcessor'
+HAYSTACK_DEFAULT_OPERATOR = 'OR'  # Change to 'OR' if you prefer
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10  # Adjust as needed
+
+#LOGGING = {
+#    'version': 1,
+#    'disable_existing_loggers': False,
+#    'formatters': {
+#        'verbose': {
+#            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+#            'datefmt' : "%d/%b/%Y %H:%M:%S"
+#        },
+#       'simple': {
+#            'format': '%(levelname)s %(message)s'
+#        },
+#    },
+#    'handlers': {
+#        'file': {
+#            'level': 'DEBUG',
+#            'class': 'logging.FileHandler',
+#            'filename': 'mysite.log',
+#            'formatter': 'verbose'
+#        },
+#    },
+#    'loggers': {
+#        'django': {
+#            'handlers':['file'],
+#            'propagate': True,
+#            'level':'DEBUG',
+#        },
+#        'MYAPP': {
+#            'handlers': ['file'],
+#            'level': 'DEBUG',
+#        },
+#    }
+#}
+
+LOGGING = {
+
+    'version': 1,
+    # 'filters': {
+    #     # Add an unbound RequestFilter.
+    #     'request': {
+    #         '()': 'django_requestlogging.logging_filters.RequestFilter',
+    #     },
+    # },
+    'loggers': {
+        'django': {
+            'handlers': ['log', 'info', 'warning', 'error', 'critical'],
+            'level': 'DEBUG',
+            # 'filters': ['request'],
+        }
+    },
+    'handlers': {
+        'log': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': './logs/log.log',
+            'formatter': 'verbose',
+        },
+        'info': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': './logs/info.log',
+            'formatter': 'verbose',
+        },
+        'warning': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': './logs/warning.log',
+            'formatter': 'verbose',
+        },
+        'error': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': './logs/error.log',
+            'formatter': 'verbose',
+        },
+        'critical': {
+            'level': 'CRITICAL',
+            'class': 'logging.FileHandler',
+            'filename': './logs/critical.log',
+            'formatter': 'verbose',
+        }
+
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        # 'request_format': {
+        #     'format': '%(remote_addr)s %(username)s "%(request_method)s '
+        #     '%(path_info)s %(server_protocol)s" %(http_user_agent)s '
+        #     '%(message)s %(asctime)s',
+        # },
+
+    },
 }

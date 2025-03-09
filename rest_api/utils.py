@@ -1,8 +1,8 @@
-from distutils import util
-from functools import reduce
 import itertools
 import logging
 import types
+from distutils import util
+from functools import reduce
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.constants import LOOKUP_SEP

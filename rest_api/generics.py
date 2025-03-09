@@ -1,17 +1,14 @@
+from django.core.exceptions import ImproperlyConfigured
 from rest_framework import generics as rest_framework_generics
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
-
-from django.core.exceptions import ImproperlyConfigured
-
 
 from .api_view_mixins import (
     CheckQuerysetAPIViewMixin, DynamicFieldListAPIViewMixin,
     InstanceExtraDataAPIViewMixin, QuerySetOverrideCheckAPIViewMixin,
     SerializerExtraContextAPIViewMixin, SchemaInspectionAPIViewMixin
 )
-
 from .serializers import BlankSerializer
 
 

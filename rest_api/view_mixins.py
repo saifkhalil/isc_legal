@@ -3,19 +3,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.query import QuerySet
 from django.http import Http404, HttpResponseRedirect
-from django.http.response import FileResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import ModelFormMixin
-
-# from mayan.apps.acls.classes import ModelPermission
-# from mayan.apps.acls.models import AccessControlList
-# from mayan.apps.common.settings import setting_home_view
-# from mayan.apps.databases.utils import check_queryset
-# from mayan.apps.mime_types.classes import MIMETypeBackend
-# from mayan.apps.permissions import Permission
 
 from .exceptions import ActionError
 # from .forms import DynamicForm, FormFieldsetMixin
@@ -24,6 +15,14 @@ from .literals import (
     TEXT_LIST_AS_ITEMS_PARAMETER, TEXT_LIST_AS_ITEMS_VARIABLE_NAME,
     TEXT_SORT_FIELD_PARAMETER, TEXT_SORT_FIELD_VARIABLE_NAME
 )
+
+
+# from mayan.apps.acls.classes import ModelPermission
+# from mayan.apps.acls.models import AccessControlList
+# from mayan.apps.common.settings import setting_home_view
+# from mayan.apps.databases.utils import check_queryset
+# from mayan.apps.mime_types.classes import MIMETypeBackend
+# from mayan.apps.permissions import Permission
 
 
 class ContentTypeViewMixin:

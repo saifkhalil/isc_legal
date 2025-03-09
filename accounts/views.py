@@ -1,31 +1,121 @@
-from audioop import reverse
-from lib2to3.pgen2.tokenize import generate_tokens
-from django.contrib import messages
-from urllib import request
 from django.contrib.auth import login, authenticate, logout
+import six
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.exceptions import PermissionDenied
+from django.core.mail import send_mail
 from django.shortcuts import render, redirect
-from rest_framework.authtoken.models import Token
-from django.contrib.sites.shortcuts import get_current_site
-from accounts.forms import RegistrationForm, UserAuthenticationForm, UserUpdateForm
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_str
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-import six
-from django.core.mail import EmailMessage, send_mail
-from django.conf import settings
-from accounts.models import User
+# from accounts.forms import RegistrationForm, UserAuthenticationForm, UserUpdateForm
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.translation import gettext_lazy as _
-from .permissions import MyPermission
+from django.utils.translation import ngettext
+from django.views.generic import FormView
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import permissions
+from rest_framework import viewsets, status
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.response import Response
+from accounts.models import User, Employees
+from core.classes import StandardResultsSetPagination
+from accounts.serializers import EmployeesSerializer, EmpSerializer
+from django_filters import rest_framework as filters
+from rest_framework import generics
+from rest_framework.pagination import LimitOffsetPagination
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.core.cache import cache
+from haystack.query import SearchQuerySet
+from rest_framework.views import APIView
+from elasticsearch.exceptions import ElasticsearchException
 
 
+def get_user_queryset(user=None):
+    if user and (user.is_superuser or user.is_staff):
+        queryset = get_user_model().objects.all()
+    else:
+        queryset = get_user_model().objects.filter(
+            is_superuser=False, is_staff=False
+        )
+
+    return queryset.order_by('username')
+
+
+class UserSetPasswordView(FormView):
+    form_class = SetPasswordForm
+    template_name = "registration/password_reset_confirm.html"
+    pk_url_kwarg = 'user_id'
+    source_queryset = get_user_queryset()
+    success_message = 'Password change request performed on %(count)d user'
+    success_message_plural = 'Password change request performed on %(count)d users'
+
+    def get_extra_context(self):
+        queryset = self.object_list
+
+        result = {
+            'title': ngettext(
+                singular='Change user password',
+                plural='Change users passwords',
+                number=queryset.count()
+            )
+        }
+
+        if queryset.count() == 1:
+            result.update(
+                {
+                    'object': queryset.first(),
+                    'title': _(
+                        'Change password for user: %s'
+                    ) % queryset.first()
+                }
+            )
+
+        return result
+
+    def get_form_extra_kwargs(self):
+        queryset = self.object_list
+        result = {}
+        if queryset:
+            result['user'] = queryset.first()
+            return result
+        else:
+            raise PermissionDenied
+
+    def object_action(self, form, instance):
+        try:
+            instance.set_password(
+                raw_password=form.cleaned_data['new_password1']
+            )
+            instance.save()
+            messages.success(
+                message=_(
+                    'Successful password reset for user: %s.'
+                ) % instance, request=self.request
+            )
+        except Exception as exception:
+            messages.error(
+                message=_(
+                    'Error reseting password for user "%(user)s": %(error)s'
+                ) % {
+                            'error': exception, 'user': instance
+                        }, request=self.request
+            )
 
 
 class TokenGenerator(PasswordResetTokenGenerator):
     def _make_hash_value(self, user, timestamp):
         return (
-            six.text_type(user.pk) + six.text_type(timestamp) +
-            six.text_type(user.is_active)
+                six.text_type(user.pk) + six.text_type(timestamp) +
+                six.text_type(user.is_active)
         )
 
 
@@ -44,7 +134,7 @@ def send_active_email(user, request):
     })
 
     send_mail(email_subject, message, settings.DEFAULT_FROM_EMAIL, [
-              user.email], fail_silently=True, html_message=email_body)
+        user.email], fail_silently=True, html_message=email_body)
 
 
 def send_active(request, userid):
@@ -58,7 +148,7 @@ def send_active(request, userid):
     })
 
     send_mail(email_subject, message, settings.DEFAULT_FROM_EMAIL, [
-              user.email], fail_silently=True, html_message=email_body)
+        user.email], fail_silently=True, html_message=email_body)
     return redirect('dashboard')
 
 
@@ -77,10 +167,10 @@ def registration_view(request):
 
             raw_password = form.cleaned_data.get('password1')
             fullname = "%s %s" % (form.cleaned_data.get(
-                'firstname'), form.cleaned_data.get('lastname'))
+                'first_name'), form.cleaned_data.get('lastname'))
             phone = str(form.cleaned_data.get('phone'))[1:]
             send_active_email(user, request)
-            #account = authenticate(request, email=email, password=raw_password)
+            # account = authenticate(request, email=email, password=raw_password)
             # if account:
             #    login(request, account)
             messages.add_message(request, messages.SUCCESS,
@@ -97,43 +187,6 @@ def registration_view(request):
     return render(request, 'account/register.html', context)
 
 
-def logout_view(request):
-    logout(request)
-    return redirect('home')
-
-
-def login_view(request):
-    context = {}
-    if request.GET.get('next') is None:
-        next_page = 'home'
-    else:
-        next_page = request.GET.get('next')
-    user = request.user
-    if user.is_authenticated:
-        return redirect('home')
-    if request.POST:
-        form = UserAuthenticationForm(request.POST)
-        if form.is_valid():
-            email = request.POST['email']
-            password = request.POST['password']
-            user = authenticate(email=email, password=password)
-            if not user.is_verified:
-                messages.add_message(request, messages.ERROR,
-                                     _('Email is not verified, please check your email inbox'))
-                return render(request, "account/login.html", context)
-            if user.is_blocked:
-                messages.add_message(request, messages.ERROR,
-                                     _('It looks like your account has been blocked Please contact system admin for more information.'))
-                return render(request, "account/login.html", context)
-            if user:
-                login(request, user)
-                return redirect(next_page)
-    else:
-        form = UserAuthenticationForm()
-    context['login_form'] = form
-    return render(request, "account/login.html", context)
-
-
 def account_view(request):
     context = {}
     if request.POST:
@@ -142,7 +195,7 @@ def account_view(request):
             form.initial = {
                 "email": request.POST['email'],
                 "username": request.POST['username'],
-                "firstname": request.POST['firstname'],
+                "first_name": request.POST['first_name'],
                 "lastname": request.POST['lastname'],
                 "phone": request.POST['phone'],
             }
@@ -154,7 +207,7 @@ def account_view(request):
             initial={
                 "email": request.user.email,
                 "username": request.user.username,
-                "firstname": request.user.firstname,
+                "first_name": request.user.first_name,
                 "lastname": request.user.lastname,
                 "phone": request.user.phone,
             }
@@ -199,3 +252,101 @@ def unblock_user(request, userid):
     selected_user.is_blocked = False
     selected_user.save()
     return redirect('dashboard')
+
+
+class Top10Pagination(LimitOffsetPagination):
+    default_limit = 10
+    max_limit = 10
+
+
+class EmployeesFilter(filters.FilterSet):
+    full_name = filters.CharFilter(lookup_expr='icontains')
+
+    class Meta:
+        model = Employees
+        fields = ['full_name', ]
+
+
+class EmployeesViewSet(viewsets.ReadOnlyModelViewSet):
+    pagination_class = Top10Pagination
+    queryset = Employees.objects.all()
+    serializer_class = EmployeesSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = EmployeesFilter
+
+    @method_decorator(vary_on_cookie)
+    @method_decorator(cache_page(60 * 60))
+    def dispatch(self, *args, **kwargs):
+        return super(EmployeesViewSet, self).dispatch(*args, **kwargs)
+
+
+class SearchEmployeesAPIView(viewsets.ModelViewSet):
+    queryset = Employees.objects.all()  # Set your queryset here
+    serializer_class = EmpSerializer
+    permission_classes = [permissions.DjangoModelPermissions]
+
+    def get_queryset(self):
+        query = self.request.query_params.get('q', '')
+        search_results = SearchQuerySet().filter(text=query)
+
+        if not search_results:
+            suggestions = self.get_suggestions(query)
+            return Response({"suggestions": suggestions})
+
+        serialized_results = [result.object for result in search_results]
+        return Response(serialized_results)
+
+    def get_suggestions(self, query):
+        try:
+            # Use Elasticsearch's suggest API for "did you mean" suggestions
+            suggestions = SearchQuerySet().spelling_suggestion(query)
+            return [suggestion for suggestion in suggestions]
+        except ElasticsearchException:
+            return []  # Return an empty list if suggestions cannot be generated
+
+
+class SearchEmployeeAPIView(APIView):
+    queryset = Employees.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    def get(self, request, format=None):
+        query = request.query_params.get('q', '')
+        search_results_contains = SearchQuerySet().filter(text__contains=query)
+        search_results_contains_highlight = SearchQuerySet().filter(text__contains=query).highlight(
+    pre_tags=['<strong>'], post_tags=['</strong>'])
+        search_results_fuzzy = SearchQuerySet().filter(text__fuzzy=query)
+
+        # if not search_results:
+        #     suggestions = self.get_suggestions(query)
+        #
+        #     if suggestions is not None:  # Check if suggestions were generated
+        #         return Response({"results": [], "suggestions": suggestions})
+
+        serialized_results_contains = [self.serialize_employee(result.object) for result in search_results_contains]
+        serialized_results_contains_highlight = [{"full_name": result.highlighted[0], 'email': result.email} for result in search_results_contains_highlight]
+        serialized_results_fuzzy = [self.serialize_employee(result.object) for result in search_results_fuzzy]
+
+        return Response(
+            data={
+            # "results": serialized_results_contains,
+            "results": serialized_results_contains_highlight,
+            "suggestions": serialized_results_fuzzy
+        }
+        )
+
+    def serialize_employee(self, employee):
+        # Use your EmployeesSerializer to serialize the employee object
+        serializer = EmployeesSerializer(employee)
+        return serializer.data
+
+    def get_suggestions(self, query):
+        try:
+            suggestions = SearchQuerySet().spelling_suggestion(query)
+            if suggestions:
+                return suggestions
+            else:
+                return []
+        except ElasticsearchException:
+            return []

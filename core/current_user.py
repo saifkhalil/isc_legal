@@ -2,7 +2,6 @@ from threading import current_thread
 
 from django.utils.deprecation import MiddlewareMixin
 
-
 _requests = {}
 
 
@@ -20,7 +19,6 @@ class RequestMiddleware(MiddlewareMixin):
         _requests.pop(current_thread().ident, None)
         return response
 
-
     def process_exception(self, request, exception):
         # if an exception has happened, request should be flushed too
-         _requests.pop(current_thread().ident, None)
+        _requests.pop(current_thread().ident, None)

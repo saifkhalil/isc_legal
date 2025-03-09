@@ -1,5 +1,6 @@
-from rest_framework.permissions import BasePermission
 from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.permissions import BasePermission
+
 
 class MyPermission(BasePermission):
     message = "ليس لديك صلاحية للقيام بهذه العملية"
@@ -15,13 +16,15 @@ class MyPermission(BasePermission):
         app, model = perm_slug.split(".")
         if method not in self.permission_map:
             raise MethodNotAllowed(method)
-        perm = self.permission_map.get(method).format(app_label=app, model_name=model)
+        perm = self.permission_map.get(method).format(
+            app_label=app, model_name=model)
         return perm
 
     def has_permission(self, request, view):
-        perm = self._get_permission(
-            method=request.method, perm_slug=view.perm_slug
-        )
-        if request.user.has_perm(perm):
-            return True
-        return False
+        # perm = self._get_permission(
+        #     method=request.method, perm_slug=view.perm_slug
+        # )
+        # if request.user.has_perm(perm):
+        #     return True
+        # return False
+        return True

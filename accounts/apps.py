@@ -6,3 +6,4 @@ class AccountsConfig(AppConfig):
     name = 'accounts'
     icon_name = 'group'
     verbose_name = _("Accounts")
+

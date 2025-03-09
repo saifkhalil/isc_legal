@@ -1,16 +1,14 @@
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
-
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
-from .view_mixins import ExternalObjectBaseMixin
-
 from .literals import (
     QUERY_FIELD_EXCLUDE_PARAMETER, QUERY_FIELD_ONLY_PARAMETER
 )
+from .view_mixins import ExternalObjectBaseMixin
 
 
 class AsymmetricSerializerAPIViewMixin:

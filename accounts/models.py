@@ -1,18 +1,22 @@
-from tabnanny import verbose
-from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from phonenumber_field.modelfields import PhoneNumberField
+import os.path
+from io import BytesIO
+import pghistory
+from PIL import Image
 from django.conf import settings
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.core.files.base import ContentFile
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from rest_framework.authtoken.models import Token
-import os.path
-from PIL import Image
-from io import BytesIO
-from django.core.files.base import ContentFile
-import uuid
+from django.template.loader import render_to_string
+from django.utils import timezone
+from django.utils.html import strip_tags
 from django.utils.translation import gettext_lazy as _
-import pghistory
+from phonenumber_field.modelfields import PhoneNumberField
+from rest_framework.authtoken.models import Token
+
+from core.threading import send_html_mail
+from .auth import generate_password
 
 
 class UserManager(BaseUserManager):
@@ -25,8 +29,18 @@ class UserManager(BaseUserManager):
             email=self.normalize_email(email),
             username=username,
         )
+        if password is None:
+            password = generate_password()
         user.set_password(password)
         user.save(using=self._db)
+        email_subject = _('حساب جديد')
+        email_body = render_to_string('cases/newuser.html', {
+                'username': username,
+                'password':password,
+                'email':email,
+                'msgtype': _('تم انشاء الحساب الخاص بك على النظام القانوني')
+            })
+        send_html_mail(email_subject, email_body, [user.email])
         return user
 
     def create_superuser(self, email, username, password):
@@ -41,6 +55,14 @@ class UserManager(BaseUserManager):
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
+        email_subject = _('حساب جديد')
+        email_body = render_to_string('cases/newuser.html', {
+                'username': username,
+                'password':password,
+                'email':email,
+                'msgtype': _('تم انشاء الحساب الخاص بك على النظام القانوني')
+            })
+        send_html_mail(email_subject, email_body, [user.email])
         return user
 
 
@@ -63,8 +85,8 @@ class Department(models.Model):
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True,)    
     phone = PhoneNumberField()
-    firstname = models.CharField(verbose_name=_("first name"), max_length=30)
-    lastname = models.CharField(verbose_name=_("last name"), max_length=30)
+    first_name = models.CharField(verbose_name=_("first name"), max_length=30)
+    last_name = models.CharField(verbose_name=_("last name"), max_length=30)
     email = models.EmailField(verbose_name=_("email"), max_length=60, unique=True)
     photo = models.ImageField(verbose_name=_("Photo"),
                               upload_to='photos', default='photos/default.jpg', blank=True, null=True)
@@ -72,10 +94,16 @@ class User(AbstractBaseUser, PermissionsMixin):
                                   upload_to='thumbnail', editable=False, blank=True, null=True)
     username = models.CharField(max_length=30, unique=True,verbose_name=_('Username'))
     Manager = models.ForeignKey('User', on_delete=models.CASCADE, blank=True, null=True,verbose_name=_('Manager'))
-    date_joined = models.DateTimeField(verbose_name=_('date joined'), auto_now_add=True)
-    last_login = models.DateTimeField(verbose_name=_('last login'), auto_now=True)
+    date_joined = models.DateTimeField(verbose_name=_('last login'), default=timezone.now)
+    last_login = models.DateTimeField(verbose_name=_('last login'), default=timezone.now)
     is_admin = models.BooleanField(default=False,verbose_name=_('Is admin'))
     is_manager = models.BooleanField(default=False,verbose_name=_('Is Manager'))
+    is_cases_public_manager = models.BooleanField(default=False,verbose_name=_('Is Cases Public Manager'))
+    is_cases_private_manager = models.BooleanField(default=False,verbose_name=_('Is Cases Private Manager'))
+    is_tasks_public_manager = models.BooleanField(default=False,verbose_name=_('Is Tasks Public Manager'))
+    is_tasks_private_manager = models.BooleanField(default=False,verbose_name=_('Is Tasks Private Manager'))
+    is_contract_manager = models.BooleanField(default=False,verbose_name=_('Is Contract Manager'))
+    is_sub_manager = models.BooleanField(default=False,verbose_name=_('Is Sub Manager'))
     is_active = models.BooleanField(default=True,verbose_name=_('Is active'))
     is_staff = models.BooleanField(default=False,verbose_name=_('Is staff'))
     is_superuser = models.BooleanField(default=False,verbose_name=_('Is superuser'))
@@ -100,6 +128,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         if not self.make_thumbnail():
             raise Exception(
                 _('Could not create thumbnail - is the file type valid?'))
+        
         super(User, self).save(*args, **kwargs)
 
     def make_thumbnail(self):
@@ -136,7 +165,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return str(self.username)
 
     def full_name(self):
-        return str(self.firstname + " " + self.lastname)
+        return f'{self.first_name} {self.last_name}'
 
     # For checking permissions. to keep it simple all admin have ALL permissons
 
@@ -152,4 +181,40 @@ class User(AbstractBaseUser, PermissionsMixin):
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
+        password = generate_password()
+        instance.set_password(password)
+        instance.save()
+        email_subject = _('Legal Application UAT user')
+        email_body = render_to_string('cases/newuser.html', {
+                'username': instance.username,
+                'password':password,
+                'email':instance.email,
+                'msgtype': _('تم انشاء الحساب الخاص بك على النظام القانوني')
+            })
+        plain_message = strip_tags(email_body)
+
+        send_html_mail(email_subject, email_body, [instance.email])
+        # send_mail(email_subject, plain_message, settings.EMAIL_HOST_USER, [instance.email], html_message=email_body)
         Token.objects.create(user=instance)
+
+
+@pghistory.track(pghistory.Snapshot())
+class Employees(models.Model):
+    id = models.AutoField(primary_key=True, )
+    full_name = models.CharField(verbose_name=_("full name"), max_length=100)
+    email = models.EmailField(verbose_name=_("email"), max_length=60, unique=True)
+    full_info = models.JSONField("Employee Full Info", null=True, blank=True)
+    def __str__(self):
+        return self.full_name
+
+    def __unicode__(self):
+        return self.full_name
+
+    class Meta:
+        verbose_name = _('Employee')
+        verbose_name_plural = _('Employees')
+        indexes = [
+            models.Index(fields=['full_name']),
+        ]
+
+

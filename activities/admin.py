@@ -1,30 +1,15 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
 from .models import *
-# Register your models here.
 
 
-# class task_typeAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'type')
+class taskAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    list_display = ('id', 'title', 'description',  'due_date', 'assign_date', 'task_status', 'is_deleted','modified_by')
 
-# class event_typeAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'type')
 
-# class hearing_typeAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'type')
+class hearingAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    list_display = ('id', 'name', 'hearing_date', 'case_id', 'hearing_status', 'remind_me', 'is_deleted')
 
-class taskAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title','description','assignee','due_date','task_status','is_deleted')
 
-class hearingAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name','hearing_date','case_id','hearing_status','is_deleted')
-
-# class eventAdmin(admin.ModelAdmin):
-#     list_display = ('id','eid', 'event_type','created_by','from_date','to_date')
-#     readonly_fields = ['eid']
-
-# admin.site.register(task_type, task_typeAdmin)
 admin.site.register(task, taskAdmin)
 admin.site.register(hearing, hearingAdmin)
-# admin.site.register(hearing_type, hearing_typeAdmin)
-# admin.site.register(event_type, event_typeAdmin)
-# admin.site.register(event, eventAdmin)
