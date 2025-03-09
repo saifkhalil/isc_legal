@@ -17,7 +17,6 @@ from .model_mixins import ExtraDataModelMixin, HooksModelMixin
 from auditlog.models import LogEntry as OriginalLogEntry
 from django.contrib.admin.utils import flatten_fieldsets
 
-@pghistory.track(pghistory.Snapshot())
 class priorities(models.Model):
     id = models.AutoField(primary_key=True, )
     priority = models.CharField(
@@ -34,7 +33,6 @@ class priorities(models.Model):
         verbose_name_plural = _('Priorities')
 
 
-@pghistory.track(pghistory.Snapshot())
 class replies(models.Model):
     id = models.AutoField(primary_key=True, )
     reply = models.CharField(max_length=250, blank=False,
@@ -60,7 +58,6 @@ class replies(models.Model):
         verbose_name_plural = _('Replies')
 
 
-@pghistory.track(pghistory.Snapshot())
 class comments(models.Model):
     id = models.AutoField(primary_key=True, )
     comment = models.CharField(
@@ -96,7 +93,7 @@ class comments(models.Model):
         verbose_name_plural = _('Comments')
 
 
-@pghistory.track(pghistory.Snapshot())
+
 class court(models.Model):
     id = models.AutoField(primary_key=True, )
     name = models.CharField(max_length=250, unique=True,
@@ -114,7 +111,6 @@ class court(models.Model):
         ordering = ["name"]
 
 
-@pghistory.track(pghistory.Snapshot())
 class contracts(models.Model):
     id = models.AutoField(primary_key=True, )
     name = models.CharField(max_length=250, blank=False,
@@ -131,7 +127,6 @@ class contracts(models.Model):
         User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False)
 
 
-@pghistory.track(pghistory.Snapshot())
 class documents(ExtraDataModelMixin, HooksModelMixin, models.Model):
     id = models.AutoField(primary_key=True, )
     name = models.CharField(max_length=250, blank=False,
@@ -288,7 +283,7 @@ class Path(MPTTModel):
                 )
 
 
-@pghistory.track(pghistory.Snapshot())
+
 class Status(models.Model):
     id = models.AutoField(primary_key=True, )
     status = models.CharField(
@@ -316,7 +311,7 @@ class NotificationManager(models.Manager):
 
 
 
-@pghistory.track(pghistory.Snapshot())
+
 class Notification(models.Model):
     id = models.AutoField(primary_key=True, )
     action_at = models.DateTimeField(auto_now_add=True)

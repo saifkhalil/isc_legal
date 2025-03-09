@@ -12,7 +12,6 @@ from datetime import timedelta
 from auditlog.registry import auditlog
 
 
-@pghistory.track(pghistory.Snapshot())
 class Contract(models.Model):
     id = models.AutoField(primary_key=True, help_text='Contract Id')
     name = models.CharField(
@@ -67,7 +66,6 @@ class Contract(models.Model):
 
 
 
-@pghistory.track(pghistory.Snapshot())
 class Payment(models.Model):
     id = models.AutoField(primary_key=True)
     contract = models.ForeignKey(Contract, on_delete=models.CASCADE, related_name='payments', verbose_name=_('Contract'))
@@ -97,7 +95,7 @@ class Payment(models.Model):
         Reminder.objects.update_or_create(payment=self, defaults={'reminder_date': reminder_date, 'created_by': self.created_by})
 
 
-@pghistory.track(pghistory.Snapshot())
+
 class Duration(models.Model):
     id = models.AutoField(primary_key=True, )
     type = models.CharField(max_length=250, blank=False,
@@ -123,7 +121,7 @@ class Duration(models.Model):
         verbose_name = _('Duration')
         verbose_name_plural = _('Durations')
 
-@pghistory.track(pghistory.Snapshot())
+
 class Type(models.Model):
     id = models.AutoField(primary_key=True, )
     name = models.CharField(max_length=200, blank=False, null=False, verbose_name=_('Name'))

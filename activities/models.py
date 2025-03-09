@@ -6,8 +6,6 @@ from django.utils.translation import gettext_lazy as _
 from accounts.models import User
 from core.models import comments, court, Status, documents, priorities
 
-
-@pghistory.track(pghistory.Snapshot())
 class hearing(models.Model):
     id = models.AutoField(primary_key=True, )
     name = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('Name'))
@@ -52,7 +50,6 @@ task_categories = (
 )
 
 
-@pghistory.track(pghistory.Snapshot())
 class task(models.Model):
     id = models.AutoField(primary_key=True, )
     title = models.CharField(max_length=250, blank=False, null=False, verbose_name=_('title'))

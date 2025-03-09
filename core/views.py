@@ -22,6 +22,8 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.decorators import login_required
+
 from activities.models import task, hearing
 from cases.models import LitigationCases, Folder, AdministrativeInvestigation, Notation
 from cases.permissions import Manager_SuperUser
@@ -49,6 +51,10 @@ from django.views.decorators.vary import vary_on_cookie
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
+
+def index(request):
+
+    return render(request, 'index.html')
 
 def setCache(key,query):
     cache_data = cache.get(key)
@@ -83,6 +89,7 @@ def get_date(req_day):
 
 
 @never_cache
+@login_required
 def myhome(request):
     d = get_date(request.GET.get('month', None))
     pre_month = prev_month(d)
@@ -100,6 +107,7 @@ def myhome(request):
 
 
 @never_cache
+@login_required
 def about(request):
     return render(request, 'about.html')
 

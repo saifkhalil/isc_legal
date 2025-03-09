@@ -28,9 +28,10 @@ from rest_framework_simplejwt.views import (
 
 from . import views
 from .views import (
-    APIPathListView, APIPathView
+    APIPathListView, APIPathView, myhome, about
 )
 from accounts.views import SearchEmployeeAPIView
+from cases.views import cases_list,delete_case
 
 def handler404(request, *args, **argv):
     response = render(request, '404.html')
@@ -87,11 +88,15 @@ urlpatterns = [
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += i18n_patterns(
+    path('i18n/', include('django.conf.urls.i18n')),
+    path('',myhome,name='home'),
+    path('cases/',cases_list,name='cases_list'),
+    path('cases/<int:pk>/',delete_case,name='delete_case'),
+    path('about/',about,name='about'),
     path('lang/', include('rosetta.urls')),
     path('notifications/', views.notifications),
     path('admin/', admin.site.urls),
     path('sentry-debug/', trigger_error),
-    path('i18n/', include('django.conf.urls.i18n')),
-    path('account/', include('django.contrib.auth.urls')),
+    # path('account/', include('django.contrib.auth.urls')),
     path('accounts/', include('accounts.urls')),
 )

@@ -24,15 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # sentry settings
-
-import sentry_sdk
-
-sentry_sdk.init(
-    dsn="http://3db22fa7fc91b72e22ce86f5bc1bd314@172.18.223.12:9000/2",
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for tracing.
-    traces_sample_rate=1.0,
-)
+#
+# import sentry_sdk
+#
+# sentry_sdk.init(
+#     dsn="http://3db22fa7fc91b72e22ce86f5bc1bd314@172.18.223.12:9000/2",
+#     # Set traces_sample_rate to 1.0 to capture 100%
+#     # of transactions for tracing.
+#     traces_sample_rate=1.0,
+# )
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -175,7 +175,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'ar'
 
 TIME_ZONE = 'Asia/Baghdad'
 
@@ -188,8 +188,9 @@ USE_TZ = True
 SITE_ID = 1
 
 LANGUAGES = (
-    ('en', _('English')),
     ('ar', _('Arabic')),
+    ('en', _('English')),
+
 )
 
 LOCALE_PATHS = [
@@ -212,7 +213,7 @@ STATICFILES_DIRS = [
 AUTH_USER_MODEL = 'accounts.User'
 
 LOGIN_REDIRECT_URL = 'home'
-LOGIN_URL = 'login'
+LOGIN_URL = '/accounts/login'
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -529,66 +530,66 @@ HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10  # Adjust as needed
 #        },
 #    }
 #}
-
-LOGGING = {
-
-    'version': 1,
-    # 'filters': {
-    #     # Add an unbound RequestFilter.
-    #     'request': {
-    #         '()': 'django_requestlogging.logging_filters.RequestFilter',
-    #     },
-    # },
-    'loggers': {
-        'django': {
-            'handlers': ['log', 'info', 'warning', 'error', 'critical'],
-            'level': 'DEBUG',
-            # 'filters': ['request'],
-        }
-    },
-    'handlers': {
-        'log': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': './logs/log.log',
-            'formatter': 'verbose',
-        },
-        'info': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': './logs/info.log',
-            'formatter': 'verbose',
-        },
-        'warning': {
-            'level': 'WARNING',
-            'class': 'logging.FileHandler',
-            'filename': './logs/warning.log',
-            'formatter': 'verbose',
-        },
-        'error': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': './logs/error.log',
-            'formatter': 'verbose',
-        },
-        'critical': {
-            'level': 'CRITICAL',
-            'class': 'logging.FileHandler',
-            'filename': './logs/critical.log',
-            'formatter': 'verbose',
-        }
-
-    },
-    'formatters': {
-        'verbose': {
-            'format': '{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-        # 'request_format': {
-        #     'format': '%(remote_addr)s %(username)s "%(request_method)s '
-        #     '%(path_info)s %(server_protocol)s" %(http_user_agent)s '
-        #     '%(message)s %(asctime)s',
-        # },
-
-    },
-}
+#
+# LOGGING = {
+#
+#     'version': 1,
+#     # 'filters': {
+#     #     # Add an unbound RequestFilter.
+#     #     'request': {
+#     #         '()': 'django_requestlogging.logging_filters.RequestFilter',
+#     #     },
+#     # },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['log', 'info', 'warning', 'error', 'critical'],
+#             'level': 'DEBUG',
+#             # 'filters': ['request'],
+#         }
+#     },
+#     'handlers': {
+#         'log': {
+#             'level': 'DEBUG',
+#             'class': 'logging.FileHandler',
+#             'filename': './logs/log.log',
+#             'formatter': 'verbose',
+#         },
+#         'info': {
+#             'level': 'INFO',
+#             'class': 'logging.FileHandler',
+#             'filename': './logs/info.log',
+#             'formatter': 'verbose',
+#         },
+#         'warning': {
+#             'level': 'WARNING',
+#             'class': 'logging.FileHandler',
+#             'filename': './logs/warning.log',
+#             'formatter': 'verbose',
+#         },
+#         'error': {
+#             'level': 'ERROR',
+#             'class': 'logging.FileHandler',
+#             'filename': './logs/error.log',
+#             'formatter': 'verbose',
+#         },
+#         'critical': {
+#             'level': 'CRITICAL',
+#             'class': 'logging.FileHandler',
+#             'filename': './logs/critical.log',
+#             'formatter': 'verbose',
+#         }
+#
+#     },
+#     'formatters': {
+#         'verbose': {
+#             'format': '{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}',
+#             'style': '{',
+#         },
+#         # 'request_format': {
+#         #     'format': '%(remote_addr)s %(username)s "%(request_method)s '
+#         #     '%(path_info)s %(server_protocol)s" %(http_user_agent)s '
+#         #     '%(message)s %(asctime)s',
+#         # },
+#
+#     },
+# }

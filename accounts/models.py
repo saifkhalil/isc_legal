@@ -81,7 +81,6 @@ class Department(models.Model):
         verbose_name = _('Department')
         verbose_name_plural = _('Departments')
 
-@pghistory.track(pghistory.Snapshot())
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True,)    
     phone = PhoneNumberField()
@@ -198,7 +197,6 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
         Token.objects.create(user=instance)
 
 
-@pghistory.track(pghistory.Snapshot())
 class Employees(models.Model):
     id = models.AutoField(primary_key=True, )
     full_name = models.CharField(verbose_name=_("full name"), max_length=100)

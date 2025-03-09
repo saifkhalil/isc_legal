@@ -8,540 +8,1209 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-22 11:41+0300\n"
-"PO-Revision-Date: 2022-11-22 11:42+0300\n"
-"Last-Translator: Anonymous User <saif.ibrahim@qi.iq>\n"
+"POT-Creation-Date: 2025-03-05 08:38+0300\n"
+"PO-Revision-Date: 2025-03-05 08:39+0300\n"
+"Last-Translator: Saif AlKhateeb <saif.ibrahim@qi.iq>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
-"X-Translated-Using: django-rosetta 0.9.8\n"
+"X-Translated-Using: django-rosetta 0.10.1\n"
 
-#: .\accounts\apps.py:8
+#: accounts/admin.py:50
+msgid "Personal info"
+msgstr "معلومات الشخص"
+
+#: accounts/admin.py:52
+msgid "Permissions"
+msgstr "الصلاحيات"
+
+#: accounts/admin.py:70
+msgid "Important dates"
+msgstr "تواريخ مهمة"
+
+#: accounts/admin.py:167
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
+#: accounts/admin.py:180
+msgid "Password changed successfully."
+msgstr "تم تغيير كلمة المرور بنجاح"
+
+#: accounts/admin.py:201
+#, python-format
+msgid "Change password: %s"
+msgstr "تغير كلمة المرور"
+
+#: accounts/apps.py:8
 msgid "Accounts"
 msgstr "الحسابات"
 
-#: .\accounts\forms.py:12
-msgid "Required. Add a valid email address."
-msgstr "البريد الالكتروني اجباري"
+#: accounts/forms.py:31 templates/account/login.html:26
+#: templates/account/register.html:47
+msgid "Password"
+msgstr "كلمة المرور"
 
-#: .\accounts\forms.py:15
-msgid "Enter a valid phone number (e.g. 7801000000)."
-msgstr "يجب ادخال رقم هاتف صحيح (مثال 7801000000)"
+#: accounts/forms.py:31
+msgid "Enter your password"
+msgstr "ادخل كلمة المرور"
 
-#: .\accounts\forms.py:16
-msgid "Policy for terms of use"
-msgstr "شروط الاستخدام"
+#: accounts/forms.py:32 templates/account/login.html:20
+#: templates/account/register.html:21
+msgid "Email"
+msgstr "البريد الالكتروني"
 
-#: .\accounts\forms.py:16
-msgid "You must accept to policy for terms of use"
-msgstr "يجب الموافق على الشروط والاحكام"
+#: accounts/forms.py:32
+msgid "Enter your email"
+msgstr "ادخل البريد الالكتروني"
 
-#: .\accounts\models.py:21
+#: accounts/forms.py:43
+msgid "Invalid login"
+msgstr "معلوت الدخول خاطئة"
+
+#: accounts/models.py:25
 msgid "Users must have an email address"
 msgstr "يجب ادخال البريد الالكتروني"
 
-#: .\accounts\models.py:23
+#: accounts/models.py:27
 msgid "Users must have a username"
 msgstr "يجب ادخال اسم المستخدم"
 
-#: .\accounts\models.py:49 .\activities\models.py:34 .\cases\models.py:33
-#: .\cases\models.py:65 .\cases\models.py:80 .\core\models.py:102
-#: .\core\models.py:117 .\core\models.py:130
+#: accounts/models.py:36 accounts/models.py:58
+msgid "حساب جديد"
+msgstr "حساب جديد"
+
+#: accounts/models.py:41 accounts/models.py:63 accounts/models.py:191
+msgid "تم انشاء الحساب الخاص بك على النظام القانوني"
+msgstr "تم انشاء الحساب الخاص بك على النظام القانوني"
+
+#: accounts/models.py:71 activities/models.py:11 cases/models.py:17
+#: cases/models.py:34 cases/models.py:50 cases/models.py:69
+#: contract/models.py:127 core/models.py:100 core/models.py:117
+#: core/models.py:133 rest_api/serializers.py:45
 msgid "Name"
 msgstr "الاسم"
 
-#: .\accounts\models.py:50
+#: accounts/models.py:72 cases/models.py:419 rest_api/serializers.py:120
 msgid "Description"
 msgstr "التفاصيل"
 
-#: .\accounts\models.py:59
+#: accounts/models.py:81
 msgid "Department"
 msgstr "القسم"
 
-#: .\accounts\models.py:60
+#: accounts/models.py:82
 msgid "Departments"
 msgstr "الاقسام"
 
-#: .\accounts\models.py:66
+#: accounts/models.py:87
 msgid "first name"
 msgstr "الاسم الاول"
 
-#: .\accounts\models.py:67
+#: accounts/models.py:88
 msgid "last name"
 msgstr "الاسم الاخير"
 
-#: .\accounts\models.py:68
+#: accounts/models.py:89 accounts/models.py:203
 msgid "email"
 msgstr "البريد الالكتروني"
 
-#: .\accounts\models.py:69
+#: accounts/models.py:90
 msgid "Photo"
 msgstr "صورة"
 
-#: .\accounts\models.py:71
+#: accounts/models.py:92
 msgid "Thumbnail image"
 msgstr "الصورة المصغرة"
 
-#: .\accounts\models.py:73 .\templates\account\register.html:25
+#: accounts/models.py:94 templates/account/register.html:25
 msgid "Username"
 msgstr "اسم المستخدم"
 
-#: .\accounts\models.py:74
+#: accounts/models.py:95
 msgid "Manager"
 msgstr "المدير"
 
-#: .\accounts\models.py:75
-msgid "date joined"
-msgstr "تاريخ الانضمام"
-
-#: .\accounts\models.py:76
+#: accounts/models.py:96 accounts/models.py:97
 msgid "last login"
 msgstr "اخر دخول"
 
-#: .\accounts\models.py:77
+#: accounts/models.py:98
 msgid "Is admin"
 msgstr "مدير نظام"
 
-#: .\accounts\models.py:78
+#: accounts/models.py:99
 msgid "Is Manager"
 msgstr "مدير"
 
-#: .\accounts\models.py:79
+#: accounts/models.py:100
+msgid "Is Cases Public Manager"
+msgstr "مدير الدعوى العامة"
+
+#: accounts/models.py:101
+msgid "Is Cases Private Manager"
+msgstr "مدير القضايا الخاصة"
+
+#: accounts/models.py:102
+msgid "Is Tasks Public Manager"
+msgstr "مدير المهام العامة"
+
+#: accounts/models.py:103
+msgid "Is Tasks Private Manager"
+msgstr "مدير القضايا العامة"
+
+#: accounts/models.py:104
+msgid "Is Contract Manager"
+msgstr "مدير العقود العامة"
+
+#: accounts/models.py:105
+msgid "Is Sub Manager"
+msgstr "مدير فرعي"
+
+#: accounts/models.py:106
 msgid "Is active"
 msgstr "فعال"
 
-#: .\accounts\models.py:80
+#: accounts/models.py:107
 msgid "Is staff"
 msgstr "موظف"
 
-#: .\accounts\models.py:81
+#: accounts/models.py:108
 msgid "Is superuser"
 msgstr "مستخدم خارق"
 
-#: .\accounts\models.py:82
+#: accounts/models.py:109
 msgid "Is verified"
 msgstr "متحقق منه"
 
-#: .\accounts\models.py:83
+#: accounts/models.py:110
 msgid "Is blocked"
 msgstr "مقفل"
 
-#: .\accounts\models.py:84
+#: accounts/models.py:111
 msgid "Email Notification"
 msgstr "اشعار الاميل"
 
-#: .\accounts\models.py:86
+#: accounts/models.py:113
 msgid "Please confirm that you read and agree to our terms & conditions"
 msgstr "يرجى تأكيد أنك قرأت ووافقت على الشروط والأحكام الخاصة بنا"
 
-#: .\accounts\models.py:87
+#: accounts/models.py:114
 msgid "Created at"
 msgstr "تكون بتاريخ"
 
-#: .\accounts\models.py:88
+#: accounts/models.py:115
 msgid "Modified at"
 msgstr "تاريخ التعديل"
 
-#: .\accounts\models.py:90
+#: accounts/models.py:117
 msgid "Created by"
 msgstr "تكون بواسطة"
 
-#: .\accounts\models.py:92
+#: accounts/models.py:119
 msgid "Modified by"
 msgstr "عدل بواسطة"
 
-#: .\accounts\models.py:102
+#: accounts/models.py:129
 msgid "Could not create thumbnail - is the file type valid?"
 msgstr "تعذر إنشاء الصورة المصغرة - هل نوع الملف صالح؟"
 
-#: .\accounts\models.py:146
+#: accounts/models.py:177
 msgid "User"
 msgstr "المستخدم"
 
-#: .\accounts\models.py:147
+#: accounts/models.py:178
 msgid "Users"
 msgstr "المستخدمين"
 
-#: .\accounts\views.py:87
-msgid ""
-"User registered successfully, verification email has been sent, please check"
-" it "
-msgstr "تم تسجيل المستخدم بنجاح ، تم إرسال بريد التحقق ، يرجى التحقق منه"
+#: accounts/models.py:186
+msgid "Legal Application UAT user"
+msgstr ""
 
-#: .\accounts\views.py:122
+#: accounts/models.py:202
+msgid "full name"
+msgstr "الاسم الكامل"
+
+#: accounts/models.py:212
+msgid "Employee"
+msgstr "موظف"
+
+#: accounts/models.py:213
+msgid "Employees"
+msgstr "موظفين"
+
+#: accounts/views.py:69
 msgid "Email is not verified, please check your email inbox"
 msgstr ""
 "لم يتم التحقق من البريد الإلكتروني ، يرجى التحقق من صندوق البريد الإلكتروني "
 "الخاص بك"
 
-#: .\accounts\views.py:126
+#: accounts/views.py:73
 msgid ""
-"It looks like your account has been blocked Please contact system admin for "
-"more information."
+"It looks like your account has been blocked Please contact "
+"saif.ibrahim@qi.iq for more information."
 msgstr ""
 "بدو أنه تم حظر حسابك ، يرجى الاتصال بمسؤول النظام للحصول على مزيد من "
 "المعلومات."
 
-#: .\accounts\views.py:150
+#: accounts/views.py:102
+msgid "Change user password"
+msgid_plural "Change users passwords"
+msgstr[0] "تغير المرور"
+msgstr[1] "تغير المرور"
+msgstr[2] "تغير المرور"
+msgstr[3] "تغير المرور"
+msgstr[4] "تغير المرور"
+msgstr[5] "تغير المرور"
+
+#: accounts/views.py:113
+#, python-format
+msgid "Change password for user: %s"
+msgstr "تغير المرور للمستخدم"
+
+#: accounts/views.py:137
+#, python-format
+msgid "Successful password reset for user: %s."
+msgstr "تم إعادة تعيين كلمة المرور بنجاح للمستخدم: %s."
+
+#: accounts/views.py:143
+#, python-format
+msgid "Error reseting password for user \"%(user)s\": %(error)s"
+msgstr "خطأ في إعادة تعيين كلمة المرور للمستخدم \"%(user)sa\": %(error)s"
+
+#: accounts/views.py:213
+msgid ""
+"User registered successfully, verification email has been sent, please check"
+" it "
+msgstr "تم تسجيل المستخدم بنجاح ، تم إرسال بريد التحقق ، يرجى التحقق منه"
+
+#: accounts/views.py:239
 msgid "Profile Updated"
 msgstr "تحديث الملف الشخصي"
 
-#: .\accounts\views.py:183
+#: accounts/views.py:272
 msgid "Email Verified, you can now login"
 msgstr "تم التحقق من البريد الإلكتروني ، يمكنك الآن تسجيل الدخول"
 
-#: .\accounts\views.py:186
+#: accounts/views.py:275
 msgid "Email Verification erorr, please try agin"
 msgstr "خطأ في التحقق من البريد الإلكتروني ، يرجى المحاولة مرة أخرى"
 
-#: .\activities\apps.py:6
+#: activities/apps.py:8
 msgid "Activities"
 msgstr "الانشطة"
 
-#: .\activities\models.py:35 .\activities\models.py:87 .\cases\models.py:292
-#: .\core\models.py:132
+#: activities/models.py:12 activities/models.py:63 cases/models.py:207
+#: core/models.py:137 core/models.py:171
 msgid "Litigation Case"
 msgstr "دعوى"
 
-#: .\activities\models.py:36
+#: activities/models.py:13 activities/models.py:64 cases/models.py:268
+#: cases/models.py:315 core/models.py:141 core/models.py:173
+msgid "Folder"
+msgstr "ملف"
+
+#: activities/models.py:14
 msgid "Hearing Date"
 msgstr "تاريخ الجلسة"
 
-#: .\activities\models.py:37 .\cases\models.py:262
+#: activities/models.py:15 cases/models.py:170 cases/models.py:285
+#: cases/models.py:385 cases/models.py:434 contract/models.py:37
+#: templates/cases/cases_list.html:58 templates/cases/cases_list.html:98
 msgid "Assignee"
 msgstr "المكلف"
 
-#: .\activities\models.py:40 .\cases\models.py:252
+#: activities/models.py:17 cases/models.py:161 cases/models.py:281
+#: cases/models.py:426
 msgid "Court name"
 msgstr "اسم المحكمة"
 
-#: .\activities\models.py:41
+#: activities/models.py:18
 msgid "Summary by lawyer"
 msgstr "ملخص الجلسة حسب المرافعين"
 
-#: .\activities\models.py:42 .\activities\models.py:90 .\cases\models.py:277
-#: .\core\models.py:32 .\core\models.py:72 .\core\models.py:119
-#: .\core\models.py:133
+#: activities/models.py:19 activities/models.py:69 cases/models.py:19
+#: cases/models.py:51 cases/models.py:85 cases/models.py:192
+#: cases/models.py:300 cases/models.py:394 cases/models.py:441
+#: contract/models.py:41 contract/models.py:75 contract/models.py:106
+#: contract/models.py:128 core/models.py:42 core/models.py:75
+#: core/models.py:121 core/models.py:147 core/models.py:335
 msgid "Is Deleted"
 msgstr "محذوف"
 
-#: .\activities\models.py:58 .\cases\models.py:253 .\cases\models.py:271
+#: activities/models.py:21
+msgid "Hearing Priority"
+msgstr "الأولوية"
+
+#: activities/models.py:23
+msgid "Hearing Status"
+msgstr "الحالة"
+
+#: activities/models.py:26 activities/models.py:67 cases/models.py:162
+#: cases/models.py:282 core/models.py:168
+msgid "Documents"
+msgstr "الملفات"
+
+#: activities/models.py:28
+msgid "Remind Date"
+msgstr "تاريخ التذكير"
+
+#: activities/models.py:44 cases/models.py:185 cases/models.py:293
+#: core/models.py:145
 msgid "Hearing"
 msgstr "مرافعة"
 
-#: .\activities\models.py:59
+#: activities/models.py:45
 msgid "Hearings"
 msgstr "مرافعات"
 
-#: .\activities\models.py:81
-msgid "title"
-msgstr "العنوان"
-
-#: .\activities\models.py:83
-msgid "Task Description"
-msgstr "تفاصيل المهمة"
-
-#: .\activities\models.py:84
-msgid "Assigned to"
-msgstr "الفريق المكلف"
-
-#: .\activities\models.py:88
-msgid "Due date"
-msgstr " تاريخ الإستحقاق"
-
-#: .\activities\models.py:106 .\cases\models.py:272
-msgid "Task"
-msgstr "مهمة"
-
-#: .\activities\models.py:107
-msgid "Tasks"
-msgstr "مهمة"
-
-#: .\cases\apps.py:7
-msgid "Cases"
-msgstr "الدعاوى"
-
-#: .\cases\models.py:42
-msgid "Case Type"
-msgstr "نوع الدعوى"
-
-#: .\cases\models.py:43
-msgid "Case Types"
-msgstr "انواع الدعاوى"
-
-#: .\cases\models.py:74 .\cases\models.py:75 .\cases\models.py:268
-msgid "Stage"
-msgstr "مرحلة الدعوى"
-
-#: .\cases\models.py:89 .\cases\models.py:258
-msgid "Client Position"
-msgstr "صفة الموكل"
-
-#: .\cases\models.py:90
-msgid "Client Positions"
-msgstr "صفات الموكل"
-
-#: .\cases\models.py:108
-msgid "Position"
-msgstr "صفة الموكل"
-
-#: .\cases\models.py:117 .\cases\models.py:260
-msgid "Opponent Position"
-msgstr "صفة الخصم"
-
-#: .\cases\models.py:118
-msgid "Opponent Positions"
-msgstr "صفات الخصم"
-
-#: .\cases\models.py:238
+#: activities/models.py:48 cases/models.py:128
 msgid "Public"
 msgstr "عامة"
 
-#: .\cases\models.py:239
+#: activities/models.py:49 cases/models.py:129
 msgid "Private"
 msgstr "خاصة"
 
-#: .\cases\models.py:246
-msgid "Title"
+#: activities/models.py:55
+msgid "title"
 msgstr "العنوان"
 
-#: .\cases\models.py:247
-msgid "Subject"
-msgstr "الموضوع"
+#: activities/models.py:57
+msgid "Task Description"
+msgstr "تفاصيل المهمة"
 
-#: .\cases\models.py:248
+#: activities/models.py:59 cases/models.py:154
 msgid "Case Category"
 msgstr "فئة الدعوى"
 
-#: .\cases\models.py:249
-msgid "Judge Name"
-msgstr "اسم القاضي"
+#: activities/models.py:60
+msgid "Assigned to"
+msgstr "الفريق المكلف"
 
-#: .\cases\models.py:250
-msgid "Detective"
-msgstr "المحقق"
+#: activities/models.py:62
+msgid "Task Status"
+msgstr "حالة المهمة"
 
-#: .\cases\models.py:251
-msgid "Case type"
-msgstr "نوع الدعوى"
+#: activities/models.py:65
+msgid "Due date"
+msgstr " تاريخ الإستحقاق"
 
-#: .\cases\models.py:263
-msgid "Shared With"
-msgstr "مشاركة الخصوصية مع"
+#: activities/models.py:66
+msgid "Assign date"
+msgstr "تاريخ الاحالة"
 
-#: .\cases\models.py:266
-msgid "Internal Ref Number"
-msgstr "رقم المرجع الداخلي"
+#: activities/models.py:84 cases/models.py:186 cases/models.py:294
+#: core/models.py:143
+msgid "Task"
+msgstr "مهمة"
 
-#: .\cases\models.py:267
-msgid "Matter Priority"
-msgstr "الأولوية"
+#: activities/models.py:85
+msgid "Tasks"
+msgstr "مهمة"
 
-#: .\cases\models.py:293
-msgid "Litigation Cases"
-msgstr "دعاوى"
-
-#: .\cases\models.py:309
-msgid "رقم الدعوى "
-msgstr ""
-
-#: .\cases\models.py:313
+#: activities/tasks.py:28 cases/models.py:231
 msgid "You have been assigned with you below case details"
 msgstr "لقد تم تعيينك كمحامي للدعوى ادناه"
 
-#: .\cases\models.py:322 .\cases\models.py:340
+#: cases/apps.py:9 templates/base.html:78
+msgid "Cases"
+msgstr "الدعاوى"
+
+#: cases/models.py:28
+msgid "Case Type"
+msgstr "نوع الدعوى"
+
+#: cases/models.py:29
+msgid "Case Types"
+msgstr "انواع الدعاوى"
+
+#: cases/models.py:44 cases/models.py:160
+msgid "Case characteristic"
+msgstr "صفة الدعوى"
+
+#: cases/models.py:45
+msgid "Case characteristics"
+msgstr "صفات الدعوى"
+
+#: cases/models.py:63 cases/models.py:64 cases/models.py:176
+#: templates/cases/cases_list.html:36 templates/cases/cases_list.html:95
+msgid "Stage"
+msgstr "مرحلة الدعوى"
+
+#: cases/models.py:78 cases/models.py:166
+msgid "Client Position"
+msgstr "صفة الموكل"
+
+#: cases/models.py:79
+msgid "Client Positions"
+msgstr "صفات الموكل"
+
+#: cases/models.py:84 cases/models.py:149 cases/models.py:275
+#: contract/models.py:21 rest_api/serializers.py:129
+msgid "Title"
+msgstr "العنوان"
+
+#: cases/models.py:107 cases/models.py:188 cases/models.py:292
+#: cases/models.py:393 cases/models.py:431 contract/models.py:39
+msgid "Important Development"
+msgstr "تطور مهمة"
+
+#: cases/models.py:108
+msgid "Important Developments"
+msgstr "تطورات مهمة"
+
+#: cases/models.py:114
+msgid "Position"
+msgstr "صفة الموكل"
+
+#: cases/models.py:123 cases/models.py:168
+msgid "Opponent Position"
+msgstr "صفة الخصم"
+
+#: cases/models.py:124
+msgid "Opponent Positions"
+msgstr "صفات الخصم"
+
+#: cases/models.py:134
+msgid "رابحة"
+msgstr "رابحة"
+
+#: cases/models.py:135
+msgid "خاسرة"
+msgstr "خاسرة"
+
+#: cases/models.py:152 cases/models.py:276 cases/models.py:376
+#: cases/models.py:418 contract/models.py:24
+#: templates/cases/cases_list.html:93
+msgid "Subject"
+msgstr "الموضوع"
+
+#: cases/models.py:155 cases/models.py:427
+msgid "Judge Name"
+msgstr "اسم القاضي"
+
+#: cases/models.py:156 cases/models.py:428
+msgid "Detective"
+msgstr "المحقق"
+
+#: cases/models.py:158
+msgid "Case type"
+msgstr "نوع الدعوى"
+
+#: cases/models.py:164 cases/models.py:283 cases/models.py:379
+#: cases/models.py:424 contract/models.py:36 core/events.py:6
+#: core/models.py:199
+msgid "Paths"
+msgstr "الملفات"
+
+#: cases/models.py:172 cases/models.py:287 cases/models.py:387
+#: cases/models.py:436 contract/models.py:38
+msgid "Shared With"
+msgstr "مشاركة الخصوصية مع"
+
+#: cases/models.py:173 cases/models.py:288
+msgid "Internal Ref Number"
+msgstr "رقم المرجع الداخلي"
+
+#: cases/models.py:175
+msgid "Matter Priority"
+msgstr "الأولوية"
+
+#: cases/models.py:178
+msgid "Case Status"
+msgstr "حالة الدعوى"
+
+#: cases/models.py:180
+msgid "Case Close Status"
+msgstr "حالة غلق الدعوى"
+
+#: cases/models.py:183
+msgid "Case Close Comment"
+msgstr "تعليق غلق الدعوى"
+
+#: cases/models.py:208
+msgid "Litigation Cases"
+msgstr "دعاوى"
+
+#: cases/models.py:227
+msgid "رقم الدعوى "
+msgstr "رقم الدعوى"
+
+#: cases/models.py:238 cases/models.py:257
 msgid "New Case #"
 msgstr "رقم الدعوى الجديدة"
 
-#: .\cases\models.py:326 .\cases\models.py:344
+#: cases/models.py:242 cases/models.py:261
 msgid "You have been shared with you below case details"
 msgstr "تمت مشاركة الدعوى ادناه معك"
 
-#: .\cases\views.py:79
-msgid "Detailed Columns"
-msgstr "أعمدة مفصلة"
+#: cases/models.py:269
+msgid "Administrative investigations"
+msgstr "التحقيقات الإدارية"
 
-#: .\core\apps.py:8
-msgid "Core"
-msgstr "اساسي"
+#: cases/models.py:270 cases/models.py:456 core/models.py:176
+msgid "Notation"
+msgstr "تدوين"
 
-#: .\core\models.py:15 .\core\models.py:24
+#: cases/models.py:274
+msgid "Record Type"
+msgstr "نوع الموكل"
+
+#: cases/models.py:278
+msgid "Folder Category"
+msgstr "فئة الملف"
+
+#: cases/models.py:280
+msgid "Folder type"
+msgstr "نوع الدعوى"
+
+#: cases/models.py:290
+msgid "Folder Priority"
+msgstr "الأولوية"
+
+#: cases/models.py:297
+msgid "Folder Status"
+msgstr "حالة المف"
+
+#: cases/models.py:316
+msgid "Folders"
+msgstr "الملفات"
+
+#: cases/models.py:378
+msgid "Administrative order number"
+msgstr "رقم الأمر الإداري"
+
+#: cases/models.py:381
+msgid "Chairman of the Committee"
+msgstr "رئيس اللجنة"
+
+#: cases/models.py:383
+msgid "Committee members"
+msgstr "أعضاء اللجنة"
+
+#: cases/models.py:389 cases/models.py:438 core/models.py:23 core/models.py:32
+#: templates/cases/cases_list.html:102
 msgid "Priority"
 msgstr "الأولوية"
 
-#: .\core\models.py:25
+#: cases/models.py:409 core/models.py:175
+msgid "Administrative Investigation"
+msgstr "التحقيق الإداري"
+
+#: cases/models.py:410
+msgid "Administrate IveInvestigations"
+msgstr "التحقيق الإداري"
+
+#: cases/models.py:421
+msgid "Reference Number"
+msgstr "رقم المرجع الداخلي"
+
+#: cases/models.py:425
+msgid "Requester"
+msgstr "طلب بواسطة"
+
+#: cases/models.py:429
+msgid "Authorized number"
+msgstr "الرقم المصرح به"
+
+#: cases/models.py:457
+msgid "Notations"
+msgstr "ملاحظات"
+
+#: cases/tasks.py:49
+msgid "توجد دعوى متأخرة لمدة شهر من تاريخ الإنشاء"
+msgstr "توجد دعوى متأخرة لمدة شهر من تاريخ الإنشاء"
+
+#: contract/models.py:25
+msgid "type"
+msgstr "نوع الدعوى"
+
+#: contract/models.py:26
+msgid "Company Name"
+msgstr "اسم الشركة"
+
+#: contract/models.py:27
+msgid "Out Side Iraq"
+msgstr "خارج العراق"
+
+#: contract/models.py:28
+msgid "Total amount"
+msgstr "المبلغ الكلي"
+
+#: contract/models.py:31
+msgid "First Party"
+msgstr "الطرف الاول"
+
+#: contract/models.py:32
+msgid "Second Party"
+msgstr "الطرف الثاني"
+
+#: contract/models.py:33
+msgid "Third Party"
+msgstr "الطرف الثاالث"
+
+#: contract/models.py:34
+msgid "Auto Renewal"
+msgstr "تجديد تلقائي"
+
+#: contract/models.py:35
+msgid "Penal clause"
+msgstr "بند جزائي"
+
+#: contract/models.py:54 contract/models.py:71 core/models.py:177
+msgid "Contract"
+msgstr "عقد"
+
+#: contract/models.py:55
+msgid "Contracts"
+msgstr "عقود"
+
+#: contract/models.py:72
+msgid "Amount"
+msgstr "قيمة"
+
+#: contract/models.py:88
+msgid "Payment"
+msgstr "دفعة"
+
+#: contract/models.py:89
+msgid "Payments"
+msgstr "الدفعات"
+
+#: contract/models.py:102 contract/models.py:143
+#: templates/cases/cases_list.html:24 templates/cases/cases_list.html:25
+#: templates/cases/cases_list.html:94
+msgid "Type"
+msgstr "نوع الدعوى"
+
+#: contract/models.py:103
+msgid "No of days"
+msgstr "عدد الايام"
+
+#: contract/models.py:104
+msgid "Reminder days"
+msgstr "ايام التذكير"
+
+#: contract/models.py:105
+msgid "Is recurring"
+msgstr "متكررة"
+
+#: contract/models.py:121
+msgid "Duration"
+msgstr "المدة"
+
+#: contract/models.py:122
+msgid "Durations"
+msgstr "المدة"
+
+#: contract/models.py:144
+msgid "Types"
+msgstr "انواع الدعاوى"
+
+#: contract/models.py:150
+msgid "Reminder Date"
+msgstr "تاريخ التذكير"
+
+#: contract/models.py:151
+msgid "Is Sent"
+msgstr "مرسلة"
+
+#: contract/models.py:162
+msgid "Reminder"
+msgstr "تذكير"
+
+#: contract/models.py:163
+msgid "Reminders"
+msgstr "تذكيرات"
+
+#: core/apps.py:9
+msgid "Core"
+msgstr "اساسي"
+
+#: core/events.py:10
+msgid "Path created"
+msgstr "تم إنشاء الملف"
+
+#: core/events.py:13
+msgid "Path deleted"
+msgstr "ملف محذوف"
+
+#: core/events.py:16
+msgid "Path edited"
+msgstr "تم تعديل الملف"
+
+#: core/events.py:19
+msgid "Document added to path"
+msgstr "تم اضافة الملف"
+
+#: core/events.py:22
+msgid "Document removed from path"
+msgstr "تم مسح الملف"
+
+#: core/literals.py:12
+#, python-format
+msgid "Unknown or obsolete event type: %s"
+msgstr ""
+
+#: core/models.py:33
 msgid "Priorities"
 msgstr "الأولويات"
 
-#: .\core\models.py:30 .\core\models.py:47 .\core\models.py:67
+#: core/models.py:39 core/models.py:57 core/models.py:66
 msgid "Reply"
 msgstr "رد"
 
-#: .\core\models.py:48
+#: core/models.py:58
 msgid "Replies"
 msgstr "ردود"
 
-#: .\core\models.py:66 .\core\models.py:88
+#: core/models.py:64 core/models.py:92
 msgid "Comment"
 msgstr "ملاحظات"
 
-#: .\core\models.py:89
+#: core/models.py:93
 msgid "Comments"
 msgstr "ملاحظات"
 
-#: .\core\models.py:111
+#: core/models.py:109 templates/cases/cases_list.html:96
 msgid "Court"
 msgstr "المحكمة"
 
-#: .\core\models.py:112
+#: core/models.py:110
 msgid "Courts"
 msgstr "المحاكم"
 
-#: .\core\models.py:118 .\core\models.py:131
+#: core/models.py:118 core/models.py:134
 msgid "Attachment"
 msgstr "المرفقة"
 
-#: .\core\settings.py:189
-msgid "English"
-msgstr "الانكليزية"
+#: core/models.py:139 core/models.py:198 core/models.py:269
+msgid "Path"
+msgstr "الملف"
 
-#: .\core\settings.py:190
+#: core/models.py:270
+msgid "Parent and Name"
+msgstr "اسم الاب"
+
+#: core/models.py:277
+#, python-format
+msgid "%(model_name)s with this %(field_names)s already exists."
+msgstr ""
+
+#: core/models.py:290 core/models.py:301 templates/cases/cases_list.html:47
+#: templates/cases/cases_list.html:97
+msgid "Status"
+msgstr "الحالة"
+
+#: core/models.py:291
+msgid "Is Completed"
+msgstr "مكتمل"
+
+#: core/models.py:292
+msgid "Is Done"
+msgstr "تم"
+
+#: core/models.py:302
+msgid "Statuses"
+msgstr "الحالات"
+
+#: core/models.py:348
+msgid "Notification"
+msgstr "اشعار"
+
+#: core/models.py:349
+msgid "Notifications"
+msgstr "اشعارات"
+
+#: core/search/serializers.py:341 core/serializers.py:341
+#: rest_api/serializers.py:77
+msgid "URL"
+msgstr "المسار"
+
+#: core/search/serializers.py:453 core/serializers.py:454
+msgid "Primary key of the document to add to the Path."
+msgstr "المفتاح الأساسي للمستند الذي سيتم إضافته إلى الملف"
+
+#: core/search/serializers.py:454 core/search/serializers.py:462
+#: core/serializers.py:455 core/serializers.py:463
+msgid "Document ID"
+msgstr "رقم الملف"
+
+#: core/search/serializers.py:461 core/serializers.py:462
+msgid "Primary key of the document to remove from the Path."
+msgstr "المفتاح الأساسي للمستند الذي سيتم مسحة من الملف."
+
+#: core/settings.py:191
 msgid "Arabic"
 msgstr "العربية"
 
-#: .\templates\about.html:13 .\templates\base.html:73
+#: core/settings.py:192
+msgid "English"
+msgstr "الانكليزية"
+
+#: rest_api/fields.py:30
+#, python-format
+msgid "Unable to find serializer class for: %s"
+msgstr ""
+
+#: rest_api/relations.py:31
+#, python-brace-format
+msgid "Invalid pk \"{pk_value}\" - object does not exist."
+msgstr ""
+
+#: rest_api/relations.py:34
+#, python-brace-format
+msgid "Incorrect type. Expected pk value, received {data_type}."
+msgstr ""
+
+#: rest_api/relations.py:36
+msgid "This field is required."
+msgstr ""
+
+#: rest_api/serializers.py:36
+msgid "Content"
+msgstr ""
+
+#: rest_api/serializers.py:39
+msgid "Data"
+msgstr ""
+
+#: rest_api/serializers.py:42
+msgid "Headers"
+msgstr ""
+
+#: rest_api/serializers.py:48
+msgid "Status code"
+msgstr "رقم الحالة"
+
+#: rest_api/serializers.py:51
+msgid "Requests"
+msgstr "طلب بواسطة"
+
+#: rest_api/serializers.py:74
+msgid "Label"
+msgstr ""
+
+#: rest_api/serializers.py:105
+msgid "Author"
+msgstr ""
+
+#: rest_api/serializers.py:108
+msgid "Author email"
+msgstr ""
+
+#: rest_api/serializers.py:111
+msgid "Build"
+msgstr ""
+
+#: rest_api/serializers.py:114
+msgid "Build string"
+msgstr ""
+
+#: rest_api/serializers.py:117
+msgid "Copyright"
+msgstr ""
+
+#: rest_api/serializers.py:123
+msgid "Django version"
+msgstr ""
+
+#: rest_api/serializers.py:126
+msgid "License"
+msgstr ""
+
+#: rest_api/serializers.py:132
+msgid "Version"
+msgstr ""
+
+#: rest_api/serializers.py:135
+msgid "Website"
+msgstr "الموقع الإلكتروني"
+
+#: rest_api/view_mixins.py:393
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr ""
+
+#: rest_api/view_mixins.py:419
+#, python-format
+msgid "Unable to perform operation on object %(instance)s; %(exception)s."
+msgstr ""
+
+#: rest_api/view_mixins.py:422
+#, python-format
+msgid "Operation performed on %(count)d objects."
+msgstr ""
+
+#: rest_api/view_mixins.py:423
+#, python-format
+msgid "Operation performed on %(object)s."
+msgstr ""
+
+#: rest_api/view_mixins.py:424
+#, python-format
+msgid "Operation performed on %(count)d object."
+msgstr ""
+
+#: rest_api/view_mixins.py:425
+#, python-format
+msgid "Perform operation on %(count)d objects."
+msgstr ""
+
+#: rest_api/view_mixins.py:426
+#, python-format
+msgid "Perform operation on %(object)s."
+msgstr ""
+
+#: rest_api/view_mixins.py:427
+#, python-format
+msgid "Perform operation on %(count)d object."
+msgstr ""
+
+#: rest_api/view_mixins.py:511
+msgid "Object"
+msgstr "عنصر"
+
+#: templates/about.html:13 templates/base.html:81
 msgid "About"
 msgstr "عنا"
 
-#: .\templates\about.html:21
+#: templates/about.html:21
 msgid "How we can help you"
 msgstr "كيف نستطيع مساعدتك"
 
-#: .\templates\about.html:22
+#: templates/about.html:22
 msgid "ddvTest"
 msgstr ""
 
-#: .\templates\account\login.html:22
-msgid "Login to ISC Legal App"
-msgstr "تسجيل الدخول للنظام القانوني"
-
-#: .\templates\account\login.html:38 .\templates\account\register.html:21
-msgid "Email"
-msgstr "البريد الالكتروني"
-
-#: .\templates\account\login.html:44 .\templates\account\register.html:47
-msgid "Password"
-msgstr "كلمة المرور"
-
-#: .\templates\account\login.html:59
+#: templates/account/login.html:45
 msgid "Login"
 msgstr "تسجيل الدخول"
 
-#: .\templates\account\login.html:60
-msgid "Change Password"
-msgstr "تغير المرور"
-
-#: .\templates\account\login.html:61 .\templates\account\register.html:71
-msgid "Register"
-msgstr "تسجيل"
-
-#: .\templates\account\register copy.html:15
-#: .\templates\account\register.html:13
+#: templates/account/register copy.html:15 templates/account/register.html:13
 msgid "Register to ISC Legal App"
 msgstr "التسجيل في النظام القانوني"
 
-#: .\templates\account\register.html:17
+#: templates/account/register.html:17
 msgid "User Registration"
 msgstr "تشجيل المستخدم"
 
-#: .\templates\account\register.html:30
+#: templates/account/register.html:30
 msgid "First Name"
 msgstr "الاسم الاول"
 
-#: .\templates\account\register.html:34
+#: templates/account/register.html:34
 msgid "Last Name"
 msgstr "الاسم الاخير"
 
-#: .\templates\account\register.html:40
+#: templates/account/register.html:40
 msgid "Phone"
 msgstr "الهاتف"
 
-#: .\templates\account\register.html:52
+#: templates/account/register.html:52
 msgid "Confirm Password"
 msgstr "تاكيد كلمة المرور"
 
-#: .\templates\account\register.html:56
+#: templates/account/register.html:56
 msgid "Please check the below:"
 msgstr "يرجى التاكد من التالي:"
 
-#: .\templates\base.html:13 .\templates\base.html:15 .\templates\base.html:17
-#: .\templates\base.html:19 .\templates\base.html:28 .\templates\base.html:29
-#: .\templates\base.html:36 .\templates\base.html:37 .\templates\base.html:57
-#: .\templates\base.html:64
+#: templates/account/register.html:71
+msgid "Register"
+msgstr "تسجيل"
+
+#: templates/accounts/employees/getzoho.html:12
+msgid "Export"
+msgstr "تصدير"
+
+#: templates/accounts/employees/getzoho.html:13
+msgid "Import"
+msgstr "استيراد"
+
+#: templates/accounts/employees/getzoho.html:14
+msgid "Get or Update Employees"
+msgstr "تحديث الموظفين"
+
+#: templates/base.html:13 templates/base.html:15 templates/base.html:17
+#: templates/base.html:19 templates/base.html:28 templates/base.html:29
+#: templates/base.html:36 templates/base.html:37
 msgid "ISC Legal App"
 msgstr "النظام القانوني"
 
-#: .\templates\base.html:70
+#: templates/base.html:75
 msgid "Home"
 msgstr "الصفحة الرئيسية"
 
-#: .\templates\cases\email.html:287
+#: templates/base.html:89
+msgid "Logout"
+msgstr "تسجيل الخروج"
+
+#: templates/cases/cases_list.html:13
+msgid "Search keywords"
+msgstr "كلمات البحث الرئيسية"
+
+#: templates/cases/cases_list.html:19 templates/cases/cases_list.html:31
+#: templates/cases/cases_list.html:42 templates/cases/cases_list.html:53
+msgid "All"
+msgstr "الكل"
+
+#: templates/cases/cases_list.html:65
+msgid "10 records"
+msgstr "10 سجلات"
+
+#: templates/cases/cases_list.html:66
+msgid "25 records"
+msgstr "25 سجلا"
+
+#: templates/cases/cases_list.html:67
+msgid "50 records"
+msgstr "50 سجلا"
+
+#: templates/cases/cases_list.html:69
+msgid "Number of records"
+msgstr "عدد السجلات"
+
+#: templates/cases/cases_list.html:74
+msgid "Search"
+msgstr "بحث"
+
+#: templates/cases/cases_list.html:75
+msgid "Clear"
+msgstr "الغاء"
+
+#: templates/cases/cases_list.html:85
+msgid "New Case"
+msgstr "دعوى جديدة"
+
+#: templates/cases/cases_list.html:92
+msgid "Number"
+msgstr "رقم"
+
+#: templates/cases/cases_list.html:99
+msgid "Created At"
+msgstr "تكون بتاريخ"
+
+#: templates/cases/cases_list.html:100
+msgid "Category"
+msgstr "الفئة"
+
+#: templates/cases/cases_list.html:101
+msgid "Characteristic"
+msgstr "صفة الخصم"
+
+#: templates/cases/cases_list.html:103
+msgid "Outcome"
+msgstr "نتيجة الدعوى"
+
+#: templates/cases/cases_list.html:104
+msgid "Actions"
+msgstr "اجراءات"
+
+#: templates/cases/cases_list.html:113
+msgid "No data available in table"
+msgstr "لا توجد بيانات في الجدول"
+
+#: templates/cases/cases_list.html:136 templates/cases/cases_list.html:158
+#: templates/cases/cases_list.html:180
+msgid "Delete"
+msgstr "حذف"
+
+#: templates/cases/cases_list.html:138 templates/cases/cases_list.html:160
+#: templates/cases/cases_list.html:182
+msgid "اخر تطور مهم"
+msgstr ""
+
+#: templates/cases/cases_list.html:194 templates/cases/cases_list.html:198
+msgid "Previous"
+msgstr "السابق"
+
+#: templates/cases/cases_list.html:205
+msgid "current"
+msgstr "الحالي"
+
+#: templates/cases/cases_list.html:220 templates/cases/cases_list.html:224
+msgid "Next"
+msgstr "التالي"
+
+#: templates/cases/email.html:287
 msgid "Legal App New Case #"
 msgstr "رقم الدعوى الجديدة"
 
-#: .\templates\cases\email.html:336
+#: templates/cases/email.html:336
 msgid "Dear"
 msgstr "السيد"
 
-#: .\templates\cases\email.html:341 .\templates\cases\emailnew.html:190
+#: templates/cases/email.html:341 templates/cases/emailnew.html:190
 msgid "Case Category:"
 msgstr "فئة الدعوى"
 
-#: .\templates\cases\email.html:342 .\templates\cases\emailnew.html:191
+#: templates/cases/email.html:342 templates/cases/emailnew.html:191
 msgid "Judge:"
 msgstr "القاضي"
 
-#: .\templates\cases\email.html:343 .\templates\cases\emailnew.html:192
+#: templates/cases/email.html:343 templates/cases/emailnew.html:192
 msgid "Detective:"
 msgstr "القاضي"
 
-#: .\templates\cases\email.html:344 .\templates\cases\emailnew.html:193
+#: templates/cases/email.html:344 templates/cases/emailnew.html:193
 msgid "Case Type:"
 msgstr "نوع الدعوى"
 
-#: .\templates\cases\email.html:345 .\templates\cases\emailnew.html:194
+#: templates/cases/email.html:345 templates/cases/emailnew.html:194
 msgid "Court:"
 msgstr "المحكمة"
 
-#: .\templates\cases\email.html:346
+#: templates/cases/email.html:346
 msgid "Shared With:"
 msgstr "مشاركة الخصوصية مع"
 
-#: .\templates\cases\email.html:347 .\templates\cases\emailnew.html:195
+#: templates/cases/email.html:347 templates/cases/emailnew.html:195
 msgid "Internal refrence number:"
 msgstr "رقم المرجع الداخلي"
 
-#: .\templates\cases\email.html:369
+#: templates/cases/email.html:369
 msgid "V I E W IT N O W"
 msgstr "شاهد التفاصيل"
 
-#: .\templates\cases\email.html:497
+#: templates/cases/email.html:497
 msgid "You are receiving this because you registered on Legal app"
 msgstr "أنت تتلقى هذا البريد الالكتروني لأنك سجلت في التطبيق القانوني"
 
-#: .\templates\cases\emailnew.html:189
+#: templates/cases/emailnew.html:189
 msgid "Case Number:"
 msgstr "رقم الدعوى:"
 
-#: .\templates\index.html:11
+#: templates/index.html:11
 msgid "Welcome to ISC Legal App"
 msgstr "اهلا بك في النظام القانوني"
 
-#~ msgid "Hearing Type"
-#~ msgstr "نوع الموكل"
+#~ msgid "Clear Filters"
+#~ msgstr "الغاء التصفية"
+
+#~ msgid "Required. Add a valid email address."
+#~ msgstr "البريد الالكتروني اجباري"
+
+#~ msgid "Enter a valid phone number (e.g. 7801000000)."
+#~ msgstr "يجب ادخال رقم هاتف صحيح (مثال 7801000000)"
+
+#~ msgid "Policy for terms of use"
+#~ msgstr "شروط الاستخدام"
+
+#~ msgid "You must accept to policy for terms of use"
+#~ msgstr "يجب الموافق على الشروط والاحكام"
+
+#~ msgid "date joined"
+#~ msgstr "تاريخ الانضمام"
+
+#~ msgid "Detailed Columns"
+#~ msgstr "أعمدة مفصلة"
+
+#~ msgid "Login to ISC Legal App"
+#~ msgstr "تسجيل الدخول للنظام القانوني"
 
 #~ msgid "Hearing Types"
 #~ msgstr "انواع الموكل"
@@ -555,17 +1224,11 @@ msgstr "اهلا بك في النظام القانوني"
 #~ msgid "Task ID"
 #~ msgstr "رقم مهمة"
 
-#~ msgid "Requested By"
-#~ msgstr "طلب بواسطة"
-
 #~ msgid "Event Type"
 #~ msgstr "نوع الموكل"
 
 #~ msgid "Event Types"
 #~ msgstr "انواع الموكل"
-
-#~ msgid "Event ID"
-#~ msgstr "حرقم دث"
 
 #~ msgid "Created By"
 #~ msgstr "طلب بواسطة"
@@ -591,12 +1254,6 @@ msgstr "اهلا بك في النظام القانوني"
 #~ msgid "Practice Areas"
 #~ msgstr "نطاقات العمل"
 
-#~ msgid "Status"
-#~ msgstr "الحالة"
-
-#~ msgid "Case Status"
-#~ msgstr "حالة الدعوى"
-
 #~ msgid "Case Statuses"
 #~ msgstr "حالات الدعوى"
 
@@ -605,9 +1262,6 @@ msgstr "اهلا بك في النظام القانوني"
 
 #~ msgid "Client Types"
 #~ msgstr "انواع الموكل"
-
-#~ msgid "Category"
-#~ msgstr "الفئة"
 
 #~ msgid "Company category"
 #~ msgstr "فئة الشركة"
@@ -648,12 +1302,6 @@ msgstr "اهلا بك في النظام القانوني"
 #~ msgid "Company Legal Type"
 #~ msgstr "نوع الشركة القانوني"
 
-#~ msgid "Reference"
-#~ msgstr "رقم المرجع الداخلي"
-
-#~ msgid "Company"
-#~ msgstr "الشركة"
-
 #~ msgid "Companies"
 #~ msgstr "الشركات"
 
@@ -665,9 +1313,6 @@ msgstr "اهلا بك في النظام القانوني"
 
 #~ msgid "Zip"
 #~ msgstr "الرمز"
-
-#~ msgid "Street Name"
-#~ msgstr "اسم الشارع"
 
 #~ msgid "Building Number"
 #~ msgstr "رقم المبنى"
@@ -684,9 +1329,6 @@ msgstr "اهلا بك في النظام القانوني"
 #~ msgid "City"
 #~ msgstr "المدينة"
 
-#~ msgid "Website"
-#~ msgstr "الموقع الإلكتروني"
-
 #~ msgid "Additional Street Name"
 #~ msgstr "اسم الشارع الإضافي"
 
@@ -698,9 +1340,6 @@ msgstr "اهلا بك في النظام القانوني"
 
 #~ msgid "Company Address"
 #~ msgstr "عنوان الشركة"
-
-#~ msgid "Person"
-#~ msgstr "شخص"
 
 #~ msgid "Persons"
 #~ msgstr "اشخاص"

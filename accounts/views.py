@@ -11,7 +11,7 @@ from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_str
-# from accounts.forms import RegistrationForm, UserAuthenticationForm, UserUpdateForm
+from accounts.forms import UserAuthenticationForm
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
@@ -48,6 +48,42 @@ def get_user_queryset(user=None):
         )
 
     return queryset.order_by('username')
+
+def login_view(request):
+    context = {}
+    if request.GET.get('next') is None:
+        next_page = 'home'
+    else:
+        next_page = request.GET.get('next')
+    user = request.user
+    if user.is_authenticated:
+        return redirect('home')
+    if request.POST:
+        form = UserAuthenticationForm(request.POST)
+        if form.is_valid():
+            email = request.POST['email']
+            password = request.POST['password']
+            user = authenticate(email=email, password=password)
+            if not user.is_verified:
+                messages.add_message(request, messages.ERROR,
+                                     _('Email is not verified, please check your email inbox'))
+                return render(request, "account/login.html", context)
+            if user.is_blocked:
+                messages.add_message(request, messages.ERROR,
+                                     _('It looks like your account has been blocked Please contact saif.ibrahim@qi.iq for more information.'))
+                return render(request, "account/login.html", context)
+            if user:
+                login(request, user)
+                return redirect(next_page)
+    else:
+        form = UserAuthenticationForm()
+    context['login_form'] = form
+    return render(request, "account/login.html", context)
+
+def logout_view(request):
+    logout(request)
+    return redirect('/accounts/login/')
+
 
 
 class UserSetPasswordView(FormView):

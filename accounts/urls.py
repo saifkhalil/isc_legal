@@ -28,7 +28,9 @@ from accounts.views import (
     UserSetPasswordView,
     EmployeesViewSet,
     SearchEmployeesAPIView,
-    SearchEmployeeAPIView
+    SearchEmployeeAPIView,
+    login_view,
+    logout_view
 )
 from django.views.decorators.cache import cache_page
 router = routers.DefaultRouter()
@@ -36,6 +38,8 @@ router.register(r'employees', EmployeesViewSet, "employees")
 
 urlpatterns = [
     # path('after', views.after, name='after'),
+    path('login/', login_view, name='login'),
+    path('logout/', logout_view, name='logout'),
     path('verify/<uuid:userid>', send_active, name="send_active"),
     path('block_user/<uuid:userid>', block_user, name="block_user"),
     path('unblock_user/<uuid:userid>', unblock_user, name="unblock_user"),

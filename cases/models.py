@@ -12,7 +12,6 @@ from activities.models import task, hearing
 from core.models import priorities, comments, documents, court, Status, Path
 from core.threading import send_html_mail
 
-@pghistory.track(pghistory.Snapshot())
 class case_type(models.Model):
     id = models.AutoField(primary_key=True, )
     type = models.CharField(max_length=250, blank=False, null=False, verbose_name=_('Name'))
@@ -30,7 +29,6 @@ class case_type(models.Model):
         verbose_name_plural = _('Case Types')
 
 
-@pghistory.track(pghistory.Snapshot())
 class characteristic(models.Model):
     id = models.AutoField(primary_key=True, )
     name = models.CharField(max_length=250, blank=False, null=False, verbose_name=_('Name'))
@@ -47,8 +45,6 @@ class characteristic(models.Model):
         verbose_name_plural = _('Case characteristics')
 
 
-
-@pghistory.track(pghistory.Snapshot())
 class stages(models.Model):
     id = models.AutoField(primary_key=True, )
     name = models.CharField(max_length=250, blank=False, null=False, verbose_name=_('Name'))
@@ -68,7 +64,6 @@ class stages(models.Model):
         verbose_name_plural = _('Stage')
 
 
-@pghistory.track(pghistory.Snapshot())
 class client_position(models.Model):
     id = models.AutoField(primary_key=True, )
     name = models.CharField(max_length=250, blank=False, null=False, verbose_name=_('Name'))
@@ -84,7 +79,6 @@ class client_position(models.Model):
         verbose_name_plural = _('Client Positions')
 
 
-@pghistory.track(pghistory.Snapshot())
 class ImportantDevelopment(models.Model):
     id = models.AutoField(primary_key=True, )
     title = models.CharField(max_length=1000, blank=False, null=False, verbose_name=_('Title'))
@@ -115,7 +109,6 @@ class ImportantDevelopment(models.Model):
         ordering = ["created_at"]
 
 
-@pghistory.track(pghistory.Snapshot())
 class opponent_position(models.Model):
     id = models.AutoField(primary_key=True, )
     position = models.CharField(max_length=250, blank=False, null=False, verbose_name=_('Position'))
@@ -143,7 +136,6 @@ case_close_status = (
 )
 
 
-@pghistory.track(pghistory.Snapshot())
 class LitigationCases(models.Model):
     """
     This Model Handle the Litigation cases objects
@@ -271,7 +263,6 @@ def LitigationCases_sharedwith_send_email(sender, instance, action, reverse, pk_
                 send_html_mail(email_subject, email_body, [cuser.email])
 
 
-@pghistory.track(pghistory.Snapshot())
 class Folder(models.Model):
     record_types = (
         ("Folder", _("Folder")),
@@ -379,7 +370,7 @@ class Folder(models.Model):
 #                 })
 #                 send_html_mail(email_subject, email_body, [cuser.email])
 
-@pghistory.track(pghistory.Snapshot())
+
 class AdministrativeInvestigation(models.Model):
     id = models.AutoField(primary_key=True, )
     subject = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Subject'))
@@ -422,7 +413,6 @@ class AdministrativeInvestigation(models.Model):
         ]
 
 
-@pghistory.track(pghistory.Snapshot())
 class Notation(models.Model):
     id = models.AutoField(primary_key=True, )
     subject = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Subject'))

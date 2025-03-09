@@ -4,14 +4,16 @@ from audioop import reverse
 from datetime import datetime
 from datetime import timedelta
 import django_filters.rest_framework
+from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count
 from django.db.models import Q
-from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect, HttpResponseForbidden, JsonResponse
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.http import require_POST
 from django_celery_beat.models import ClockedSchedule, PeriodicTask
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -41,12 +43,164 @@ from django.utils.dateparse import parse_date
 from django.core.cache import cache
 from core.utils import LegalCache
 from rest_framework.exceptions import NotFound
+from django.core.paginator import Paginator
+from urllib.parse import urlencode
+import logging
+
+logger = logging.getLogger(__name__)
 
 def manager_superuser_check(request):
     return Response(data={"detail": "انت غير مصرح بالمسح"}, status=status.HTTP_401_UNAUTHORIZED)
     current_user = User.objects.get(id=request.user.id)
     if not (current_user.is_manager or current_user.is_superuser):
         return Response(data={"detail": "انت غير مصرح بالمسح"}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+
+@login_required
+def cases_list(request):
+    number_of_records = 10
+    keywords = stage = assignee = case_type = status = None
+    assignees_set = court_set = case_type_set = stage_set = case_status_set = None
+
+    if request.method == 'GET':
+        # Clear filters and redirect if needed.
+        if request.GET.get('clear'):
+            for key in ['keywords', 'stage', 'assignee', 'type', 'status', 'number_of_records']:
+                request.session.pop(key, None)
+            return redirect(request.path)
+
+        # Retrieve filter parameters from GET or session.
+        if 'keywords' in request.GET:
+            keywords = request.GET.get('keywords')
+            request.session['keywords'] = keywords  # Update session even if empty
+        else:
+            keywords = request.session.get('keywords', '')
+        stage = request.GET.get('stage') or request.session.get('stage',0)
+        assignee = request.GET.get('assignee') or request.session.get('assignee',0)
+        case_type = request.GET.get('type') or request.session.get('type',0)
+        status = request.GET.get('status') or request.session.get('status',0)
+
+        # Save parameters to session if provided.
+        for key, value in (('keywords', keywords), ('stage', stage),
+                           ('assignee', assignee), ('type', case_type),
+                           ('status', status)):
+            if value is not None:
+                request.session[key] = value
+
+        # Handle number_of_records.
+        if request.GET.get('number_of_records'):
+            try:
+                number_of_records = int(request.GET.get('number_of_records'))
+            except ValueError:
+                number_of_records = 10
+            request.session['number_of_records'] = number_of_records
+        else:
+            number_of_records = request.session.get('number_of_records', 10)
+
+        # Build search query using Q objects.
+        query = Q()
+        if keywords:
+            # Filter out words shorter than 2 characters.
+            query_words = [w for w in keywords.split() if len(w) >= 2]
+            for word in query_words:
+                query |= Q(name__icontains=word) | Q(assignee__username__icontains=word)
+        if stage and stage != '0':
+            query &= Q(Stage_id=stage)
+        if case_type and case_type != '0':
+            query &= Q(case_type_id=case_type)
+        if assignee and assignee != '0':
+            query &= Q(assignee_id=assignee)
+        # Optionally, add status filtering if needed:
+        if status and status != '0':
+            query &= Q(case_status_id=status)
+
+        # Get base queryset.
+        cases_qs = LitigationCases.objects.filter(is_deleted=False).order_by('-created_by')
+
+        # Retrieve filter dropdown data from cache or compute if not cached.
+        cache_key = "litigation_cases_objects"
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            stage_set = cached_data.get('Stage')
+            court_set = cached_data.get('court')
+            case_type_set = cached_data.get('case_type')
+            assignees_set = cached_data.get('assignees')
+            case_status_set = cached_data.get('case_status')
+        else:
+            stages = []
+            courts = []
+            case_types = []
+            assignees = []
+            case_status = []
+            for case in cases_qs:
+                if case.Stage:
+                    stages.append(dict_item(case.Stage.id, case.Stage.name))
+                if case.court:
+                    courts.append(dict_item(case.court.id, case.court.name))
+                if case.case_type:
+                    case_types.append(dict_item(case.case_type.id, case.case_type.type))
+                if case.assignee:
+                    assignees.append(dict_item(case.assignee.id, case.assignee.username))
+                if case.case_status:
+                    case_status.append(dict_item(case.case_status.id, case.case_status.status))
+            stage_set = GetUniqueDictionaries(stages)
+            court_set = GetUniqueDictionaries(courts)
+            case_type_set = GetUniqueDictionaries(case_types)
+            assignees_set = GetUniqueDictionaries(assignees)
+            case_status_set = GetUniqueDictionaries(case_status)
+            cached_data = {
+                'Stage': stage_set,
+                'court': court_set,
+                'case_type': case_type_set,
+                'assignees': assignees_set,
+                'case_status': case_status_set
+            }
+            cache.set(cache_key, cached_data, timeout=60 * 60)
+
+        # Apply filters.
+        cases_qs = cases_qs.filter(query)
+    else:
+        cases_qs = LitigationCases.objects.filter(is_deleted=False).order_by('-created_by')
+
+    # Set up pagination.
+    paginator = Paginator(cases_qs, number_of_records)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    page_range = paginator.get_elided_page_range(number=page_number, on_each_side=2, on_ends=2)
+
+    # Prepare session info for the template.
+    session_info = {
+        'number_of_records': number_of_records or 10,
+        'keywords': keywords or '',
+        'type': case_type or 0,
+        'stage': stage or 0,
+        'assignee': assignee or 0,
+        'case_status': status or 0
+    }
+
+    # Build a filter query string to be used in pagination links.
+    # Only include filter keys (exclude 'page').
+    filter_params = {}
+    for key in ['keywords', 'stage', 'assignee', 'type', 'status', 'number_of_records']:
+        value = request.session.get(key)
+        if value:
+            filter_params[key] = value
+    filter_query = urlencode(filter_params)
+
+    context = {
+        'cases': page_obj,
+        'courts': court_set,
+        'types': case_type_set,
+        'stages': stage_set,
+        'assignees': assignees_set,
+        'statuses': case_status_set,
+        'page_range': page_range,
+        'session': json.dumps(session_info),
+        'filter_query': filter_query,  # New variable for pagination links.
+    }
+    return render(request, 'cases/cases_list.html', context)
 
 
 def case(request, case_id=None):
@@ -61,6 +215,21 @@ def case(request, case_id=None):
         form.save()
         return HttpResponseRedirect(reverse('cal:calendar'))
     return render(request, 'cases/case.html', {'form': form})
+
+
+@require_POST
+def delete_case(request, pk=None):
+    print('delete_case',pk)
+    instance = LitigationCases.objects.get(pk=pk)
+    if not (request.user.is_manager or request.user.is_superuser):
+        return JsonResponse({'success': False, 'message':"You do not have permission to perform this action."},status=401)
+    instance = get_object_or_404(LitigationCases, pk=pk)
+    instance.is_deleted = True
+    instance.modified = timezone.now()
+    # Assuming you have a field to record the modifying user:
+    instance.modified_by = request.user
+    instance.save()
+    return JsonResponse({'success': True, 'message': 'Case has been deleted successfully.'},status=200)
 
 
 def filter_cases(queryset, created_at_after=None, created_at_before=None, assignee_id=None):

@@ -1,7 +1,10 @@
 from django import forms
-from django.contrib.auth import password_validation
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate
+# from phonenumber_field.formfields import PhoneNumberField
 from django.utils.translation import gettext_lazy as _
-
+# from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget, PhoneNumberPrefixWidget
+from accounts.models import User
 
 # class RegistrationForm(UserCreationForm):
 #     email = forms.EmailField(
@@ -23,20 +26,21 @@ from django.utils.translation import gettext_lazy as _
 #         # }
 
 
-# class UserAuthenticationForm(forms.ModelForm):
+class UserAuthenticationForm(forms.ModelForm):
 
-#     password = forms.CharField(label='Password', widget=forms.PasswordInput)
+    password = forms.CharField(label=_('Password'), widget=forms.PasswordInput,help_text=_('Enter your password'))
+    email = forms.EmailField(label=_('Email'), widget=forms.PasswordInput,help_text=_('Enter your email'))
 
-#     class Meta:
-#         model = User
-#         fields = ('email', 'password')
+    class Meta:
+        model = User
+        fields = ('email', 'password')
 
-#     def clean(self):
-#         if self.is_valid():
-#             email = self.cleaned_data['email']
-#             password = self.cleaned_data['password']
-#             if not authenticate(email=email, password=password):
-#                 raise forms.ValidationError("Invalid login")
+    def clean(self):
+        if self.is_valid():
+            email = self.cleaned_data['email']
+            password = self.cleaned_data['password']
+            if not authenticate(email=email, password=password):
+                raise forms.ValidationError(_("Invalid login"))
 
 
 # class UserUpdateForm(forms.ModelForm):
@@ -63,26 +67,26 @@ from django.utils.translation import gettext_lazy as _
 #         raise forms.ValidationError(
 #             'Username "%s" is already in use.' % username)
 
-class SetPasswordForm(forms.Form):
-    new_password1 = forms.CharField(
-        label=_("New password"),
-        strip=False,
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
-        help_text=password_validation.password_validators_help_text_html(),
-    )
-    new_password2 = forms.CharField(
-        label=_("New password confirmation"),
-        strip=False,
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
-    )
-
-    def clean(self):
-        cleaned_data = super().clean()
-        new_password1 = cleaned_data.get("new_password1")
-        new_password2 = cleaned_data.get("new_password2")
-        if new_password1 and new_password2 and new_password1 != new_password2:
-            raise forms.ValidationError(_("The two password fields didn't match."))
-
-        password_validation.validate_password(new_password2)
-        return cleaned_data
+# class SetPasswordForm(forms.Form):
+#     new_password1 = forms.CharField(
+#         label=_("New password"),
+#         strip=False,
+#         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+#         help_text=password_validation.password_validators_help_text_html(),
+#     )
+#     new_password2 = forms.CharField(
+#         label=_("New password confirmation"),
+#         strip=False,
+#         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+#     )
+#
+#     def clean(self):
+#         cleaned_data = super().clean()
+#         new_password1 = cleaned_data.get("new_password1")
+#         new_password2 = cleaned_data.get("new_password2")
+#         if new_password1 and new_password2 and new_password1 != new_password2:
+#             raise forms.ValidationError(_("The two password fields didn't match."))
+#
+#         password_validation.validate_password(new_password2)
+#         return cleaned_data
 
