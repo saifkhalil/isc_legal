@@ -9,7 +9,7 @@ db.sqlite3-journal
 media
 
 # Ignore everything inside the static/ directory
-/static/
+static/
 
 # Allow only the css/ and js/ directories inside static/
 !static/css/
