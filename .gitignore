@@ -9,7 +9,7 @@ db.sqlite3-journal
 media
 
 # Ignore everything inside the static/ directory
-static/
+static
 
 # Allow only the css/ and js/ directories inside static/
 !static/css/
@@ -179,4 +179,3 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
-
