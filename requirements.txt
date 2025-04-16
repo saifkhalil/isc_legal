@@ -58,3 +58,5 @@ django-auditlog
 django-haystack[elasticsearch]
 djangorestframework-csv
 whoosh
+django-select2
+django_bootstrap5

@@ -42,12 +42,15 @@
     {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'css/cstyle.css' %}?v=1.4.3"> {% endcomment %}
 
 
-  <link rel="stylesheet" type="text/css" href="{% static 'css/qi-colors.css' %}?v=0.0.9">
+
     {% if CURRENT_LANGUAGE == 'en' %}
+
     <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
     {% else %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.rtl.min.css' %}">
     {% endif %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/qi-colors.css' %}?v=0.0.9">
+
     <link href="{% static 'css/fontawesome-all.css' %}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'icon/font-awesome/css/font-awesome.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/legal.css' %}?v=0.0.9">
@@ -59,14 +62,14 @@
 {% if user.is_authenticated %}
     <nav class="navbar navbar-expand-md qi-light mt-3 qi-{% if CURRENT_LANGUAGE == 'en' %}e{% else %}a{% endif %}nav">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'images/qilogo.svg' %}" width="40"
+            <a class="navbar-brand" href="#"><img src="{% static 'images/qilogo.svg' %}" width="40"
                 height="40" alt="alternative"> </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="offcanvas offcanvas-end qi-light" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
             <div class="offcanvas-header">
-              <h5 class="offcanvas-title" id="offcanvasNavbarLabel"> <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'images/qilogo.svg' %}" width="40"
+              <h5 class="offcanvas-title" id="offcanvasNavbarLabel"> <a class="navbar-brand" href="#"><img src="{% static 'images/qilogo.svg' %}" width="40"
                 height="40" alt="alternative"> </a></h5>
               <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
@@ -79,16 +82,79 @@
                     <a class="nav-link" href="{% url 'cases_list' %}">{% trans 'Cases' %}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'about' %}">{% trans 'About' %}</a>
+                    <a class="nav-link" href="{% url 'tasks_list' %}">{% trans 'Tasks' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'hearings_list' %}">{% trans 'Hearings' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'contracts_list' %}">{% trans 'Contracts' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'notations_list' %}">{% trans 'Notations' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'AdministrativeInvestigations_list' %}">{% trans 'Administrative investigations' %}</a>
                 </li>
               </ul>
-              <form class="d-flex">
-                <select class="form-select me-2" aria-label="Default select" onchange="location = this.value;">
-                    <option value="/en/{{request.get_full_path|slice:"4:"}}" {% if CURRENT_LANGUAGE == 'en' %}selected{% endif %}>English</option>
-                    <option value="/ar/{{request.get_full_path|slice:"4:"}}" {% if CURRENT_LANGUAGE == 'ar' %}selected{% endif %}>العربيّة</option>
+              <form action="{% url 'set_language' %}" method="post" class="d-flex">
+                  {% csrf_token %}
+                  <select name="language" class="form-select me-2" aria-label="Default select" onchange="this.form.submit()">
+                      <option value="en" {% if request.session.django_language == 'en' %}selected{% endif %}>English</option>
+                      <option value="ar" {% if request.session.django_language == 'ar' %}selected{% endif %}>العربيّة</option>
                   </select>
-                    <a class="btn btn-light text-nowrap" href="{% url 'logout' %}">{% trans 'Logout' %}</a>
               </form>
+              <div class="dropdown">
+            <button class="fs-5 mx-4 mt-2" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-bell position-relative">
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" >
+    <span id="notificationCount">{{ request.not_read_notifications_count }}</span>
+    <span class="visually-hidden">unread notifications</span>
+  </span></i>
+
+            </button>
+
+
+
+            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" >
+              <div class="row mx-1 notification-header">
+                <p class="col col-auto mt-1 fs-5 fw-bolder text-dark text-center">{% trans 'Notifications' %}</p>
+                    {% if request.not_read_notifications_count > 0 %}
+                    <div class="col-auto mt-1"><a class="link-success link-zoom fs-7 text-center top-50 start-50" href="#" id="read_all_notifications"><i class="bi bi-check2-all"></i> {% trans 'Read All' %}</a> </div>
+                  {% endif %}
+                    {% if request.not_deleted_notifications_count > 0 %}
+                    <div class="col-auto mt-1"><a class="link-danger link-zoom fs-7 text-center top-50 start-50" href="#" id="delete_all_notifications"><i class="bi bi-x-circle"></i> {% trans 'Delete All' %}</a> </div>
+                  {% endif %}
+                      </div>
+              <div>
+                          <ul aria-labelledby="notificationDropdown" id="notificationItems">
+
+                             {% for notification in request.notifications %}
+
+                    <li class="{% if notification.is_read %}opacity-75{% endif %}">
+                          <a class="dropdown-item notification-item" href="" data-id="{{ notification.id }}">
+                            <p class="{% if not notification.is_read %}fw-bolder text-dark{% else %}text-muted {% endif %}">  {% if notification.action == 'created' %}{% trans 'create' %}{% elif notification.action == 'updated' %}{% trans 'update' %}{% else %}{% trans 'delete' %}{% endif %} {{ notification.content_type.name }} <i class="text-primary">({{ notification.object_name }})</i></p>
+                            <small class="text-muted d-block"><strong>{{ notification.action_by.username }}</strong> {{ notification.action_at|date:"Y-m-d H:m:s" }}</small>
+                          </a>
+                    </li>
+                {% empty %}
+                    <li id="no_notifications" class="dropdown-item text-muted">No notifications</li>
+                {% endfor %}
+                  </ul>
+              </div>
+
+            </div>
+        </div>
+
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ user.username }}
+              </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+              <li>
+                <a class="dropdown-item user-item" href="{% url 'logout' %}">{% trans 'Logout' %}</a>
+              </li>
+            </ul>
+
             </div>
           </div>
         </div>
@@ -105,7 +171,22 @@
           </div>
         </div>
       </footer>
+<!-- Hidden div to store translated texts -->
+<div id="translations"
+     data-created="{% trans 'create' %}"
+     data-updated="{% trans 'update' %}"
+     data-deleted="{% trans 'delete' %}">
+</div>
 
+<div id="models"
+     data-litigationcases="{% trans 'Litigation Case' %}"
+     data-task="{% trans 'Task' %}"
+     data-hearing="{% trans 'Hearing' %}"
+     data-notation="{% trans 'Notation' %}"
+     data-administrativeinvestigation="{% trans 'Administrative Investigation' %}"
+     data-path="{% trans 'Path' %}"
+>
+</div>
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'js/custom.js' %}?v=1.1"></script>
     <script src="{% static 'js/swiper.min.js' %}"></script>
@@ -120,7 +201,208 @@
     <script src="{% static 'js/isotope.min.js' %}"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-  AOS.init();
+  $(document).ready(function() {
+     AOS.init();
+     var tab_url = window.location.pathname.replace(/^((?:[^\/]*\/){3}).*$/, "$1");
+     var active_tab = document.querySelectorAll(`a[href='${tab_url}']`);
+    active_tab[0].classList.add('active');
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+        // Request permission for browser notifications
+        if ("Notification" in window) {
+            Notification.requestPermission().then((result) => {
+                console.log("Notification permission:", result);
+            });
+        }
+    });
+     var socket = new WebSocket("ws://" + window.location.host + "/ws/notifications/");
+             var translations = document.getElementById("translations");
+        var translatedActions = {
+            "created": translations.dataset.created,
+            "updated": translations.dataset.updated,
+            "deleted": translations.dataset.deleted
+        };
+                  var models = document.getElementById("models");
+          var translatedModels = {
+              "administrativeinvestigation": models.dataset.administrativeinvestigation,
+              "notation": models.dataset.notation,
+              "task": models.dataset.task,
+              "hearing": models.dataset.hearing,
+              "litigationcases": models.dataset.litigationcases,
+              "path": models.dataset.path,
+          };
+    socket.onmessage = function (event) {
+        var notification = JSON.parse(event.data);
+        console.log(notification);
+        var modelTranslated = translatedModels[notification.content_type] || notification.content_type; // Default to action if not found
+        var notificationDropdown = document.getElementById("notificationItems");
+        var actionTranslated = translatedActions[notification.action] || notification.action; // Default to action if not found
+        var newItem = document.createElement("li");
+        var liClass = "";
+        var pClass = "";
+                    if (notification.is_read === true )
+                    {
+                      liClass = "opacity-75";
+                      pClass = "text-muted";
+                    }
+                    else {
+                      pClass = "fw-bolder text-dark";
+                    }
+        newItem.className = liClass;
+        newItem.innerHTML = `<a class="dropdown-item" href="#">
+                            <p class="${ pClass }">${actionTranslated} ${ modelTranslated } <i class="text-primary">(${ notification.object_name })</i></p>
+                            <small class="text-muted d-block"><strong>${ notification.action_by }</strong> ${ notification.timestamp }</small>
+                        </a>`;
+        const no_notifications = document.getElementById("no_notifications");
+        if(no_notifications) {
+          document.getElementById("no_notifications").remove();
+        }
+        notificationDropdown.insertBefore(newItem, notificationDropdown.firstChild.nextSibling);
+        document.getElementById("notificationCount").innerText++;
+                if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("{% trans 'Legal App - New Notification' %}", {
+                body: `${notification.action_by} ${actionTranslated} ${notification.object_name}`,
+                icon: "/static/images/qilogo.svg",  // Optional: Add your own notification icon
+                requireInteraction: true,  // Keeps the notification on screen until user dismisses
+            });
+        }
+    };
+
+
+    socket.onclose = function () {
+        console.log("WebSocket closed.");
+    };
+
+     var page = 1;  // Track the current page
+    var loading = false;  // Prevent multiple requests
+    var hasMore = true;  // Indicates if there are more notifications to load
+
+    function loadMoreNotifications() {
+        if (!hasMore || loading) return;  // Stop if no more notifications or already loading
+
+        loading = true;
+        page += 1;
+
+        fetch(`/load-more-notifications/?page=${page}`)
+            .then(response => response.json())
+            .then(data => {
+                var notificationDropdown = document.getElementById("notificationItems");
+                             var translations = document.getElementById("translations");
+        var translatedActions = {
+            "created": translations.dataset.created,
+            "updated": translations.dataset.updated,
+            "deleted": translations.dataset.deleted
+        };
+          var models = document.getElementById("models");
+          var translatedModels = {
+              "administrativeinvestigation": models.dataset.administrativeinvestigation,
+              "notation": models.dataset.notation,
+              "task": models.dataset.task,
+              "hearing": models.dataset.hearing,
+              "litigationcases": models.dataset.litigationcases,
+              "path": models.dataset.path,
+          };
+
+                data.notifications.forEach(notification => {
+                    var actionTranslated = translatedActions[notification.action] || notification.action; // Default to action if not found
+                    var modelTranslated = translatedModels[notification.content_type] || notification.content_type; // Default to action if not found
+                    var liClass = "";
+                    var pClass = "";
+                    if (notification.is_read === true )
+                    {
+                      liClass = "opacity-75";
+                      pClass = "text-muted";
+                    }
+                    else {
+                      pClass = "fw-bolder text-dark";
+                    }
+                    var newItem = document.createElement("li");
+                    newItem.className = liClass;
+                    newItem.innerHTML = `<a class="dropdown-item" href="#">
+                            <p class="${ pClass }">${actionTranslated} ${ modelTranslated } <i class="text-primary">(${ notification.object_name })</i></p>
+                            <small class="text-muted d-block"><strong>${ notification.action_by }</strong> ${ notification.timestamp }</small>
+                        </a>`;
+                    notificationDropdown.appendChild(newItem);
+                });
+
+                hasMore = data.has_more;  // Update if more notifications are available
+                loading = false;
+            })
+            .catch(error => {
+                console.error("Error loading more notifications:", error);
+                loading = false;
+            });
+    }
+
+    // Listen for scroll event on the notifications dropdown
+    document.getElementById("notificationItems").addEventListener("scroll", function () {
+        var dropdown = this;
+        if (dropdown.scrollTop + dropdown.clientHeight >= dropdown.scrollHeight - 5) {
+            loadMoreNotifications();  // Load more notifications when reaching the bottom
+        }
+    });
+  {% if request.not_read_notifications_count > 0 %}
+    document.getElementById("read_all_notifications").addEventListener('click', function() {
+        if (confirm('{% trans 'Are you sure you want to read all notifications?' %}')) {
+          fetch("{% url 'read_all_notifications'  %}", {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              alert(data.message);
+              // Option 1: Remove the row from the table
+              //this.closest('tr').remove();
+              // Option 2: Or, reload the page to reflect changes:
+              window.location.reload();
+            } else {
+              alert('Error: ' + data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('{% trans 'An error occurred while read all notifications' %}');
+          });
+        }
+      });
+  {% endif %}
+{% if request.not_deleted_notifications_count > 0 %}
+    document.getElementById("delete_all_notifications").addEventListener('click', function() {
+        if (confirm('{% trans 'Are you sure you want to delete all notifications?' %}')) {
+          fetch("{% url 'delete_all_notifications'  %}", {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              alert(data.message);
+              // Option 1: Remove the row from the table
+              //this.closest('tr').remove();
+              // Option 2: Or, reload the page to reflect changes:
+              window.location.reload();
+            } else {
+              alert('Error: ' + data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('{% trans 'An error occurred while delete all notifications' %}');
+          });
+        }
+      });
+  {% endif %}
 </script>
+
 </body>
 </html>

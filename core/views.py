@@ -1,6 +1,10 @@
 import calendar
 from datetime import date
 from datetime import datetime, timedelta
+
+from django.core.paginator import Paginator
+from django.http import JsonResponse
+from django.utils.translation import gettext as _
 from accounts.models import User
 from django.db.models import Q
 import django_filters.rest_framework
@@ -51,6 +55,11 @@ from django.views.decorators.vary import vary_on_cookie
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
+from django.shortcuts import redirect
+from django.utils.translation import activate
+from django.urls import translate_url
+import re
+
 
 def index(request):
 
@@ -62,7 +71,7 @@ def setCache(key,query):
         result = cache_data
     else:
         result = query
-        cache.set(key, result, timeout=600)
+        cache.set(key, result, timeout=None)
     return result
 
 
@@ -106,10 +115,94 @@ def myhome(request):
     return render(request, 'index.html', context=context)
 
 
+@login_required
+def set_language(request):
+    if request.method == "POST":
+        language = request.POST.get("language")
+
+        if language:
+            request.session["django_language"] = language  # Store in session
+            activate(language)  # Apply new language
+
+            # Update user's language preference
+            if request.user.is_authenticated:
+                request.user.language = language
+                request.user.save()
+
+            # Get current request URL
+            old_url = request.META.get("HTTP_REFERER", "/")
+            print(f'old_url: {old_url}')
+
+            # Try using translate_url first
+            new_url = translate_url(old_url, language)
+
+            # If translate_url fails, manually replace language prefix while keeping full path
+            if not new_url or new_url == old_url:
+                match = re.match(r'http://[^/]+/(en|ar)(/.*)?$', old_url)  # Detect language prefix
+                if match:
+                    new_url = f'/{language}{match.group(2) or "/"}'  # Replace prefix & keep path
+                else:
+                    new_url = f'/{language}/'  # Default to root with language
+
+            print(f'language: {language}')
+            print(f'new_url: {new_url}')
+            return redirect(new_url)
+
+    return redirect(request.META.get("HTTP_REFERER", "/"))  # Fallback redirect
+
 @never_cache
 @login_required
 def about(request):
     return render(request, 'about.html')
+
+
+def load_more_notifications(request):
+    """Load more notifications via AJAX for infinite scroll."""
+    page = int(request.GET.get("page", 1))  # Get current page number
+    per_page = 10  # Number of notifications per page
+
+    notifications = Notification.objects.filter(user=request.user).order_by("-action_at")
+    paginator = Paginator(notifications, per_page)
+
+    if page > paginator.num_pages:
+        return JsonResponse({"notifications": [], "has_more": False})
+
+    notification_list = [
+        {
+            "id": notification.id,
+            "action":"أنشأ" if notification.action =="create" else "حدث" if notification.action == "edit" else "حذف",
+            "action_by": notification.action_by.username if notification.action_by else "System",
+            "object_name": notification.object_name[0:20],
+            "content_type": notification.content_type.model,
+            "timestamp": notification.action_at.strftime("%Y-%m-%d %H:%M"),
+            "is_read":notification.is_read,
+        }
+        for notification in paginator.page(page).object_list
+    ]
+
+    return JsonResponse({"notifications": notification_list, "has_more": page < paginator.num_pages})
+
+def read_all_notifications(request):
+    user = request.user
+    Notification.objects.filter(user=user).order_by("-action_at").update(is_read=True)
+    return JsonResponse({'success': True, 'message': 'All Notification has been read successfully.'},status=200)
+
+def read_notification(request, notification_id):
+    notification = get_object_or_404(Notification, pk=notification_id)
+    notification.is_read = True
+    notification.save()
+    return JsonResponse({'success': True, 'message': 'Notification has been read successfully.'},status=200)
+
+def delete_all_notifications(request):
+    user = request.user
+    Notification.objects.filter(user=user).order_by("-action_at").update(is_deleted=True)
+    return JsonResponse({'success': True, 'message': 'All Notification has been deleted successfully.'},status=200)
+
+def delete_notification(request, notification_id):
+    notification = get_object_or_404(Notification, pk=notification_id)
+    notification.is_deleted = True
+    notification.save()
+    return JsonResponse({'success': True, 'message': 'Notification has been deleted successfully.'},status=200)
 
 
 def notifications(request):
@@ -233,7 +326,7 @@ class commentsViewSet(viewsets.ModelViewSet):
             queryset = cached_queryset
         else:
             queryset = comments.objects.all().order_by('-id').filter(is_deleted=False)
-            cache.set(cache_key,queryset,timeout=600)
+            cache.set(cache_key,queryset,timeout=None)
         return queryset
 
 class repliesViewSet(viewsets.ModelViewSet):
@@ -280,7 +373,7 @@ class repliesViewSet(viewsets.ModelViewSet):
             queryset = cached_queryset
         else:
             queryset = replies.objects.all().order_by('-created_at').filter(is_deleted=False)
-            cache.set(cache_key, queryset, timeout=600)
+            cache.set(cache_key, queryset, timeout=None)
         return queryset
     
 
@@ -348,7 +441,7 @@ class contractsViewSet(viewsets.ModelViewSet):
             queryset = cached_queryset
         else:
             queryset = contracts.objects.filter(is_deleted=False).order_by('-created_by')
-            cache.set(cache_key, queryset, timeout=600)
+            cache.set(cache_key, queryset, timeout=None)
         current_user = self.request.user
         if current_user.is_contract_manager or current_user.is_superuser or current_user.is_manager:
             queryset = queryset
@@ -475,7 +568,7 @@ class documentsViewSet(viewsets.ModelViewSet):
             queryset = cached_queryset
         else:
             queryset = documents.objects.all().order_by('-created_by').filter(is_deleted=False)
-            cache.set(cache_key, queryset, timeout=600)
+            cache.set(cache_key, queryset, timeout=None)
         return queryset
 
 class eventsViewSet(viewsets.ReadOnlyModelViewSet):
@@ -715,7 +808,7 @@ class APIPathView_old(rest_framework_generics.RetrieveUpdateDestroyAPIView):
             parent_node = cached_queryset
         else:
             parent_node = Path.objects.get(id=parent_id)
-            cache.set(cache_key, parent_node, timeout=600)
+            cache.set(cache_key, parent_node, timeout=None)
         # Filter the children nodes of the parent node created by the current user
         current_user = self.request.user
         children = parent_node.get_children()
@@ -732,7 +825,7 @@ class APIPathView_old(rest_framework_generics.RetrieveUpdateDestroyAPIView):
                 cases = cases_cached_queryset
             else:
                 cases = LitigationCases.objects.filter(filter_query).distinct()
-                cache.set(cache_key, cases, timeout=600)
+                cache.set(cache_key, cases, timeout=None)
 
             admins_cache_key = f"admins_{filter_query}"
             admins_cached_queryset = cache.get(admins_cache_key)
@@ -740,7 +833,7 @@ class APIPathView_old(rest_framework_generics.RetrieveUpdateDestroyAPIView):
                 admins = admins_cache_key
             else:
                 admins = AdministrativeInvestigation.objects.filter(filter_query).distinct()
-                cache.set(admins_cache_key, admins, timeout=600)
+                cache.set(admins_cache_key, admins, timeout=None)
             notations = Notation.objects.filter(filter_query).distinct()
             folders = Folder.objects.filter(filter_query).distinct()
             cases_ids = cases.values_list('id', flat=True)
@@ -779,7 +872,7 @@ class APIPathView(rest_framework_generics.RetrieveUpdateDestroyAPIView):
 
         if parent_node is None:
             parent_node = Path.objects.select_related("parent").get(id=path_id)
-            cache.set(cache_key, parent_node, timeout=600)
+            cache.set(cache_key, parent_node, timeout=None)
 
         current_user = self.request.user
         children_cache_key = f"path_{path_id}_children_{current_user.id}"
@@ -795,7 +888,7 @@ class APIPathView(rest_framework_generics.RetrieveUpdateDestroyAPIView):
                 children_query = children_query.filter(child_filter_query).distinct()
 
             cached_children = children_query
-            cache.set(children_cache_key, cached_children, timeout=600)
+            cache.set(children_cache_key, cached_children, timeout=None)
 
         parent_node.filtered_children = cached_children
         return parent_node

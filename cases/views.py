@@ -1,16 +1,15 @@
 import datetime
 import json
-from audioop import reverse
 from datetime import datetime
 from datetime import timedelta
 import django_filters.rest_framework
+from auditlog.models import LogEntry
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count
 from django.db.models import Q
-from django.http import HttpResponseRedirect, HttpResponseForbidden, JsonResponse
+from django.http import  JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
@@ -24,12 +23,11 @@ from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
 from accounts.models import User
-from accounts.models import User
 from cases.permissions import Manager_SuperUser, Manager_SuperUser_Sub_Manager
 from contract.models import Contract
 from core.classes import StandardResultsSetPagination
 from core.classes import dict_item, GetUniqueDictionaries
-from core.models import Notification, priorities
+from core.models import Notification, priorities,Path
 from .forms import CaseForm
 from .models import LitigationCases, stages, case_type, court, client_position, opponent_position, Folder, \
     ImportantDevelopment, Status, AdministrativeInvestigation, Notation, characteristic
@@ -41,7 +39,6 @@ from .serializers import LitigationCasesSerializer, stagesSerializer, case_typeS
 from core.mixins import CSVRendererMixin, CSVRendererMixin2
 from django.utils.dateparse import parse_date
 from django.core.cache import cache
-from core.utils import LegalCache
 from rest_framework.exceptions import NotFound
 from django.core.paginator import Paginator
 from urllib.parse import urlencode
@@ -56,6 +53,16 @@ def manager_superuser_check(request):
         return Response(data={"detail": "انت غير مصرح بالمسح"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
+def get_stages_for_case_type(request):
+    case_type_id = request.GET.get('case_type_id')
+
+    if case_type_id:
+        case_type_obj = get_object_or_404(case_type, id=case_type_id)
+        stage_queryset = case_type_obj.stage.all().values("id", "name")  # Get related stages
+
+        return JsonResponse({"stages": list(stage_queryset)})
+
+    return JsonResponse({"stages": []})
 
 
 @login_required
@@ -63,7 +70,7 @@ def cases_list(request):
     number_of_records = 10
     keywords = stage = assignee = case_type = status = None
     assignees_set = court_set = case_type_set = stage_set = case_status_set = None
-
+    cases_count: int = 0
     if request.method == 'GET':
         # Clear filters and redirect if needed.
         if request.GET.get('clear'):
@@ -116,9 +123,12 @@ def cases_list(request):
         if status and status != '0':
             query &= Q(case_status_id=status)
 
+        cases_list_cache_key = "all_litigation_cases_objects"
+        cases_qs = cache.get(cases_list_cache_key)
         # Get base queryset.
-        cases_qs = LitigationCases.objects.filter(is_deleted=False).order_by('-created_by')
-
+        if cases_qs is None:
+            cases_qs = LitigationCases.objects.filter(is_deleted=False).order_by('-created_by')
+            cache.set(cases_list_cache_key, cases_qs, timeout=None)
         # Retrieve filter dropdown data from cache or compute if not cached.
         cache_key = "litigation_cases_objects"
         cached_data = cache.get(cache_key)
@@ -157,13 +167,14 @@ def cases_list(request):
                 'assignees': assignees_set,
                 'case_status': case_status_set
             }
-            cache.set(cache_key, cached_data, timeout=60 * 60)
+            cache.set(cache_key, cached_data, timeout=None)
 
         # Apply filters.
         cases_qs = cases_qs.filter(query)
     else:
         cases_qs = LitigationCases.objects.filter(is_deleted=False).order_by('-created_by')
-
+    cases_count = cases_qs.count()
+    print(f'{cases_count=}')
     # Set up pagination.
     paginator = Paginator(cases_qs, number_of_records)
     page_number = request.GET.get('page', 1)
@@ -191,6 +202,7 @@ def cases_list(request):
 
     context = {
         'cases': page_obj,
+        'cases_count': cases_count,
         'courts': court_set,
         'types': case_type_set,
         'stages': stage_set,
@@ -203,18 +215,62 @@ def cases_list(request):
     return render(request, 'cases/cases_list.html', context)
 
 
-def case(request, case_id=None):
-    instance = LitigationCases()
+def case_view(request, case_id=None, mode='view'):
+    log = {}
+    field_translations = {}
+    OPERATION_TRANSLATIONS = {}
     if case_id:
         instance = get_object_or_404(LitigationCases, pk=case_id)
-    else:
-        instance = LitigationCases()
+        if request.method == 'POST':
+            if mode == 'edit':  # Allow editing only if mode is 'edit'
+                form = CaseForm(request.POST, instance=instance, mode=mode)
+                if form.is_valid():
+                    instance = form.save(commit=False)  # Don't save yet, update fields first
+                    instance.modified_by = request.user  # ✅ Correctly update modified_by
+                    instance.modified_at = timezone.now()  # ✅ Correctly update modified_at
+                    instance.save()  # Now save the instance with updated fields
+                    return redirect('cases_list')
+            else:
+                form = CaseForm(instance=instance, mode=mode)  # Read-only form
+        else:
+            form = CaseForm(instance=instance, mode=mode)
+            if mode == 'view':
+                OPERATION_TRANSLATIONS = {
+                    'add': _('Add'),
+                    'delete': _('Delete'),
+                }
+                field_translations = {
+                    field.name: _(field.verbose_name)
+                    for field in LitigationCases._meta.fields
+                }
+                field_translations.update({
+                    field.name: _(field.verbose_name)
+                    for field in LitigationCases._meta.many_to_many
+                })
+                log = LogEntry.objects.filter(content_type__model='litigationcases',object_id=instance.pk)
+                for field in form.fields:
+                    form.fields[field].widget.attrs['disabled'] = True  # Disable all fields
 
-    form = CaseForm(request.POST or None, instance=instance)
-    if request.POST and form.is_valid():
-        form.save()
-        return HttpResponseRedirect(reverse('cal:calendar'))
-    return render(request, 'cases/case.html', {'form': form})
+    else:
+        mode = 'create'  # If no `case_id`, it's a new case
+        instance = LitigationCases()
+        form = CaseForm(request.POST or None, instance=instance, mode=mode)
+        if request.method == 'POST' and form.is_valid():
+            instance = form.save(commit=False)  # ✅ Correct way to update before saving
+            instance.created_by = request.user  # ✅ Correctly update created_by
+            instance.created_at = timezone.now()  # ✅ Correctly update created_at
+            instance.save()  # ✅ Now save the instance
+            return redirect('cases_list')
+    print(f'{log[1].changes_dict=}')
+    context = {
+        'form': form,
+        'case': instance,
+        'mode': mode,
+        'logs': log,
+        'field_translations': field_translations,
+        'operation_translations':OPERATION_TRANSLATIONS,
+    }
+    return render(request, 'cases/case.html', context)
 
 
 @require_POST
@@ -230,6 +286,260 @@ def delete_case(request, pk=None):
     instance.modified_by = request.user
     instance.save()
     return JsonResponse({'success': True, 'message': 'Case has been deleted successfully.'},status=200)
+
+
+@login_required
+def notations_list(request):
+    number_of_records = 10
+    keywords = court = priority = assignee = None
+    assignees_set = court_set = priority_set = None
+
+    if request.method == 'GET':
+        # Clear filters and redirect if needed.
+        if request.GET.get('clear'):
+            for key in ['keywords', 'court', 'assignee', 'priority', 'number_of_records']:
+                request.session.pop(key, None)
+            return redirect(request.path)
+
+        # Retrieve filter parameters from GET or session.
+        if 'keywords' in request.GET:
+            keywords = request.GET.get('keywords')
+            request.session['keywords'] = keywords  # Update session even if empty
+        else:
+            keywords = request.session.get('keywords', '')
+        court = request.GET.get('court') or request.session.get('court',0)
+        assignee = request.GET.get('assignee') or request.session.get('assignee',0)
+        priority = request.GET.get('priority') or request.session.get('priority',0)
+
+        # Save parameters to session if provided.
+        for key, value in (('keywords', keywords), ('court', court),
+                           ('priority', priority), ('assignee', assignee)):
+            if value is not None:
+                request.session[key] = value
+
+        # Handle number_of_records.
+        if request.GET.get('number_of_records'):
+            try:
+                number_of_records = int(request.GET.get('number_of_records'))
+            except ValueError:
+                number_of_records = 10
+            request.session['number_of_records'] = number_of_records
+        else:
+            number_of_records = request.session.get('number_of_records', 10)
+
+        # Build search query using Q objects.
+        query = Q()
+        if keywords:
+            query |= Q(subject__icontains=keywords)
+            # Filter out words shorter than 2 characters.
+            # query_words = [w for w in keywords.split() if len(w) >= 2]
+            # for word in query_words:
+
+        if court and court != '0':
+            query &= Q(court_id=court)
+        if priority and priority != '0':
+            query &= Q(priority_id=priority)
+        if assignee and assignee != '0':
+            query &= Q(assignee_id=assignee)
+
+        # Get base queryset.
+        notations_qs = Notation.objects.filter(is_deleted=False).order_by('-created_by')
+
+        # Retrieve filter dropdown data from cache or compute if not cached.
+        cache_key = "notations_objects"
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            court_set = cached_data.get('court')
+            priorities_set = cached_data.get('priorities')
+            assignees_set = cached_data.get('assignees')
+        else:
+            courts = []
+            priorities = []
+            assignees = []
+            for notation in notations_qs:
+                if notation.court:
+                    courts.append(dict_item(notation.court.id, notation.court.name))
+                if notation.priority:
+                    priorities.append(dict_item(notation.priority.id, notation.priority.priority))
+                if notation.assignee:
+                    assignees.append(dict_item(notation.assignee.id, notation.assignee.username))
+            court_set = GetUniqueDictionaries(courts)
+            priorities_set = GetUniqueDictionaries(priorities)
+
+            assignees_set = GetUniqueDictionaries(assignees)
+            cached_data = {
+                'court': court_set,
+                'priorities': priorities_set,
+                'assignees': assignees_set,
+            }
+            cache.set(cache_key, cached_data, timeout=None)
+
+        # Apply filters.
+        notations_qs = notations_qs.filter(query)
+    else:
+        notations_qs = Notation.objects.filter(is_deleted=False).order_by('-created_by')
+
+    # Set up pagination.
+    paginator = Paginator(notations_qs, number_of_records)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    page_range = paginator.get_elided_page_range(number=page_number, on_each_side=2, on_ends=2)
+
+    # Prepare session info for the template.
+    session_info = {
+        'number_of_records': number_of_records or 10,
+        'keywords': keywords or '',
+        'court': court or 0,
+        'priority': priority or 0,
+        'assignee': assignee or 0,
+    }
+
+    # Build a filter query string to be used in pagination links.
+    # Only include filter keys (exclude 'page').
+    filter_params = {}
+    for key in ['keywords', 'court', 'assignee', 'priority', 'number_of_records']:
+        value = request.session.get(key)
+        if value:
+            filter_params[key] = value
+    filter_query = urlencode(filter_params)
+    context = {
+        'notations': page_obj,
+        'courts': court_set,
+        'prorities': priorities_set ,
+        'assignees': assignees_set,
+        'page_range': page_range,
+        'session': json.dumps(session_info),
+        'filter_query': filter_query,  # New variable for pagination links.
+    }
+    return render(request, 'cases/notations_list.html', context)
+
+@require_POST
+def delete_notation(request, pk=None):
+    instance = Notation.objects.get(pk=pk)
+    if not (request.user.is_manager or request.user.is_superuser):
+        return JsonResponse({'success': False, 'message':"You do not have permission to perform this action."},status=401)
+    instance = get_object_or_404(Notation, pk=pk)
+    instance.is_deleted = True
+    instance.modified = timezone.now()
+    # Assuming you have a field to record the modifying user:
+    instance.modified_by = request.user
+    instance.save()
+    return JsonResponse({'success': True, 'message': 'Notation has been deleted successfully.'},status=200)
+
+
+@login_required
+def AdministrativeInvestigations_list(request):
+    number_of_records = 10
+    keywords = priority = None
+    priority_set = None
+
+    if request.method == 'GET':
+        # Clear filters and redirect if needed.
+        if request.GET.get('clear'):
+            for key in ['keywords', 'priority', 'number_of_records']:
+                request.session.pop(key, None)
+            return redirect(request.path)
+
+        # Retrieve filter parameters from GET or session.
+        if 'keywords' in request.GET:
+            keywords = request.GET.get('keywords')
+            request.session['keywords'] = keywords  # Update session even if empty
+        else:
+            keywords = request.session.get('keywords', '')
+        priority = request.GET.get('priority') or request.session.get('priority',0)
+
+        # Save parameters to session if provided.
+        for key, value in (('keywords', keywords), ('priority', priority)) :
+            if value is not None:
+                request.session[key] = value
+
+        # Handle number_of_records.
+        if request.GET.get('number_of_records'):
+            try:
+                number_of_records = int(request.GET.get('number_of_records'))
+            except ValueError:
+                number_of_records = 10
+            request.session['number_of_records'] = number_of_records
+        else:
+            number_of_records = request.session.get('number_of_records', 10)
+
+        # Build search query using Q objects.
+        query = Q()
+        if keywords:
+            query |= Q(subject__icontains=keywords)
+            # Filter out words shorter than 2 characters.
+            # query_words = [w for w in keywords.split() if len(w) >= 2]
+            # for word in query_words:
+        if priority and priority != '0':
+            query &= Q(priority_id=priority)
+
+        # Get base queryset.
+        AdministrativeInvestigations_qs = AdministrativeInvestigation.objects.filter(is_deleted=False).order_by('-created_by')
+
+        # Retrieve filter dropdown data from cache or compute if not cached.
+        cache_key = "AdministrativeInvestigations_objects"
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            priorities_set = cached_data.get('priorities')
+        else:
+            priorities = []
+            for Administrative_Investigation in AdministrativeInvestigations_qs:
+                if Administrative_Investigation.priority:
+                    priorities.append(dict_item(Administrative_Investigation.priority.id, Administrative_Investigation.priority.priority))
+            priorities_set = GetUniqueDictionaries(priorities)
+            cached_data = {
+                'priorities': priorities_set,
+            }
+            cache.set(cache_key, cached_data, timeout=None)
+
+        # Apply filters.
+        AdministrativeInvestigations_qs = AdministrativeInvestigations_qs.filter(query)
+    else:
+        AdministrativeInvestigations_qs = AdministrativeInvestigation.objects.filter(is_deleted=False).order_by('-created_by')
+
+    # Set up pagination.
+    paginator = Paginator(AdministrativeInvestigations_qs, number_of_records)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    page_range = paginator.get_elided_page_range(number=page_number, on_each_side=2, on_ends=2)
+
+    # Prepare session info for the template.
+    session_info = {
+        'number_of_records': number_of_records or 10,
+        'keywords': keywords or '',
+        'priority': priority or 0,
+    }
+
+    # Build a filter query string to be used in pagination links.
+    # Only include filter keys (exclude 'page').
+    filter_params = {}
+    for key in ['keywords', 'priority', 'number_of_records']:
+        value = request.session.get(key)
+        if value:
+            filter_params[key] = value
+    filter_query = urlencode(filter_params)
+    context = {
+        'AdministrativeInvestigations': page_obj,
+        'prorities': priorities_set ,
+        'page_range': page_range,
+        'session': json.dumps(session_info),
+        'filter_query': filter_query,  # New variable for pagination links.
+    }
+    return render(request, 'cases/AdministrativeInvestigations_list.html', context)
+
+@require_POST
+def delete_AdministrativeInvestigation(request, pk=None):
+    instance = AdministrativeInvestigation.objects.get(pk=pk)
+    if not (request.user.is_manager or request.user.is_superuser):
+        return JsonResponse({'success': False, 'message':"You do not have permission to perform this action."},status=401)
+    instance = get_object_or_404(AdministrativeInvestigation, pk=pk)
+    instance.is_deleted = True
+    instance.modified = timezone.now()
+    # Assuming you have a field to record the modifying user:
+    instance.modified_by = request.user
+    instance.save()
+    return JsonResponse({'success': True, 'message': f'{_("Administrative Investigation")} {_("has been deleted successfully.")}'},status=200)
+
 
 
 def filter_cases(queryset, created_at_after=None, created_at_before=None, assignee_id=None):
@@ -625,7 +935,7 @@ class LitigationCasesViewSet(CSVRendererMixin2, viewsets.ModelViewSet):
             case_type_set = GetUniqueDictionaries(case_type)
             assignees_set = GetUniqueDictionaries(assignees)
             data={'Stage': Stage_set, 'court': court_set, 'case_type': case_type_set,'assignees': assignees_set}
-            cache.set(cache_key, data, timeout=600)
+            cache.set(cache_key, data, timeout=None)
         return Response(status=status.HTTP_200_OK,data=data)
 
     @action(methods=['get'], detail=False, serializer_class=CombinedStatisticsSerializer)

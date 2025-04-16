@@ -1,4 +1,7 @@
 import pghistory
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+import json
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
@@ -16,6 +19,7 @@ from .events import (
 from .model_mixins import ExtraDataModelMixin, HooksModelMixin
 from auditlog.models import LogEntry as OriginalLogEntry
 from django.contrib.admin.utils import flatten_fieldsets
+
 
 class priorities(models.Model):
     id = models.AutoField(primary_key=True, )
@@ -311,8 +315,19 @@ class NotificationManager(models.Manager):
 
 
 
-
 class Notification(models.Model):
+
+    CREATE = 0
+    UPDATE = 1
+    DELETE = 2
+    ACCESS = 3
+
+    choices = (
+        (CREATE, _("create")),
+        (UPDATE, _("update")),
+        (DELETE, _("delete")),
+        (ACCESS, _("access")),
+    )
     id = models.AutoField(primary_key=True, )
     action_at = models.DateTimeField(auto_now_add=True)
     action_by = models.ForeignKey(
@@ -330,7 +345,7 @@ class Notification(models.Model):
                             max_length=20, blank=True, null=True)
     created_by = models.ForeignKey(
         User, related_name='%(class)s_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
-    action = models.CharField(verbose_name="Action", max_length=20)
+    action = models.CharField(verbose_name="Action", max_length=20,choices=choices)
     is_deleted = models.BooleanField(
         default=False, verbose_name=_("Is Deleted"))
     is_read = models.BooleanField(verbose_name="Read Status", default=False)
@@ -344,9 +359,36 @@ class Notification(models.Model):
     def __unicode__(self):
         return self.status
 
+    def mark_as_read(self):
+        self.is_read = True
+        self.save()
+
     class Meta:
         verbose_name = _('Notification')
         verbose_name_plural = _('Notifications')
+        ordering = ['-action_at']
+
+    def send_notification(self):
+        """Send notification event to WebSocket consumers."""
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f"notifications_{self.user.id}",  # Send notification to the user's WebSocket group
+            {
+                "type": "send_notification",
+                "message": json.dumps({
+                    "id": self.id,
+                    "content_type": self.content_type.name,
+                    "action": self.action,
+                    "action_by": self.action_by.username if self.action_by else "System",
+                    "object_name": self.object_name,
+                    "timestamp": self.action_at.strftime("%Y-%m-%d %H:%M"),
+                }),
+            },
+        )
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.send_notification()  # Send WebSocket event after saving
 
 
 #

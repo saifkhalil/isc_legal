@@ -1,0 +1,109 @@
+{% load i18n %}
+{% load static %}
+{% load file_filters %}
+{% load humanize %}
+<div class="modal fade modal-lg" id="CaseHistory" tabindex="-1" aria-labelledby="CaseHistory" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="CaseHistory">{% trans 'Case History' %}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="panel-inner-container text-sm flex justify-between items-center flex-col gap-5 sm:flex-row sm:gap-0 text-right">
+            <div class="created-info flex justify-center flex-col gap-3">
+              <div>
+                <span>{% trans 'Created by' %}: </span>
+                <span class="mx-2 fw-bold">{{ case.created_by.username }}</span>
+              </div>
+              <div>
+                <span>{% trans 'Created at' %}: </span>
+                <span class="mx-2 fw-bold">{{ case.created_at|date:"Y-m-d h:i a" }}</span>
+              </div>
+            </div>
+            <div class="created-info flex justify-center flex-col gap-3">
+              <div>
+                <span>{% trans 'Modified by' %}: </span>
+                <span class="mx-2 fw-bold">{{ case.modified_by.username }}</span>
+              </div>
+              <div>
+                <span>{% trans 'Modified at' %}: </span>
+                <span class="mx-2 fw-bold">{{ case.modified_at|date:"Y-m-d h:i a" }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row p-3">
+        <p class="pb-3"><strong>{% trans 'Case History List' %}</strong> <span>({% trans 'sorted from newest to oldest' %})</span></p>
+        <div class="edits-list overflow-auto develop-scroll" style="height: 50vh;">
+          {% for log in logs %}
+          <div data-show="true" class="ant-alert ant-alert-success ant-alert-no-icon" role="alert" style="margin-bottom: 10px;">
+            <div class="ant-alert-content"><div class="ant-alert-message">
+              <div class="w-full">
+                <div class="breif">
+                <div class="flex items-start justify-between">
+                  <div class="flex items-center gap-1 flex-wrap" style="flex: 5 1 0%;">
+                    <span>{{ log.get_action_display }}</span>
+                    <span class="font-bold fw-bold">{{ log.actor.username }}</span>
+                  {% if log.action != 0 %}
+                      <span>{% if log.changes|length > 1 %}{% trans 'fields' %}{% else %}{% trans 'field' %}{% endif %}</span>
+                      <span>
+                      {% for change in log.changes %}
+                        {% with field_translations|dict_get:change as translated_name %}
+                        {{ translated_name|default:change }}
+                        {% endwith %}
+                      {% endfor %}
+                    <button data-bs-toggle="collapse" class="underline cursor-pointer text-xs text-green-600" data-bs-target="#log_{{ log.id }}" aria-expanded="false" aria-controls="log_{{ log.id }}" style="cursor: pointer;">{% trans 'See more' %}</button>
+                  {% else %}
+                    <span>{% trans 'Litigation Case' %}</span>
+                    <button data-bs-toggle="collapse" class="underline cursor-pointer text-xs text-green-600" data-bs-target="#log_{{ log.id }}" aria-expanded="false" aria-controls="log_{{ log.id }}" style="cursor: pointer;">{% trans 'See more' %}</button>
+                  {% endif %}
+                  </div>
+                  <div class="text-qibackground text-xs text-right" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ log.timestamp|date:"Y-m-d h:i:s a" }}">{{ log.timestamp|naturaltime }}</div>
+                </div>
+              </div>
+              </div>
+            <div class="row">
+                  <ul class="collapse" id="log_{{ log.id }}" >
+                  {% for field, value in log.changes_dict.items %}
+                    {% if field not in 'id,start_time,event,is_deleted,created_at' %}
+                   <li>
+                      <span>
+                        {% with field_translations|dict_get:field as translated_name %}
+                        <i class="bi bi-dot"></i> {{ translated_name|default:field }} :
+                        {% endwith %}
+                         {% if log.action != 0 %}
+                        {% if value.type == 'm2m' %}
+                          <strong>{{ value.objects|join:" " }}</strong>
+                        {% else %}
+                          {% trans 'from' %}
+                          {% for val in value %}
+                            {% if val != 'None' %}
+                              <strong>{{ val }}</strong>
+                            {% else %}
+                              <strong>" "</strong>
+                            {% endif %}
+                            {% if not forloop.last %} {% trans 'to' %} {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                          {% else %}
+                           <span><strong>{{ value|last }}</strong></span>
+                      {% endif %}
+                      </span>
+                    </li>
+                    {% endif %}
+                      {% endfor %}
+                  </ul>
+                  </div>
+            </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+</div>

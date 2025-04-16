@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
     'django.contrib.sites',
     'django.contrib.admindocs',
+    'django.contrib.humanize',
     'mptt',
     'rest_framework_swagger',
     'rest_framework',
@@ -95,6 +96,8 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'django_extensions',
+    'django_bootstrap5',
+    'django_select2',
     'pghistory',
     'pgtrigger',
     'dbbackup',
@@ -118,7 +121,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 'drf_api_logger.middleware.api_logger_middleware.APILoggerMiddleware',
     'core.middleware.AuditlogMiddleware',
-    'django.contrib.admindocs.middleware.XViewMiddleware'
+    'django.contrib.admindocs.middleware.XViewMiddleware',
+    'core.middleware.NotificationMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -254,8 +258,15 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         'LOCATION': 'redis://127.0.0.1:6379/1',  # Replace with your Redis server address
 
+    },
+    "select2": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
     }
 }
+
+SELECT2_CACHE_BACKEND = "select2"
+
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'ISC Legal App',
@@ -432,14 +443,14 @@ DJOSER = {
 }
 
 
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels_redis.core.RedisChannelLayer",
-#         "CONFIG": {
-#             "hosts": [("localhost", 6379)],
-#         },
-#     },
-# }
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
 
 MPTT_DEFAULT_LEVEL_INDICATOR = "---"
 DEFAULT_LEVEL_INDICATOR = "---"
@@ -593,3 +604,13 @@ HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10  # Adjust as needed
 #
 #     },
 # }
+
+BOOTSTRAP5 = {
+'server_side_validation': True,
+"layout":"floating"
+}
+
+SELECT2_CSS = [
+    '/static/css/select2.min.css',
+    '/static/css/select2-bootstrap-5-theme.min.css',
+]

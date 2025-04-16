@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+{% load static %}
+
+<div class="card shadow-sm m-5 mb-3 mt-3 " {% if user.enable_transision %}  data-aos="zoom-in" {% endif %}>
+  <div class="card-body">
+    <form method="GET">
+      <div class="row g-3">
+        <div class="col-md">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="keywords" name="keywords" placeholder="Search keywords">
+            <label for="keywords">{% trans 'Search keywords' %}</label>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="form-floating">
+            <select class="form-select" id="hearing_case" name="hearing_case" onchange="javascript:this.form.submit()">
+              <option value='0'>{% trans 'All' %}</option>
+              {% for case in hearing_cases %}
+                <option value="{{ case.id }}">{{ case.name }}</option>
+              {% endfor %}
+            </select>
+            <label for="hearing_case">{% trans 'Cases' %}</label>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="form-floating">
+            <select class="form-select" name="hearing_status" id="hearing_status" onchange="javascript:this.form.submit()">
+              <option value='0'>{% trans 'All' %}</option>
+              {% for hearing_status in hearing_statuses %}
+                <option value="{{ hearing_status.id }}">{{ hearing_status.name }}</option>
+              {% endfor %}
+            </select>
+            <label for="hearing_status">{% trans 'Status' %}</label>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="form-floating">
+            <select class="form-select" name="assignee" id="assignee" onchange="javascript:this.form.submit()">
+              <option value='0'>{% trans 'All' %}</option>
+              {% for assign in assignees %}
+                <option value="{{ assign.id }}">{{ assign.name }}</option>
+              {% endfor %}
+            </select>
+            <label for="assignee">{% trans 'Assignee' %}</label>
+          </div>
+      </div>
+        <div class="col-md">
+              <div class="form-floating">
+                <select class="form-control" placeholder="Number of records" id="number_of_records" onchange="javascript:this.form.submit()"
+                  name="number_of_records" aria-label="priority">
+                  <option value='10'>{% trans '10 records' %}</option>
+                  <option value='25'>{% trans '25 records' %}</option>
+                  <option value='50'>{% trans '50 records' %}</option>
+                </select>
+                <label for="id" class="form-label">{% trans 'Number of records' %}</label>
+              </div>
+            </div>
+          <div class="col-md mt-4 text-center">
+            <div class="start-50">
+              <button type="submit" name="search" value="search" class="btn btn-warning"><i class="bi bi-search"></i> {% trans 'Search' %}</button>
+            <button type="submit" name="clear" value="clear" class="btn btn-danger text-dark"><i class="bi bi-x-circle-fill"></i> {% trans 'Clear' %}</button>
+            </div>
+
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="row px-5 pb-3">
+  <div class="col">
+    <a role="button" class="btn btn-primary pulse-primary" href="{% url 'hearings_list' %}" {% if user.enable_transision %}  data-aos="zoom-in" {% endif %}><i class="bi bi-file-earmark-plus"></i> {% trans 'New hearing' %}</a>
+  </div>
+</div>
+  <section class="px-5 pb-5" >
+    <table class="table {% if hearings|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
+    <thead {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
+        <tr class="bg-gray-100">
+          <td class="pt-3 pb-3 text-bold">{% trans 'Number' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Name' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Status' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Assignee' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Created At' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Court' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Related Case' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Actions' %}</td>
+        </tr>
+    </thead>
+    <tbody>
+      {% for hearing in hearings %}
+        <tr class="bg-white"  {% if user.enable_transision %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
+          <td class="pt-2 pb-2">{{ hearing.id }}</td>
+          <td class="pt-2 pb-2" data-toggle="tooltip" data-placement="top" title="{{ hearing.name|default:''}}"><a href="{% url 'hearing_view' hearing.id %}">{{ hearing.name|truncatechars:40 }}</a> </td>
+          <td class="pt-2 pb-2"><button class="cursor-default btn btn-sm btn-{% if hearing.hearing_status.id == 1 %}light{% elif hearing.hearing_status.id == 2 %}warning text-dark{% elif hearing.hearing_status.id == 3 or hearing.hearing_status.id == 5 or hearing.hearing_status.id == 6 %}danger{% elif hearing.hearing_status.id == 4 or hearing.hearing_status.id == 7 %}success{% else %}light text-dark{% endif %}">
+            <span style="width:24px" class="{% if hearing.hearing_status.id == 1 %}bi bi-asterisk{% elif hearing.hearing_status.id == 2 %}fas fa-spinner fa-spin{% elif hearing.hearing_status.id == 3 or hearing.hearing_status.id == 5 or hearing.hearing_status.id == 6 %}bi bi-x-circle{% elif hearing.hearing_status.id == 4 or hearing.hearing_status.id == 7 %}bi bi-check2-all{% else %}bi bi-x-circle{% endif %}" role="status" aria-hidden="true"></span>
+            {{ hearing.hearing_status|default:'' }}</button></td>
+          <td class="pt-2 pb-2">{% for assignee in hearing.assignee.all %}<span class="bg-light border border-light-subtle rounded-2">{{ assignee.username|default:'' }} </span>  {% endfor %}</td>
+          <td class="pt-2 pb-2">{{ hearing.created_at|date:"Y-m-d" }}</td>
+          <td class="pt-2 pb-2" data-toggle="tooltip" data-placement="top" title="{{ hearing.court|default:'' }}">{{ hearing.court|default:''|truncatechars:40 }}</td>
+          <td class="pt-2 pb-2">{% for case in hearing.cases.all %}<a href="#"  class="icon-link icon-link-hover"> {{ case|default:''|truncatechars:40 }}</a>{% endfor %}</td>
+          <td class="pt-2 pb-2">
+              {% if user.is_manager or user.is_superuser %}
+                  <button class="btn btn-sm btn-danger delete-hearing" data-hearing-id="{{ hearing.id }}"><i class="bi bi-trash3-fill"></i></button>
+              {% else %}
+                  <button class="btn btn-sm btn-danger" disabled>{% trans 'Delete' %}</button>
+              {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+                <tr>
+          <td class="pt-5 pb-0 text-center fs-2 border-bottom-0" colspan="13"><i class="bi bi-inbox-fill"></i></td>
+        </tr>
+        <tr>
+        <td class="pt-0 pb-5 text-center" colspan="13">{% trans 'No data available in table' %}</td>
+        </tr>
+      {% endfor %}
+      <tbody>
+      </table>
+          <!-- Start of Pagination -->
+    <nav aria-label="Page navigation shadow-sm">
+<ul class="pagination justify-content-center flex-wrap">
+{% if hearings.has_previous %}
+  <li class="page-item">
+    <a class="btn btn-light" href="?{{ filter_query }}&page={{ hearings.previous_page_number }}">{% trans 'Previous' %}</a>
+  </li>
+{% else %}
+  <li class="page-item disabled">
+    <button class="btn btn-light " disabled aria-disabled="true">{% trans 'Previous' %}</button>
+  </li>
+{% endif %}
+
+{% for i in page_range %}
+  {% if hearings.number == i %}
+    <li class="page-item active">
+      <span class="btn btn-secondary">{{ i }} <span class="visually-hidden">{% trans 'current' %}</span></span>
+    </li>
+  {% else %}
+    {% if i == hearings.paginator.ELLIPSIS %}
+      <button class="page-item disabled" aria-disabled="true"><span class="btn btn-light">{{ i }}</span></button>
+    {% else %}
+      <li class="page-item">
+        <a class="btn btn-light" href="?{{ filter_query }}&page={{ i }}">{{ i }}</a>
+      </li>
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+{% if hearings.has_next %}
+  <li class="page-item">
+    <a class="btn btn-light" href="?{{ filter_query }}&page={{ hearings.next_page_number }}">{% trans 'Next' %}</a>
+  </li>
+{% else %}
+  <li class="page-item disabled">
+    <button class="btn btn-light " disabled aria-disabled="true">{% trans 'Next' %}</button>
+  </li>
+{% endif %}
+</ul>
+</nav>
+
+      <!-- End of Pagination -->
+
+</section>
+<script type="text/javascript">
+  var sessionData = JSON.parse('{{ session | escapejs }}');
+  window.addEventListener('load', function () {
+    if (sessionData.number_of_records !== undefined) {
+      document.getElementById('number_of_records').value = sessionData.number_of_records;
+    }
+    else {
+       document.getElementById('number_of_records').value = 10
+    }
+    if (sessionData.keywords !== undefined) {
+      document.getElementById('keywords').value = sessionData.keywords;
+    }
+    else{
+      document.getElementById('keywords').value = '';
+    }
+    if (sessionData.hearing_case !== undefined) {
+      document.getElementById('hearing_case').value = sessionData.hearing_case;
+    }
+    else {
+      document.getElementById('hearing_case').value = 0;
+    }
+    if (sessionData.hearing_status !== undefined) {
+      document.getElementById('hearing_status').value = sessionData.hearing_status;
+    }
+    else {
+      document.getElementById('hearing_status').value = 0;
+    }
+    // Optionally handle additional keys:
+    if (sessionData.assignee !== undefined) {
+      document.getElementById('assignee').value = sessionData.assignee;
+    }
+    else {
+      document.getElementById('assignee').value = 0;
+    }
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+  return new bootstrap.Popover(popoverTriggerEl, {html : true,trigger : 'hover click'})
+})
+  });
+</script>
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-hearing').forEach(function(button) {
+      button.addEventListener('click', function() {
+        const hearingId = this.getAttribute('data-hearing-id');
+        if (confirm('{% trans 'Are you sure you want to delete?' %}')) {
+          fetch("{% url 'delete_hearing' 0 %}".replace("0", hearingId), {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              alert(data.message);
+              // Option 1: Remove the row from the table
+              this.closest('tr').remove();
+              // Option 2: Or, reload the page to reflect changes:
+              // window.location.reload();
+            } else {
+              alert('Error: ' + data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('{% trans 'An error occurred while deleting.' %}');
+          });
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

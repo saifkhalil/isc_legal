@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+{% load static %}
+
+<div class="card shadow-sm m-5 mb-3 mt-3 " {% if user.enable_transision %}  data-aos="zoom-in" {% endif %}>
+  <div class="card-body">
+    <form method="GET">
+      <div class="row g-3">
+        <div class="col-md">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="keywords" name="keywords" placeholder="Search keywords">
+            <label for="keywords">{% trans 'Search keywords' %}</label>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="form-floating">
+            <select class="form-select" id="type" name="type" onchange="javascript:this.form.submit()">
+              <option value='0'>{% trans 'All' %}</option>
+              {% for type in types %}
+                <option value="{{ type.id }}">{{ type.name }}</option>
+              {% endfor %}
+            </select>
+            <label for="type">{% trans 'Type' %}</label>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="form-floating">
+            <select class="form-select" name="assignee" id="assignee" onchange="javascript:this.form.submit()">
+              <option value='0'>{% trans 'All' %}</option>
+              {% for assignee in assignees %}
+                <option value="{{ assignee.id }}">{{ assignee.name }}</option>
+              {% endfor %}
+            </select>
+            <label for="assignee">{% trans 'Assignee' %}</label>
+          </div>
+        </div>
+      <div class="col-md">
+        <div class="form-floating">
+            <select class="form-select" name="company" id="company" onchange="javascript:this.form.submit()">
+              <option value='0'>{% trans 'All' %}</option>
+              {% for company in companies %}
+                <option value="{{ company.name }}">{{ company.name }}</option>
+              {% endfor %}
+            </select>
+            <label for="company">{% trans 'Company' %}</label>
+          </div>
+      </div>
+        <div class="col-md">
+          <div class="form-floating">
+            <select class="form-select" name="out_side_iraq" id="out_side_iraq" onchange="javascript:this.form.submit()">
+              <option value='0'>{% trans 'All' %}</option>
+              <option value='International'>{% trans 'International' %}</option>
+              <option value='Domestic'>{% trans 'Domestic' %}</option>
+            </select>
+            <label for="out_side_iraq">{% trans 'Contract Type' %}</label>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="form-floating">
+            <select class="form-select" name="auto_renewal" id="auto_renewal" onchange="javascript:this.form.submit()">
+              <option value='0'>{% trans 'All' %}</option>
+              <option value='True'>{% trans 'Yes' %}</option>
+              <option value='False'>{% trans 'No' %}</option>
+            </select>
+            <label for="auto_renewal">{% trans 'Auto Renewal' %}</label>
+          </div>
+        </div>
+
+        <div class="col-md">
+              <div class="form-floating">
+                <select class="form-control" placeholder="Number of records" id="number_of_records" onchange="javascript:this.form.submit()"
+                  name="number_of_records" aria-label="priority">
+                  <option value='10'>{% trans '10 records' %}</option>
+                  <option value='25'>{% trans '25 records' %}</option>
+                  <option value='50'>{% trans '50 records' %}</option>
+                </select>
+                <label for="id" class="form-label">{% trans 'Number of records' %}</label>
+              </div>
+            </div>
+          <div class="col-md mt-4 text-center">
+            <div class="start-50">
+              <button type="submit" name="search" value="search" class="btn btn-warning"><i class="bi bi-search"></i> {% trans 'Search' %}</button>
+            <button type="submit" name="clear" value="clear" class="btn btn-danger text-dark"><i class="bi bi-x-circle-fill"></i> {% trans 'Clear' %}</button>
+            </div>
+
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="row px-5 pb-3">
+  <div class="col">
+    <a role="button" class="btn btn-primary pulse-primary" href="{% url 'contracts_list' %}" {% if user.enable_transision %}  data-aos="zoom-in" {% endif %}><i class="bi bi-file-earmark-plus"></i> {% trans 'New contract' %}</a>
+  </div>
+</div>
+  <section class="px-5 pb-5" >
+    <table class="table {% if contracts|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
+    <thead {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
+        <tr class="bg-gray-100">
+          <td class="pt-3 pb-3 text-bold">{% trans 'Number' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Name' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Type' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Company' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Auto Renewal' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'First Party' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Second Party' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Contract Type' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Assignee' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Created At' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Actions' %}</td>
+        </tr>
+    </thead>
+    <tbody>
+      {% if contracts|length <= 0 %}
+        <tr>
+          <td class="pt-5 pb-0 text-center fs-2" colspan="13" style="border-bottom-width:0px"><i class="bi bi-inbox-fill"></i></td>
+        </tr>
+        <tr>
+        <td class="pt-0 pb-5 text-center" colspan="13">{% trans 'No data available in table' %}</td>
+        </tr>
+      {% else %}
+      {% for contract in contracts %}
+        <tr class="bg-white"  {% if user.enable_transision %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
+          <td class="pt-2 pb-2">{{ contract.id }}</td>
+          <td class="pt-2 pb-2" data-toggle="tooltip" data-placement="top" title="{{ contract.name|default:''}}">{{ contract.name|truncatechars:40 }}</td>
+          <td class="pt-2 pb-2">{{ contract.type|default:'' }}</td>
+          <td class="pt-2 pb-2">{{ contract.company|default:'' }}</td>
+          <td class="pt-2 pb-2">{% if contract.auto_renewal == False %}<i class="bi bi-x-circle-fill text-danger"></i>{% else %}<i class="bi bi-check-circle-fill text-success"></i>{% endif %}</td>
+          <td class="pt-2 pb-2">{{ contract.first_party|default:'' }}</td>
+          <td class="pt-2 pb-2">{{ contract.second_party|default:'' }}</td>
+          <td class="pt-2 pb-2">
+          {% if contract.out_side_iraq == True %}
+            {% trans "International" %}
+          {% else %}
+            {% trans "Domestic" %}
+          {% endif %}
+          </td>
+          <td class="pt-2 pb-2"><span class="bg-light border border-light-subtle rounded-2">{{ contract.assignee|default:'' }}</span></td>
+          <td class="pt-2 pb-2">{{ contract.created_by|date:"Y-m-d" }}</td>
+          <td class="pt-2 pb-2">
+              {% if user.is_manager or user.is_superuser %}
+                  <button class="btn btn-sm btn-danger delete-contract" data-contract-id="{{ contract.id }}"><i class="bi bi-trash3-fill"></i></button>
+              {% else %}
+                  <button class="btn btn-sm btn-danger" disabled>{% trans 'Delete' %}</button>
+              {% endif %}
+          <button class="btn btn-sm btn-success" data-bs-toggle="popover" title="{% trans 'اخر تطور مهم' %}" data-bs-content="{{ contract.ImportantDevelopment.last|default:'لا يوجد' }} {% if contract.ImportantDevelopment.last %} <br> بتاريخ: {{ contract.ImportantDevelopment.last.created_at|date:'Y:m:d' }}{% endif %}"><i class="bi bi-card-list"></i></button>
+          </td>
+        </tr>
+      {% endfor %}
+    {% endif %}
+      <tbody>
+      </table>
+          <!-- Start of Pagination -->
+    <nav aria-label="Page navigation shadow-sm">
+<ul class="pagination justify-content-center flex-wrap">
+{% if contracts.has_previous %}
+  <li class="page-item">
+    <a class="btn btn-light" href="?{{ filter_query }}&page={{ contracts.previous_page_number }}">{% trans 'Previous' %}</a>
+  </li>
+{% else %}
+  <li class="page-item disabled">
+    <button class="btn btn-light " disabled aria-disabled="true">{% trans 'Previous' %}</button>
+  </li>
+{% endif %}
+
+{% for i in page_range %}
+  {% if contracts.number == i %}
+    <li class="page-item active">
+      <span class="btn btn-secondary">{{ i }} <span class="visually-hidden">{% trans 'current' %}</span></span>
+    </li>
+  {% else %}
+    {% if i == contracts.paginator.ELLIPSIS %}
+      <button class="page-item disabled" aria-disabled="true"><span class="btn btn-light">{{ i }}</span></button>
+    {% else %}
+      <li class="page-item">
+        <a class="btn btn-light" href="?{{ filter_query }}&page={{ i }}">{{ i }}</a>
+      </li>
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+{% if contracts.has_next %}
+  <li class="page-item">
+    <a class="btn btn-light" href="?{{ filter_query }}&page={{ contracts.next_page_number }}">{% trans 'Next' %}</a>
+  </li>
+{% else %}
+  <li class="page-item disabled">
+    <button class="btn btn-light " disabled aria-disabled="true">{% trans 'Next' %}</button>
+  </li>
+{% endif %}
+</ul>
+</nav>
+
+      <!-- End of Pagination -->
+
+</section>
+<script type="text/javascript">
+  var sessionData = JSON.parse('{{ session | escapejs }}');
+  window.addEventListener('load', function () {
+    if (sessionData.number_of_records !== undefined) {
+      document.getElementById('number_of_records').value = sessionData.number_of_records;
+    }
+    else {
+       document.getElementById('number_of_records').value = 10
+    }
+    if (sessionData.keywords !== undefined) {
+      document.getElementById('keywords').value = sessionData.keywords;
+    }
+    else{
+      document.getElementById('keywords').value = '';
+    }
+    if (sessionData.type !== undefined) {
+      document.getElementById('type').value = sessionData.type;
+    }
+    else {
+      document.getElementById('type').value = 0;
+    }
+    if (sessionData.out_side_iraq !== undefined) {
+      document.getElementById('out_side_iraq').value  = sessionData.out_side_iraq;
+    }
+    else {
+      document.getElementById('out_side_iraq').value = 0;
+    }
+    if (sessionData.auto_renewal !== undefined) {
+      document.getElementById('auto_renewal').value = sessionData.auto_renewal;
+    }
+    else {
+      document.getElementById('auto_renewal').value = 0;
+    }
+    // Optionally handle additional keys:
+    if (sessionData.assignee !== undefined) {
+      document.getElementById('assignee').value = sessionData.assignee;
+    }
+    else {
+      document.getElementById('assignee').value = 0;
+    }
+    if (sessionData.company !== undefined) {
+      document.getElementById('company').value = sessionData.company;
+    }
+    else {
+      document.getElementById('company').value = 0;
+    }
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+  return new bootstrap.Popover(popoverTriggerEl, {html : true,trigger : 'hover click'})
+})
+  });
+</script>
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-contract').forEach(function(button) {
+      button.addEventListener('click', function() {
+        const contractId = this.getAttribute('data-contract-id');
+        if (confirm('{% trans 'Are you sure you want to delete?' %}')) {
+          fetch("{% url 'delete_contract' 0 %}".replace("0", contractId), {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              alert(data.message);
+              // Option 1: Remove the row from the table
+              this.closest('tr').remove();
+              // Option 2: Or, reload the page to reflect changes:
+              // window.location.reload();
+            } else {
+              alert('Error: ' + data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('{% trans 'An error occurred while deleting.' %}');
+          });
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

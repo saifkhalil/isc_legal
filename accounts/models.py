@@ -82,7 +82,12 @@ class Department(models.Model):
         verbose_name_plural = _('Departments')
 
 class User(AbstractBaseUser, PermissionsMixin):
-    id = models.AutoField(primary_key=True,)    
+    LANGUAGE_CHOICES = [
+        ('en', _('English')),
+        ('ar', _('Arabic')),
+    ]
+
+    id = models.AutoField(primary_key=True,)
     phone = PhoneNumberField()
     first_name = models.CharField(verbose_name=_("first name"), max_length=30)
     last_name = models.CharField(verbose_name=_("last name"), max_length=30)
@@ -93,6 +98,9 @@ class User(AbstractBaseUser, PermissionsMixin):
                                   upload_to='thumbnail', editable=False, blank=True, null=True)
     username = models.CharField(max_length=30, unique=True,verbose_name=_('Username'))
     Manager = models.ForeignKey('User', on_delete=models.CASCADE, blank=True, null=True,verbose_name=_('Manager'))
+    language = models.CharField(
+        max_length=5, choices=LANGUAGE_CHOICES, default='ar', verbose_name=_('Language')
+    )
     date_joined = models.DateTimeField(verbose_name=_('last login'), default=timezone.now)
     last_login = models.DateTimeField(verbose_name=_('last login'), default=timezone.now)
     is_admin = models.BooleanField(default=False,verbose_name=_('Is admin'))
@@ -108,6 +116,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False,verbose_name=_('Is superuser'))
     is_verified = models.BooleanField(default=False,verbose_name=_('Is verified'))
     is_blocked = models.BooleanField(default=False,verbose_name=_('Is blocked'))
+    enable_transision = models.BooleanField(default=True, verbose_name=_('Enable transision'))
     email_notification = models.BooleanField(default=True,verbose_name=_('Email Notification'))
     i_agree = models.BooleanField(
         verbose_name=_("Please confirm that you read and agree to our terms & conditions"), default=False, blank=False, null=False)
@@ -132,7 +141,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def make_thumbnail(self):
         image = Image.open(self.photo)
-        image.thumbnail((100, 100), Image.ANTIALIAS)
+        image.thumbnail((100, 100), Image.Resampling.LANCZOS)
 
         thumb_name, thumb_extension = os.path.splitext(self.photo.name)
         thumb_extension = thumb_extension.lower()

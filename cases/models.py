@@ -12,11 +12,27 @@ from activities.models import task, hearing
 from core.models import priorities, comments, documents, court, Status, Path
 from core.threading import send_html_mail
 
-class case_type(models.Model):
+
+class DefaultManager(models.Manager):
+    """ Custom manager to exclude deleted records """
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
+
+class BaseModel(models.Model):
+    """ Abstract base model to apply the default manager to all models """
+    # Apply the custom manager to all child models
+    objects = DefaultManager()
+    all_objects = models.Manager()  # Keep default manager to access all records
+
+    class Meta:
+        abstract = True  # Ensures this model is not created in the database
+
+class case_type(BaseModel):
     id = models.AutoField(primary_key=True, )
     type = models.CharField(max_length=250, blank=False, null=False, verbose_name=_('Name'))
     stage = models.ManyToManyField('stages', related_name='case_types', blank=True)
     is_deleted = models.BooleanField(default=False, verbose_name=_("Is Deleted"))
+
 
     def __str__(self):
         return self.type
@@ -24,9 +40,11 @@ class case_type(models.Model):
     def __unicode__(self):
         return self.type
 
+
     class Meta:
         verbose_name = _('Case Type')
         verbose_name_plural = _('Case Types')
+
 
 
 class characteristic(models.Model):
@@ -45,7 +63,7 @@ class characteristic(models.Model):
         verbose_name_plural = _('Case characteristics')
 
 
-class stages(models.Model):
+class stages(BaseModel):
     id = models.AutoField(primary_key=True, )
     name = models.CharField(max_length=250, blank=False, null=False, verbose_name=_('Name'))
     is_deleted = models.BooleanField(default=False, verbose_name=_("Is Deleted"))
@@ -79,7 +97,7 @@ class client_position(models.Model):
         verbose_name_plural = _('Client Positions')
 
 
-class ImportantDevelopment(models.Model):
+class ImportantDevelopment(BaseModel):
     id = models.AutoField(primary_key=True, )
     title = models.CharField(max_length=1000, blank=False, null=False, verbose_name=_('Title'))
     is_deleted = models.BooleanField(default=False, verbose_name=_("Is Deleted"))
@@ -136,7 +154,7 @@ case_close_status = (
 )
 
 
-class LitigationCases(models.Model):
+class LitigationCases(BaseModel):
     """
     This Model Handle the Litigation cases objects
 
@@ -436,7 +454,7 @@ class Notation(models.Model):
                                          verbose_name=_('Shared With'))
     priority = models.ForeignKey(priorities, on_delete=models.CASCADE, null=True, blank=True,
                                  verbose_name=_('Priority'))
-    start_time = models.DateField(null=True, blank=True)
+    start_time = models.DateField(null=True, blank=True,verbose_name=_('Start Time'))
     end_time = models.DateField(null=True, blank=True)
     is_deleted = models.BooleanField(default=False, verbose_name=_("Is Deleted"))
     created_at = models.DateTimeField(auto_now_add=True, editable=False)

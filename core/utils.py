@@ -35,7 +35,7 @@ class LegalCache:
 
         if data is None:
             data = get_object_or_404(self.model, id=self.obj_id)
-            cache.set(cache_key, data, timeout=60 * 60)  # Cache for 1 hour
+            cache.set(cache_key, data, timeout=None)  # Cache for 1 hour
 
         return data
 
@@ -49,7 +49,7 @@ class LegalCache:
 
         if data is None:
             data = self.model.objects.filter(is_deleted=False).order_by("-created_at")
-            cache.set(cache_key, data, timeout=60 * 60)  # Cache for 1 hour
+            cache.set(cache_key, data, timeout=None)  # Cache for 1 hour
 
         return data
 

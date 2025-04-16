@@ -7,7 +7,22 @@ _thread_local = threading.local()
 from django.apps import apps
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
+from django.utils.deprecation import MiddlewareMixin
+from core.models import Notification
 
+class NotificationMiddleware(MiddlewareMixin):
+    """Middleware to add unread notifications to request context"""
+
+    def process_request(self, request):
+        if request.user.is_authenticated:  # Only fetch for logged-in users
+            all_notifications = Notification.objects.filter(user=request.user, is_deleted=False).order_by("-action_at")
+            request.notifications = all_notifications[:10]  # Get latest 10 unread notifications
+            request.not_read_notifications_count = len(all_notifications.filter(is_read=False))
+            request.not_deleted_notifications_count = len(all_notifications.filter(is_deleted=False))
+        else:
+            request.notifications = []  # Empty for non-authenticated users
+            request.not_read_notifications_count = 0
+            request.not_deleted_notifications_count = 0
 
 class AuditlogMiddleware(_AuditlogMiddleware):
     def __call__(self, request):

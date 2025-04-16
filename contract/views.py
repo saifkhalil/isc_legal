@@ -1,4 +1,8 @@
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_POST
 from django_celery_beat.models import ClockedSchedule, PeriodicTask
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
@@ -19,7 +23,8 @@ from rest_framework.decorators import action
 from core.classes import dict_item, GetUniqueDictionaries
 import json
 from django.db.models import Q
-
+from django.core.cache import cache
+from urllib.parse import urlencode
 
 class ContractViewSet(viewsets.ModelViewSet):
     model = Contract
@@ -235,3 +240,158 @@ class TypeViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication, ]
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "contract.Type"
+
+
+@login_required
+def contracts_list(request):
+    number_of_records = 10
+    keywords = type = assignee = out_side_iraq = auto_renewal = company = None
+    type_set = assignee_set = company_set =  None
+
+    if request.method == 'GET':
+        # Clear filters and redirect if needed.
+        if request.GET.get('clear'):
+            for key in ['keywords', 'type', 'assignee', 'out_side_iraq', 'auto_renewal', 'company', 'number_of_records']:
+                request.session.pop(key, None)
+            return redirect(request.path)
+
+        # Retrieve filter parameters from GET or session.
+        if 'keywords' in request.GET:
+            keywords = request.GET.get('keywords')
+            request.session['keywords'] = keywords  # Update session even if empty
+        else:
+            keywords = request.session.get('keywords', '')
+        type = request.GET.get('type') or request.session.get('type',0)
+        assignee = request.GET.get('assignee') or request.session.get('assignee',0)
+        out_side_iraq = request.GET.get('out_side_iraq') or request.session.get('out_side_iraq',0)
+        auto_renewal = request.GET.get('auto_renewal') or request.session.get('auto_renewal',0)
+        company = request.GET.get('company') or request.session.get('company',0)
+
+        # Save parameters to session if provided.
+        for key, value in (('keywords', keywords), ('type', type),
+                           ('assignee', assignee), ('out_side_iraq', out_side_iraq),
+                           ('auto_renewal', auto_renewal), ('company', company)):
+            if value is not None:
+                request.session[key] = value
+
+        # Handle number_of_records.
+        if request.GET.get('number_of_records'):
+            try:
+                number_of_records = int(request.GET.get('number_of_records'))
+            except ValueError:
+                number_of_records = 10
+            request.session['number_of_records'] = number_of_records
+        else:
+            number_of_records = request.session.get('number_of_records', 10)
+
+        # Build search query using Q objects.
+        query = Q()
+        if keywords:
+            query |= Q(name__icontains=keywords)
+            # Filter out words shorter than 2 characters.
+            # query_words = [w for w in keywords.split() if len(w) >= 2]
+            # for word in query_words:
+            #     query |= Q(description__icontains=word)
+        if type and type != '0':
+            query &= Q(type=type)
+        if assignee and assignee != '0':
+            query &= Q(assignee__id=assignee)
+        if out_side_iraq and out_side_iraq != '0':
+            if out_side_iraq == 'International':
+                qy_out_side_iraq = True
+            elif out_side_iraq == 'Domestic':
+                qy_out_side_iraq = False
+            query &= Q(out_side_iraq=qy_out_side_iraq)
+        # Optionally, add status filtering if needed:
+        if auto_renewal and auto_renewal != '0':
+            query &= Q(auto_renewal=auto_renewal)
+        if company and company != '0':
+            query &= Q(company=company)
+
+        # Get base queryset.
+        contracts_qs = Contract.objects.filter(is_deleted=False).order_by('-created_by')
+
+        # Retrieve filter dropdown data from cache or compute if not cached.
+        contract_key = "contracts_objects"
+        cached_data = cache.get(contract_key)
+        if cached_data:
+            types_set = cached_data.get('types')
+            assignees_set = cached_data.get('assignees')
+            companies_set = cached_data.get('companies')
+        else:
+            types = []
+            assignees = []
+            companies = []
+            for contract in contracts_qs:
+                if contract.type:
+                    types.append(dict_item(contract.type.id, contract.type.name))
+                if contract.assignee:
+                    assignees.append(dict_item(contract.assignee.id, contract.assignee.username))
+                if contract.company:
+
+                    companies.append(dict_item(contract.company, contract.company))
+            assignees_set = GetUniqueDictionaries(assignees)
+            types_set = GetUniqueDictionaries(types)
+            companies_set = GetUniqueDictionaries(companies)
+            cached_data = {
+                'types': types_set,
+                'assignees': assignees_set,
+                'companies': companies_set,
+            }
+            cache.set(contract_key, cached_data, timeout=None)
+
+        # Apply filters.
+        hearings_qs = contracts_qs.filter(query)
+    else:
+        hearings_qs = Contract.objects.filter(is_deleted=False).order_by('-created_by')
+
+    # Set up pagination.
+    paginator = Paginator(hearings_qs, number_of_records)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    page_range = paginator.get_elided_page_range(number=page_number, on_each_side=2, on_ends=2)
+
+    # Prepare session info for the template.
+    session_info = {
+        'number_of_records': number_of_records or 10,
+        'keywords': keywords or '',
+        'type': type or 0,
+        'assignee': assignee or 0,
+        'out_side_iraq': out_side_iraq or 0,
+        'auto_renewal': auto_renewal or 0,
+        'company': company or 0,
+    }
+
+    # Build a filter query string to be used in pagination links.
+    # Only include filter keys (exclude 'page').
+    filter_params = {}
+    for key in ['keywords', 'type', 'assignee', 'out_side_iraq', 'auto_renewal', 'company', 'number_of_records']:
+        value = request.session.get(key)
+        if value:
+            filter_params[key] = value
+    filter_query = urlencode(filter_params)
+    context = {
+        'contracts': page_obj,
+        'assignees': assignees_set,
+        'types': types_set,
+        'companies': companies_set,
+        'page_range': page_range,
+        'session': json.dumps(session_info),
+        'filter_query': filter_query,  # New variable for pagination links.
+    }
+    return render(request, 'contracts/contracts_list.html', context)
+
+
+@require_POST
+def delete_contract(request, pk=None):
+    print('delete_contract',pk)
+    instance = Contract.objects.get(pk=pk)
+    if not (request.user.is_manager or request.user.is_superuser):
+        return JsonResponse({'success': False, 'message':"You do not have permission to perform this action."},status=401)
+    instance = get_object_or_404(Contract, pk=pk)
+    instance.is_deleted = True
+    instance.modified = timezone.now()
+    # Assuming you have a field to record the modifying user:
+    instance.modified_by = request.user
+    instance.save()
+    return JsonResponse({'success': True, 'message': 'Contract has been deleted successfully.'},status=200)

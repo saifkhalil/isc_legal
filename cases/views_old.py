@@ -445,7 +445,7 @@ class LitigationCasesViewSet(CSVRendererMixin2, viewsets.ModelViewSet):
             case_type_set = GetUniqueDictionaries(case_type)
             assignees_set = GetUniqueDictionaries(assignees)
             data={'Stage': Stage_set, 'court': court_set, 'case_type': case_type_set,'assignees': assignees_set}
-            cache.set(cache_key, data, timeout=600)
+            cache.set(cache_key, data, timeout=None)
         return Response(status=status.HTTP_200_OK,data=data)
 
     @action(methods=['get'], detail=False, serializer_class=CombinedStatisticsSerializer)

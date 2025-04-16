@@ -1,26 +1,21 @@
-from djangochannelsrestframework.generics import GenericAsyncAPIConsumer
-from djangochannelsrestframework.mixins import ListModelMixin
-from djangochannelsrestframework.observer import model_observer
+import json
+from channels.generic.websocket import AsyncWebsocketConsumer
 
-from .models import Notification
-from .serializers import NotificationSerializer
+class NotificationConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        """Handle new WebSocket connection."""
+        if self.scope["user"].is_authenticated:
+            self.group_name = f"notifications_{self.scope['user'].id}"
+            await self.channel_layer.group_add(self.group_name, self.channel_name)
+            await self.accept()
+        else:
+            await self.close()
 
+    async def disconnect(self, close_code):
+        """Handle WebSocket disconnection."""
+        if self.scope["user"].is_authenticated:
+            await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
-# class NotificationConsumer(ListModelMixin,GenericAsyncAPIConsumer):
-#
-#     queryset = Notification.objects.all().filter(is_deleted=False)
-#     serializer_class = NotificationSerializer
-#     # permission_classes = (permissions.AllowAny)
-#
-#
-#     async def connect(self,**kwargs):
-#         await self.Notification_change.subscribe()
-#         await super().connect()
-#
-#     @model_observer(Notification)
-#     async def Notification_change(self,message,observer=None, **kwargs):
-#         await self.send_json(message)
-#
-#     @Notification_change.serializer
-#     def model_serialize(self,instance,action,**kwargs):
-#         return dict(data=NotificationSerializer(instance=instance).data,action=action.value)
+    async def send_notification(self, event):
+        """Send notification to WebSocket frontend."""
+        await self.send(text_data=event["message"])

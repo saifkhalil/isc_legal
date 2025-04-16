@@ -391,7 +391,7 @@ class PathSerializer(serializers.ModelSerializer):
                 field_object = related_model._meta.get_field(field)
                 related_obj = related_model.objects.only(field).get(id=obj.id)
                 cached_name = getattr(related_obj,field_object.attname)
-                cache.set(cache_key, cached_name, timeout=600)
+                cache.set(cache_key, cached_name, timeout=None)
             except related_model.DoesNotExist:
                 cached_name = None
 
@@ -432,7 +432,7 @@ class PathSerializer(serializers.ModelSerializer):
                 children_query = children_query.filter(child_filter_query).distinct()
 
             children_data = PathSerializer(children_query, many=True, context=self.context).data
-            cache.set(cache_key, children_data, timeout=600)
+            cache.set(cache_key, children_data, timeout=None)
         else:
             children_data = cached_children
 

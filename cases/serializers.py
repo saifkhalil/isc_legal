@@ -114,14 +114,14 @@ class LitigationCasesSerializer_OLD(DynamicFieldsMixin, serializers.ModelSeriali
                 case = cached_case
             else:
                 case = get_object_or_404(LitigationCases, pk=pk)
-                cache.set(cache_key, obj, 60 * 60)
+                cache.set(cache_key, obj, None)
             cache_key = f"case_{obj.id}_tasks_queryset"
             cached_queryset = cache.get(cache_key)
             if cached_queryset:
                 result = cached_queryset
             else:
                 result = case.tasks.all().filter(is_deleted=False).values()
-                cache.set(cache_key, result, timeout=600)
+                cache.set(cache_key, result, None)
             return result
 
 
@@ -134,14 +134,14 @@ class LitigationCasesSerializer_OLD(DynamicFieldsMixin, serializers.ModelSeriali
                 case = cached_case
             else:
                 case = get_object_or_404(LitigationCases, pk=pk)
-                cache.set(cache_key, obj, 60 * 60)
+                cache.set(cache_key, obj, None)
             cache_key = f"case_{obj.id}_hearing_queryset"
             cached_queryset = cache.get(cache_key)
             if cached_queryset:
                 result = cached_queryset
             else:
                 result = case.hearing.all().filter(is_deleted=False).values()
-                cache.set(cache_key, result, timeout=600)
+                cache.set(cache_key, result, None)
             return result
 
     def get_documents(self, obj):
@@ -153,7 +153,7 @@ class LitigationCasesSerializer_OLD(DynamicFieldsMixin, serializers.ModelSeriali
                 result = cached_queryset
             else:
                 result = case.documents.all().filter(is_deleted=False).values()
-                cache.set(cache_key, result, timeout=600)
+                cache.set(cache_key, result, None)
             return result
 
     def get_comments(self, obj):
@@ -236,7 +236,7 @@ class LitigationCasesSerializer(DynamicFieldsMixin, serializers.ModelSerializer)
 
         if cached_queryset is None:
             result = getattr(obj, related_field).filter(is_deleted=False).values()
-            cache.set(cache_key, result, timeout=600)
+            cache.set(cache_key, result, None)
         else:
             result = cached_queryset
 

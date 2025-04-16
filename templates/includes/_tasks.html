@@ -1,0 +1,27 @@
+{% load i18n %}
+{% load static %}
+<div class="card shadow-sm p-3">
+          <p class="pb-3">{% trans 'Tasks' %}</p>
+    <table class="table {% if hearings|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
+    <thead {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
+        <tr class="bg-gray-100">
+          <td class="pt-3 pb-3 text-bold">{% trans 'Sequence' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Subject' %}</td>
+          <td class="pt-3 pb-3 text-bold">{% trans 'Created At' %}</td>
+        </tr>
+    </thead>
+       <tbody>
+    {% for task in case.tasks.all  %}
+              <tr {% if user.enable_transision %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
+              <td class="pt-2 pb-2">{{ forloop.counter }}</td>
+                <td class="pt-2 pb-2"><a href="{% url 'task_view' task.id %}" target="_blank">{{ task.title }}</a></td>
+              <td class="pt-2 pb-2">{{ task.created_at|date:"Y-m-d" }}</td>
+              </tr>
+      {% empty %}
+        <tr class="bg-white">
+        <td class="p-3 text-center" colspan="13"><i class="bi bi-inbox-fill"></i> {% trans 'No data available in table' %}</td>
+        </tr>
+       {% endfor %}
+       </tbody>
+    </table>
+     </div>

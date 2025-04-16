@@ -47,7 +47,7 @@ class UserAdmin(admin.ModelAdmin):
     change_user_password_template = None
     fieldsets = (
         (None, {"fields": ("username", "password")}),
-        (_("Personal info"), {"fields": ("first_name", "last_name", "email")}),
+        (_("Personal info"), {"fields": ("first_name", "last_name", "email", "language")}),
         (
             _("Permissions"),
             {
@@ -61,7 +61,8 @@ class UserAdmin(admin.ModelAdmin):
                     "is_contract_manager",
                     "is_sub_manager",
                     "is_blocked",
-                    "email_notification",
+                    "is_verified",
+                    "enable_transision",
                     "groups",
                     "user_permissions",
                 ),

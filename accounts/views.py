@@ -10,6 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
+from django.templatetags.i18n import language
 from django.utils.encoding import force_bytes, force_str
 from accounts.forms import UserAuthenticationForm
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -37,6 +38,7 @@ from django.core.cache import cache
 from haystack.query import SearchQuerySet
 from rest_framework.views import APIView
 from elasticsearch.exceptions import ElasticsearchException
+from django.utils.translation import activate
 
 
 def get_user_queryset(user=None):
@@ -57,6 +59,8 @@ def login_view(request):
         next_page = request.GET.get('next')
     user = request.user
     if user.is_authenticated:
+        request.session['django_language'] = user.language  # Store language in session
+        activate(user.language)
         return redirect('home')
     if request.POST:
         form = UserAuthenticationForm(request.POST)
@@ -64,6 +68,7 @@ def login_view(request):
             email = request.POST['email']
             password = request.POST['password']
             user = authenticate(email=email, password=password)
+
             if not user.is_verified:
                 messages.add_message(request, messages.ERROR,
                                      _('Email is not verified, please check your email inbox'))
@@ -74,6 +79,9 @@ def login_view(request):
                 return render(request, "account/login.html", context)
             if user:
                 login(request, user)
+                request.session['django_language'] = user.language  # Store language in session
+                print(f'{user.language=}')
+                activate(user.language)  # Set active language
                 return redirect(next_page)
     else:
         form = UserAuthenticationForm()

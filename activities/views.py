@@ -1,8 +1,13 @@
 from datetime import datetime
-
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
+from django.forms import DateInput
+from django.http import JsonResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views.decorators.http import require_POST, require_GET
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions
 from rest_framework import viewsets, status
@@ -14,7 +19,11 @@ from accounts.models import User
 from cases.models import LitigationCases, Folder
 from core.classes import StandardResultsSetPagination, GetUniqueDictionaries, dict_item
 from core.models import court, Status, priorities, Notification
+from .forms import TaskForm, HearingForm
 from .models import task, hearing
+from .models import task as task_model
+from .models import hearing as hearing_model
+
 from .serializers import taskSerializer, hearingSerializer, CombinedStatisticsSerializer, TaskStatisticsSerializer
 from rest_framework.decorators import action
 from django_celery_beat.models import PeriodicTask, PeriodicTasks, ClockedSchedule
@@ -25,7 +34,7 @@ from django.db.models import Count
 from django.db.models import Q
 from rest_framework.response import Response
 from django.core.cache import cache
-
+from urllib.parse import urlencode
 
 def filter_tasks(queryset, created_at_after=None, created_at_before=None, assignee_id=None):
     """Filter cases based on date range and assignee."""
@@ -61,7 +70,7 @@ def all_tasks_query():
         queryset = cached_queryset
     else:
         queryset = task.objects.all().order_by('-id').filter(is_deleted=False)
-        cache.set(cache_key, queryset, timeout=600)
+        cache.set(cache_key, queryset, None)
     return queryset
 
 def all_hearings_query():
@@ -71,7 +80,7 @@ def all_hearings_query():
         queryset = cached_queryset
     else:
         queryset = hearing.objects.all().order_by('-id').filter(is_deleted=False)
-        cache.set(cache_key, queryset, timeout=600)
+        cache.set(cache_key, queryset, None)
     return queryset
 
 class taskViewSet(viewsets.ModelViewSet):
@@ -315,7 +324,7 @@ class taskViewSet(viewsets.ModelViewSet):
             queryset = tasks_cached_queryset
         else:
             queryset = task.objects.filter(is_deleted=False).order_by('-created_by')
-            cache.set(tasks_cache_key, queryset, timeout=600)
+            cache.set(tasks_cache_key, queryset, None)
         current_user_id = request.user.id
         if not request.user.is_manager and not request.user.is_superuser:
             filter_query = Q(assignee__id__exact=current_user_id) | Q(
@@ -326,7 +335,7 @@ class taskViewSet(viewsets.ModelViewSet):
             Task = task_cached_queryset
         else:
             Task = get_object_or_404(queryset, pk=pk)
-            cache.set(task_cache_key, Task, timeout=600)    
+            cache.set(task_cache_key, Task, None)
         serializer = self.get_serializer(Task)
         return rest_response(serializer.data, status=status.HTTP_200_OK)
 
@@ -350,14 +359,14 @@ class taskViewSet(viewsets.ModelViewSet):
                     for case in task.cases.all():
                         cases.append(dict_item(case.id, case.name))
                 if task.assignee.all():
-                    for assignee in task.assignee.all():
-                        assignees.append(dict_item(assignee.id, assignee.username))
+                    for cassignee in task.assignee.all():
+                        assignees.append(dict_item(cassignee.id, cassignee.username))
                 # if task.assignee:
                 #     assignees.append(dict_item(task.assignee.id, task.assignee.username))
             cases_set = GetUniqueDictionaries(cases)
             assignees_set = GetUniqueDictionaries(assignees)
             data = {'cases': cases_set, 'assignees': assignees_set}
-            cache.set(cache_key, data, timeout=600)
+            cache.set(cache_key, data, None)
         return rest_response(status=status.HTTP_200_OK, data=data)
 
     @action(methods=['get'], detail=False, serializer_class=CombinedStatisticsSerializer)
@@ -641,7 +650,7 @@ class hearingViewSet(viewsets.ModelViewSet):
             print('cached_queryset')
         else:
             queryset = hearing.objects.all().order_by('-id').filter(is_deleted=False)
-            cache.set(cache_key, queryset, timeout=600)
+            cache.set(cache_key, queryset, None)
         if req_hearing_date is not None:
             req_date = datetime.strptime(req_hearing_date, '%Y-%m').date()
             queryset = queryset.filter(
@@ -697,14 +706,342 @@ class hearingViewSet(viewsets.ModelViewSet):
                 if hearing.court:
                     courts.append(dict_item(hearing.court.id, hearing.court.name))
                 if hearing.assignee.all():
-                    for assignee in hearing.assignee.all():
-                        assignees.append(dict_item(assignee.id, assignee.username))
+                    for cassignee in hearing.assignee.all():
+                        assignees.append(dict_item(cassignee.id, cassignee.username))
                 # if hearing.assignee:
                 #     assignees.append(dict_item(hearing.assignee.id, hearing.assignee.username))
             cases_set = GetUniqueDictionaries(cases)
             courts_set = GetUniqueDictionaries(courts)
             assignees_set = GetUniqueDictionaries(assignees)
             data = {'cases': cases_set, 'courts': courts_set, 'assignees': assignees_set}
-            cache.set(cache_key, data, timeout=600)
+            cache.set(cache_key, data, None)
         return rest_response(status=status.HTTP_200_OK,
                              data=data)
+
+
+@login_required
+def tasks_list(request):
+    number_of_records = 10
+    keywords = task_category = assignee = task_status = task_case = None
+    task_category_set = assignee_set = task_status_set = cases_set = None
+
+    if request.method == 'GET':
+        # Clear filters and redirect if needed.
+        if request.GET.get('clear'):
+            for key in ['keywords', 'task_category', 'assignee', 'task_status', 'task_case', 'number_of_records']:
+                request.session.pop(key, None)
+            return redirect(request.path)
+
+        # Retrieve filter parameters from GET or session.
+        if 'keywords' in request.GET:
+            keywords = request.GET.get('keywords')
+            request.session['keywords'] = keywords  # Update session even if empty
+        else:
+            keywords = request.session.get('keywords', '')
+        task_category = request.GET.get('task_category') or request.session.get('task_category',0)
+        assignee = request.GET.get('assignee') or request.session.get('assignee',0)
+        task_status = request.GET.get('task_status') or request.session.get('task_status',0)
+        task_case = request.GET.get('task_case') or request.session.get('task_case',0)
+
+        # Save parameters to session if provided.
+        for key, value in (('keywords', keywords), ('task_category', task_category),
+                           ('assignee', assignee), ('task_status', task_status),
+                           ('task_case', task_case)):
+            if value is not None:
+                request.session[key] = value
+
+        # Handle number_of_records.
+        if request.GET.get('number_of_records'):
+            try:
+                number_of_records = int(request.GET.get('number_of_records'))
+            except ValueError:
+                number_of_records = 10
+            request.session['number_of_records'] = number_of_records
+        else:
+            number_of_records = request.session.get('number_of_records', 10)
+
+        # Build search query using Q objects.
+        query = Q()
+        if keywords:
+            query |= Q(description__icontains=keywords)
+            # Filter out words shorter than 2 characters.
+            # query_words = [w for w in keywords.split() if len(w) >= 2]
+            # for word in query_words:
+            #     query |= Q(description__icontains=word)
+        if task_category and task_category != '0':
+            query &= Q(task_category=task_category)
+        if task_status and task_status != '0':
+            query &= Q(task_status_id=task_status)
+        if assignee and assignee != '0':
+            query &= Q(assignee__id=assignee)
+        # Optionally, add status filtering if needed:
+        if task_case and task_case != '0':
+            query &= Q(case_id=task_case)
+
+        # Get base queryset.
+        tasks_qs = task_model.objects.filter(is_deleted=False).order_by('-created_by')
+
+        # Retrieve filter dropdown data from cache or compute if not cached.
+        task_key = "tasks_objects"
+        cached_data = cache.get(task_key)
+        if cached_data:
+            task_status_set = cached_data.get('task_statuses')
+            assignees_set = cached_data.get('assignees')
+            task_cases_set = cached_data.get('task_cases')
+        else:
+            assignees = []
+            task_statuses = []
+            task_cases = []
+            for ctask in tasks_qs:
+                if ctask.task_status:
+                    task_statuses.append(dict_item(ctask.task_status.id, ctask.task_status.status))
+                if ctask.assignee.exists():
+                    for cassignee in ctask.assignee.all():
+                        assignees.append(dict_item(cassignee.id, cassignee.username))
+                if ctask.case_id:
+                    print(f'{ctask.case_id=}')
+                    try:
+                        case = LitigationCases.objects.get(pk=ctask.case_id)
+                    except LitigationCases.DoesNotExist:
+                        case = None
+                    if case:
+                        task_cases.append(dict_item(ctask.case_id, case.name))
+            assignees_set = GetUniqueDictionaries(assignees)
+            task_status_set = GetUniqueDictionaries(task_statuses)
+            task_cases_set = GetUniqueDictionaries(task_cases)
+            cached_data = {
+                'assignees': assignees_set,
+                'task_statuses': task_status_set,
+                'task_cases': task_cases_set,
+            }
+            cache.set(task_key, cached_data, None)
+
+        # Apply filters.
+        tasks_qs = tasks_qs.filter(query)
+    else:
+        tasks_qs = task.objects.filter(is_deleted=False).order_by('-created_by')
+
+    # Set up pagination.
+    paginator = Paginator(tasks_qs, number_of_records)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    page_range = paginator.get_elided_page_range(number=page_number, on_each_side=2, on_ends=2)
+
+    # Prepare session info for the template.
+    session_info = {
+        'number_of_records': number_of_records or 10,
+        'keywords': keywords or '',
+        'task_category': task_category or 0,
+        'assignee': assignee or 0,
+        'task_status': task_status or 0,
+        'task_case': task_case or 0
+    }
+
+    # Build a filter query string to be used in pagination links.
+    # Only include filter keys (exclude 'page').
+    filter_params = {}
+    for key in ['keywords', 'task_category', 'assignee', 'task_status', 'task_case', 'number_of_records']:
+        value = request.session.get(key)
+        if value:
+            filter_params[key] = value
+    filter_query = urlencode(filter_params)
+
+    context = {
+        'tasks': page_obj,
+        'assignees': assignees_set,
+        'task_statuses': task_status_set,
+        'task_cases': task_cases_set,
+        'page_range': page_range,
+        'session': json.dumps(session_info),
+        'filter_query': filter_query,  # New variable for pagination links.
+    }
+    return render(request, 'activities/tasks_list.html', context)
+
+@require_GET
+def task_view(request, task_id=None):
+    instance = task()
+    if task_id:
+        instance = get_object_or_404(task, pk=task_id)
+    else:
+        instance = task()
+
+    form = TaskForm(request.POST or None, instance=instance)
+    if request.POST and form.is_valid():
+        form.save()
+        return HttpResponseRedirect(reverse('cal:calendar'))
+    return render(request, 'activities/task_view.html', {'form': form})
+
+@require_POST
+def delete_task(request, pk=None):
+    print('delete_task',pk)
+    instance = task.objects.get(pk=pk)
+    if not (request.user.is_manager or request.user.is_superuser):
+        return JsonResponse({'success': False, 'message':"You do not have permission to perform this action."},status=401)
+    instance = get_object_or_404(task, pk=pk)
+    instance.is_deleted = True
+    instance.modified = timezone.now()
+    # Assuming you have a field to record the modifying user:
+    instance.modified_by = request.user
+    instance.save()
+    return JsonResponse({'success': True, 'message': 'Task has been deleted successfully.'},status=200)
+
+@login_required
+def hearings_list(request):
+    number_of_records = 10
+    keywords = court = assignee = hearing_status = hearing_case = None
+    hearing_court_set = assignee_set = hearing_status_set = cases_set = None
+    if request.method == 'GET':
+        # Clear filters and redirect if needed.
+        if request.GET.get('clear'):
+            for key in ['keywords', 'court', 'assignee', 'hearing_status', 'hearing_case', 'number_of_records']:
+                request.session.pop(key, None)
+            return redirect(request.path)
+
+        # Retrieve filter parameters from GET or session.
+        if 'keywords' in request.GET:
+            keywords = request.GET.get('keywords')
+            request.session['keywords'] = keywords  # Update session even if empty
+        else:
+            keywords = request.session.get('keywords', '')
+        court = request.GET.get('court') or request.session.get('court',0)
+        assignee = request.GET.get('assignee') or request.session.get('assignee',0)
+        hearing_status = request.GET.get('hearing_status') or request.session.get('hearing_status',0)
+        hearing_case = request.GET.get('hearing_case') or request.session.get('hearing_case',0)
+        # Save parameters to session if provided.
+        for key, value in (('keywords', keywords), ('court', court),
+                           ('assignee', assignee), ('hearing_status', hearing_status),
+                           ('hearing_case', hearing_case)):
+            if value is not None:
+                request.session[key] = value
+        # Handle number_of_records.
+        if request.GET.get('number_of_records'):
+            try:
+                number_of_records = int(request.GET.get('number_of_records'))
+            except ValueError:
+                number_of_records = 10
+            request.session['number_of_records'] = number_of_records
+        else:
+            number_of_records = request.session.get('number_of_records', 10)
+        # Build search query using Q objects.
+        query = Q()
+        if keywords:
+            query |= Q(name__icontains=keywords)
+            # Filter out words shorter than 2 characters.
+            # query_words = [w for w in keywords.split() if len(w) >= 2]
+            # for word in query_words:
+            #     query |= Q(description__icontains=word)
+        if court and court != '0':
+            query &= Q(court=court)
+        if assignee and assignee != '0':
+            query &= Q(assignee__id=assignee)
+        if hearing_status and hearing_status != '0':
+            query &= Q(hearing_status_id=hearing_status)
+        # Optionally, add status filtering if needed:
+        if hearing_case and hearing_case != '0':
+            query &= Q(case_id=hearing_case)
+        # Get base queryset.
+        hearings_qs = hearing_model.objects.filter(is_deleted=False).order_by('-created_by')
+
+        # Retrieve filter dropdown data from cache or compute if not cached.
+        hearing_key = "hearings_objects"
+        cached_data = cache.get(hearing_key)
+        if cached_data:
+            courts_set = cached_data.get('courts')
+            assignees_set = cached_data.get('assignees')
+            hearing_statuses_set = cached_data.get('hearing_statuses')
+            hearing_case_set = cached_data.get('hearing_cases')
+        else:
+            courts = []
+            assignees = []
+            hearing_statuses = []
+            hearing_cases = []
+            for hearing in hearings_qs:
+                if hearing.hearing_status:
+                    hearing_statuses.append(dict_item(hearing.hearing_status.id, hearing.hearing_status.status))
+                if hearing.court:
+                    courts.append(dict_item(hearing.court.id, hearing.court.name))
+                if hearing.assignee.exists():
+                    for cassignee in hearing.assignee.all():
+                        assignees.append(dict_item(cassignee.id, cassignee.username))
+                if hearing.case_id:
+                    hearing_cases.append(dict_item(hearing.case_id, LitigationCases.objects.get(pk=hearing.case_id).name))
+            assignees_set = GetUniqueDictionaries(assignees)
+            hearing_statuses_set = GetUniqueDictionaries(hearing_statuses)
+            hearing_cases_set = GetUniqueDictionaries(hearing_cases)
+            courts_set = GetUniqueDictionaries(courts)
+            cached_data = {
+                'assignees': assignees_set,
+                'hearing_statuses': hearing_statuses_set,
+                'hearing_cases': hearing_cases_set,
+                'courts': courts_set,
+            }
+            cache.set(hearing_key, cached_data, None)
+        # Apply filters.
+        hearings_qs = hearings_qs.filter(query)
+    else:
+        hearings_qs = task.objects.filter(is_deleted=False).order_by('-created_by')
+
+    # Set up pagination.
+    paginator = Paginator(hearings_qs, number_of_records)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    page_range = paginator.get_elided_page_range(number=page_number, on_each_side=2, on_ends=2)
+    # Prepare session info for the template.
+    session_info = {
+        'number_of_records': number_of_records or 10,
+        'keywords': keywords or '',
+        'court': court or 0,
+        'assignee': assignee or 0,
+        'hearing_status': hearing_status or 0,
+        'hearing_case': hearing_case or 0
+    }
+    # Build a filter query string to be used in pagination links.
+    # Only include filter keys (exclude 'page').
+    filter_params = {}
+    for key in ['keywords', 'court', 'assignee', 'hearing_status', 'hearing_case', 'number_of_records']:
+        value = request.session.get(key)
+        if value:
+            filter_params[key] = value
+    filter_query = urlencode(filter_params)
+
+    context = {
+        'hearings': page_obj,
+        'assignees': assignees_set,
+        'hearing_statuses': hearing_statuses_set,
+        'hearing_cases': courts_set,
+        'page_range': page_range,
+        'session': json.dumps(session_info),
+        'filter_query': filter_query,  # New variable for pagination links.
+    }
+    return render(request, 'activities/hearings_list.html', context)
+
+
+
+
+def hearing_view(request, hearing_id=None):
+    instance = hearing()
+    if hearing_id:
+        instance = get_object_or_404(hearing, pk=hearing_id)
+    else:
+        instance = hearing()
+
+    form = HearingForm(request.POST or None, instance=instance)
+    if request.POST and form.is_valid():
+        form.save()
+        return redirect('hearings_list')
+    return render(request, 'activities/obj_view.html', {'form': form})
+
+
+@require_POST
+def delete_hearing(request, pk=None):
+    print('delete_hearing',pk)
+    instance = hearing.objects.get(pk=pk)
+    if not (request.user.is_manager or request.user.is_superuser):
+        return JsonResponse({'success': False, 'message':"You do not have permission to perform this action."},status=401)
+    instance = get_object_or_404(hearing, pk=pk)
+    instance.is_deleted = True
+    instance.modified = timezone.now()
+    # Assuming you have a field to record the modifying user:
+    instance.modified_by = request.user
+    instance.save()
+    return JsonResponse({'success': True, 'message': 'Hearing has been deleted successfully.'},status=200)

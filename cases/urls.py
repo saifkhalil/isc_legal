@@ -2,6 +2,7 @@ from django.urls import path, include
 from rest_framework import routers
 
 from . import views
+from .views import get_stages_for_case_type
 
 app_name = 'cases'
 
@@ -20,6 +21,7 @@ router.register(r'ImportantDevelopments', views.ImportantDevelopmentsViewSet, "I
 
 urlpatterns = [
     path('', include(router.urls)),
-    path(r'case/new/', views.case, name='case_new'),
-    path(r'case/edit/<case_id>/', views.case, name='case_edit'),
+
+    # path(r'case/new/', views.case, name='case_new'),
+    # path(r'case/edit/<case_id>/', views.case, name='case_edit'),
 ]
