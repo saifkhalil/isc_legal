@@ -1,40 +1,39 @@
+import json
 from datetime import datetime
-from django.urls import reverse
+from urllib.parse import urlencode
+
 from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
 from django.core.paginator import Paginator
+from django.db.models import Count
 from django.db.models import Q
-from django.forms import DateInput
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST, require_GET
+from django_celery_beat.models import PeriodicTask, ClockedSchedule
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.response import Response
 from rest_framework.response import Response as rest_response
-from django.contrib.contenttypes.models import ContentType
+
 from accounts.models import User
 from cases.models import LitigationCases, Folder
 from core.classes import StandardResultsSetPagination, GetUniqueDictionaries, dict_item
 from core.models import court, Status, priorities, Notification
 from .forms import TaskForm, HearingForm
+from .models import hearing as hearing_model
 from .models import task, hearing
 from .models import task as task_model
-from .models import hearing as hearing_model
-
 from .serializers import taskSerializer, hearingSerializer, CombinedStatisticsSerializer, TaskStatisticsSerializer
-from rest_framework.decorators import action
-from django_celery_beat.models import PeriodicTask, PeriodicTasks, ClockedSchedule
-import json
-from activities.tasks import hearing_notification
-from django.utils.dateparse import parse_date
-from django.db.models import Count
-from django.db.models import Q
-from rest_framework.response import Response
-from django.core.cache import cache
-from urllib.parse import urlencode
+
 
 def filter_tasks(queryset, created_at_after=None, created_at_before=None, assignee_id=None):
     """Filter cases based on date range and assignee."""

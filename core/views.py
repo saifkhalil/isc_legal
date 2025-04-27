@@ -1,33 +1,38 @@
 import calendar
+import re
 from datetime import date
 from datetime import datetime, timedelta
 
-from django.core.paginator import Paginator
-from django.http import JsonResponse
-from django.utils.translation import gettext as _
-from accounts.models import User
-from django.db.models import Q
 import django_filters.rest_framework
 from auditlog.models import LogEntry
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
+from django.urls import translate_url
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.utils.translation import activate
 from django.views.decorators.cache import never_cache
 from django_filters.rest_framework import DjangoFilterBackend
 from pghistory.models import Events
 from rest_framework import generics as rest_framework_generics
 from rest_framework import permissions
-from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework import viewsets, status
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.decorators import login_required
 
+from accounts.models import User
 from activities.models import task, hearing
 from cases.models import LitigationCases, Folder, AdministrativeInvestigation, Notation
 from cases.permissions import Manager_SuperUser
@@ -48,18 +53,13 @@ from .serializers import (
     PathSerializer
 )
 
-from django.core.cache import cache
-from rest_framework.exceptions import NotFound
 
-from django.views.decorators.vary import vary_on_cookie
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
-from django.core.cache import cache
-from django.shortcuts import redirect
-from django.utils.translation import activate
-from django.urls import translate_url
-import re
-
+def service_worker_view(request):
+    sw_path = settings.STATIC_ROOT.joinpath("css/service-worker.js") # This should be your path to service-worker.js
+    response = HttpResponse(open(sw_path).read(),
+    content_type='application/javascript')
+    response.headers['Service-Worker-Allowed'] = '/'
+    return response
 
 def index(request):
 

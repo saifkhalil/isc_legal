@@ -1,4 +1,3 @@
-from django.contrib.auth import login, authenticate, logout
 import six
 from django.conf import settings
 from django.contrib import messages
@@ -10,35 +9,28 @@ from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
-from django.templatetags.i18n import language
+from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes, force_str
-from accounts.forms import UserAuthenticationForm
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.translation import activate
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
-from django.views.generic import FormView
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import permissions
-from rest_framework import viewsets, status
-from rest_framework.authentication import TokenAuthentication, SessionAuthentication
-from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.response import Response
-from accounts.models import User, Employees
-from core.classes import StandardResultsSetPagination
-from accounts.serializers import EmployeesSerializer, EmpSerializer
-from django_filters import rest_framework as filters
-from rest_framework import generics
-from rest_framework.pagination import LimitOffsetPagination
-from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
-from django.core.cache import cache
-from haystack.query import SearchQuerySet
-from rest_framework.views import APIView
+from django.views.generic import FormView
+from django_filters import rest_framework as filters
 from elasticsearch.exceptions import ElasticsearchException
-from django.utils.translation import activate
+from haystack.query import SearchQuerySet
+from rest_framework import permissions
+from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from accounts.forms import UserAuthenticationForm
+from accounts.models import User, Employees
+from accounts.serializers import EmployeesSerializer, EmpSerializer
 
 
 def get_user_queryset(user=None):

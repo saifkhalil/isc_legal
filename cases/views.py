@@ -1,16 +1,22 @@
 import datetime
 import json
+import logging
 from datetime import datetime
 from datetime import timedelta
+from urllib.parse import urlencode
+
 import django_filters.rest_framework
 from auditlog.models import LogEntry
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
+from django.core.paginator import Paginator
 from django.db.models import Count
 from django.db.models import Q
-from django.http import  JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
+from django.utils.dateparse import parse_date
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 from django_celery_beat.models import ClockedSchedule, PeriodicTask
@@ -20,14 +26,17 @@ from rest_framework import permissions
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
+
 from accounts.models import User
 from cases.permissions import Manager_SuperUser, Manager_SuperUser_Sub_Manager
 from contract.models import Contract
 from core.classes import StandardResultsSetPagination
 from core.classes import dict_item, GetUniqueDictionaries
-from core.models import Notification, priorities,Path
+from core.mixins import CSVRendererMixin, CSVRendererMixin2
+from core.models import Notification, priorities
 from .forms import CaseForm
 from .models import LitigationCases, stages, case_type, court, client_position, opponent_position, Folder, \
     ImportantDevelopment, Status, AdministrativeInvestigation, Notation, characteristic
@@ -35,14 +44,7 @@ from .permissions import MyPermission
 from .serializers import LitigationCasesSerializer, stagesSerializer, case_typeSerializer, courtSerializer, \
     client_positionSerializer, opponent_positionSerializer, FoldersSerializer, \
     ImportantDevelopmentsSerializer, AdministrativeInvestigationsSerializer, NotationSerializer, \
-    characteristicSerializer, LitigationCaseStatisticsSerializer, CombinedStatisticsSerializer
-from core.mixins import CSVRendererMixin, CSVRendererMixin2
-from django.utils.dateparse import parse_date
-from django.core.cache import cache
-from rest_framework.exceptions import NotFound
-from django.core.paginator import Paginator
-from urllib.parse import urlencode
-import logging
+    characteristicSerializer, CombinedStatisticsSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -174,7 +176,6 @@ def cases_list(request):
     else:
         cases_qs = LitigationCases.objects.filter(is_deleted=False).order_by('-created_by')
     cases_count = cases_qs.count()
-    print(f'{cases_count=}')
     # Set up pagination.
     paginator = Paginator(cases_qs, number_of_records)
     page_number = request.GET.get('page', 1)
@@ -188,7 +189,7 @@ def cases_list(request):
         'type': case_type or 0,
         'stage': stage or 0,
         'assignee': assignee or 0,
-        'case_status': status or 0
+        'status': status or 0
     }
 
     # Build a filter query string to be used in pagination links.
@@ -199,26 +200,76 @@ def cases_list(request):
         if value:
             filter_params[key] = value
     filter_query = urlencode(filter_params)
+    fields_to_show = [
+        'id', 'name', 'case_type', 'Stage', 'court', 'case_status',
+        'assignee', 'created_at', 'case_category', 'characteristic',
+        'priority', 'case_close_status'
+    ]
 
+    headers = [
+        _("Number"), _("Subject"), _("Type"), _("Stage"), _("Court"),
+        _("Status"), _("Assignee"), _("Created At"), _("Category"),
+        _("Characteristic"), _("Priority"), _("Outcome"), _("Actions")
+    ]
+    filter_fields = [
+        {
+            "name": "keywords",
+            "label": _("Search keywords"),
+            "type": "text",
+            "value": keywords,
+        },
+        {
+            "name": "type",
+            "label": _("Type"),
+            "type": "select",
+            "value": case_type,
+            "options": case_type_set,
+        },
+        {
+            "name": "stage",
+            "label": _("Stage"),
+            "type": "select",
+            "value": stage,
+            "options": stage_set,
+        },
+        {
+            "name": "status",
+            "label": _("Status"),
+            "type": "select",
+            "value": status,
+            "options": case_status_set,
+        },
+        {
+            "name": "assignee",
+            "label": _("Assignee"),
+            "type": "select",
+            "value": assignee,
+            "options": assignees_set,
+        },
+    ]
+    cases_create = {'name':_('New Case'),'url':'case_create'}
     context = {
-        'cases': page_obj,
-        'cases_count': cases_count,
-        'courts': court_set,
-        'types': case_type_set,
-        'stages': stage_set,
-        'assignees': assignees_set,
-        'statuses': case_status_set,
+        'fields_to_show': fields_to_show,
+        'headers': headers,
+        'objs': page_obj,
+        'objs_count': cases_count,
+        'obj_view': 'case_view',
+        'obj_edit': 'case_edit',
+        'obj_delete': 'delete_case',
+        'obj_create': cases_create,
         'page_range': page_range,
         'session': json.dumps(session_info),
+        'filter_fields': filter_fields,
         'filter_query': filter_query,  # New variable for pagination links.
     }
-    return render(request, 'cases/cases_list.html', context)
+    return render(request, 'objs_list.html', context)
 
 
 def case_view(request, case_id=None, mode='view'):
     log = {}
     field_translations = {}
     OPERATION_TRANSLATIONS = {}
+    cases_create = {'name': _('New Case'), 'url': 'case_create'}
     if case_id:
         instance = get_object_or_404(LitigationCases, pk=case_id)
         if request.method == 'POST':
@@ -261,16 +312,17 @@ def case_view(request, case_id=None, mode='view'):
             instance.created_at = timezone.now()  # ✅ Correctly update created_at
             instance.save()  # ✅ Now save the instance
             return redirect('cases_list')
-    print(f'{log[1].changes_dict=}')
     context = {
         'form': form,
-        'case': instance,
+        'obj': instance,
         'mode': mode,
         'logs': log,
+        'obj_edit':'case_edit',
+        'objs_list':'cases_list',
         'field_translations': field_translations,
         'operation_translations':OPERATION_TRANSLATIONS,
     }
-    return render(request, 'cases/case.html', context)
+    return render(request, 'obj.html', context)
 
 
 @require_POST

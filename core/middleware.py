@@ -1,14 +1,32 @@
+import threading
+
 from auditlog.context import set_actor
 from auditlog.middleware import AuditlogMiddleware as _AuditlogMiddleware
-from django.utils.functional import SimpleLazyObject
-import threading
 from django.utils import timezone
+from django.utils.functional import SimpleLazyObject
+
 _thread_local = threading.local()
 from django.apps import apps
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 from django.utils.deprecation import MiddlewareMixin
 from core.models import Notification
+from django.shortcuts import redirect
+from django.utils.translation import get_language
+from django.urls import translate_url
+
+
+class LanguageMiddleware(MiddlewareMixin):
+
+    def process_request(self, request):
+        if request.user.is_authenticated:
+            user_language = request.user.language
+            cur_language = get_language()
+            if cur_language != user_language:
+                path = request.get_full_path()
+                url = translate_url(path,user_language)
+                return redirect(url)
+
 
 class NotificationMiddleware(MiddlewareMixin):
     """Middleware to add unread notifications to request context"""

@@ -1,0 +1,98 @@
+{% load file_filters i18n %}
+{% load static %}
+<section class="px-5 pb-5">
+<table class="table table-hover shadow-sm" {% if user.enable_transision %}data-aos="zoom-in"{% endif %}>
+  <thead>
+    <tr class="bg-gray-100">
+      {% for header in headers %}
+        <td class="pt-3 pb-3 text-bold">{{ header }}</td>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% if objs|length <= 0 %}
+      <tr>
+        <td colspan="{{ headers|length }}" class="text-center p-5">
+          <i class="bi bi-inbox-fill"></i> {% trans 'No data available in table' %}
+        </td>
+      </tr>
+    {% else %}
+      {% for obj in objs %}
+        <tr class="bg-white" {% if user.enable_transision %}data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00"{% endif %}>
+          {% for field in fields_to_show %}
+  <td class="pt-2 pb-2">
+    {% with value=obj|attr:field %}
+      {% if field == 'name' %}
+        <a href="{% url obj_view obj.id %}">{{ value|truncatechars:40 }}</a>
+      {% elif field == 'created_at' %}
+        {{ value|date:"Y-m-d" }}
+      {% elif field == 'case_category' %}
+        {% trans value %}
+      {% elif field == 'assignee' %}
+        {{ value.username }}
+      {% elif field == 'case_status' %}
+        {% if value %}
+          <button
+            class="cursor-default btn btn-sm btn-{{ value.color }}">
+            <span style="width:24px"
+                  class="{{ value.icon }}"
+                  role="status" aria-hidden="true"></span>
+            {{ value }}
+          </button>
+        {% endif %}
+      {% else %}
+        {{ value }}
+      {% endif %}
+    {% endwith %}
+  </td>
+{% endfor %}
+          <td class="pt-2 pb-2">
+          {% include "includes/_action_buttons.html" with obj_edit=obj_edit obj=obj user=user %}
+          </td>
+        </tr>
+      {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+    <!-- Start of Pagination -->
+    <nav aria-label="Page navigation shadow-sm">
+      <ul class="pagination justify-content-center flex-wrap">
+        {% if objs.has_previous %}
+          <li class="page-item">
+            <a class="btn btn-light"
+               href="?{{ filter_query }}&page={{ objs.previous_page_number }}">{% trans 'Previous' %}</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <button class="btn btn-light " disabled aria-disabled="true">{% trans 'Previous' %}</button>
+          </li>
+        {% endif %}
+        {% for i in page_range %}
+          {% if objs.number == i %}
+            <li class="page-item active">
+              <span class="btn btn-secondary">{{ i }} <span class="visually-hidden">{% trans 'current' %}</span></span>
+            </li>
+          {% else %}
+            {% if i == objs.paginator.ELLIPSIS %}
+              <button class="page-item disabled" aria-disabled="true"><span class="btn btn-light">{{ i }}</span>
+              </button>
+            {% else %}
+              <li class="page-item">
+                <a class="btn btn-light" href="?{{ filter_query }}&page={{ i }}">{{ i }}</a>
+              </li>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+        {% if objs.has_next %}
+          <li class="page-item">
+            <a class="btn btn-light" href="?{{ filter_query }}&page={{ objs.next_page_number }}">{% trans 'Next' %}</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled">
+            <button class="btn btn-light " disabled aria-disabled="true">{% trans 'Next' %}</button>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+<!-- End of Pagination -->
+</section>

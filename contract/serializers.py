@@ -1,13 +1,10 @@
-from django.shortcuts import get_object_or_404
 from drf_dynamic_fields import DynamicFieldsMixin
 from rest_framework import serializers
 
+from accounts.models import User
 from cases.serializers import ImportantDevelopmentsSerializer
+from core.serializers import commentsSerializer, PathSerializer
 from .models import Contract, Payment, Duration, Type
-from accounts.models import User, Employees
-
-from core.models import Status, priorities
-from core.serializers import commentsSerializer, documentsSerializer, PathSerializer
 
 
 class TypeSerializer(serializers.ModelSerializer):

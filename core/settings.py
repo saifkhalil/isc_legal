@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-import environ
 import os
+
+import environ
+
 env = environ.Env(
 
 )
@@ -22,6 +24,7 @@ from django.utils.translation import gettext_lazy as _
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+envr: str = "LOCAL"
 
 # sentry settings
 #
@@ -103,7 +106,11 @@ INSTALLED_APPS = [
     'dbbackup',
     'drf_api_logger',
     'furl',
-    'auditlog'
+    'auditlog',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.microsoft',
 ]
 
 MIDDLEWARE = [
@@ -123,6 +130,43 @@ MIDDLEWARE = [
     'core.middleware.AuditlogMiddleware',
     'django.contrib.admindocs.middleware.XViewMiddleware',
     'core.middleware.NotificationMiddleware',
+    'core.middleware.LanguageMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+]
+
+SITE_ID = 1
+
+LOGIN_URL = '/accounts/microsoft/login/'
+
+# ACCOUNT_ADAPTER = 'accounts.adapters.NoSignupAdapter'
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = env(envr+'_HTTP_PROTOCOL')
+ACCOUNT_CHANGE_EMAIL = False
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+SOCIALACCOUNT_ONLY  = True
+ACCOUNT_MAX_EMAIL_ADDRESSES = 1
+MICROSOFT_AUTHORIZATION_URL = f"https://login.microsoftonline.com/{env('MICROSOFT_TENANT')}/oauth2/v2.0/authorize"
+MICROSOFT_TOKEN_URL = f"https://login.microsoftonline.com/{env('MICROSOFT_TENANT')}/oauth2/v2.0/token"
+
+SOCIALACCOUNT_PROVIDERS = {
+    "microsoft": {
+        "APPS": [
+            {
+                "client_id": env('MICROSOFT_CLIENT_ID'),
+                "secret": env('MICROSOFT_SECRET'),
+                "settings": {
+                    "tenant": env('MICROSOFT_TENANT'),
+                    # Optional: override URLs (use base URLs without path)
+                    "login_url": "https://login.microsoftonline.com",
+                    "graph_url": "https://graph.microsoft.com",
+                }
+            }
+        ]
+    },
+}
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -217,7 +261,7 @@ STATICFILES_DIRS = [
 AUTH_USER_MODEL = 'accounts.User'
 
 LOGIN_REDIRECT_URL = 'home'
-LOGIN_URL = '/accounts/login'
+
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -271,7 +315,7 @@ SELECT2_CACHE_BACKEND = "select2"
 SPECTACULAR_SETTINGS = {
     'TITLE': 'ISC Legal App',
     'DESCRIPTION': 'ISC Legal App',
-    'VERSION': '0.9.1',
+    'VERSION': '1.3.4',
     'SERVE_INCLUDE_SCHEMA': False,
     'CONTACT': {"name": "Saif AlKhateeb", "email": "saif.ibrahim@qi.iq"},
 }

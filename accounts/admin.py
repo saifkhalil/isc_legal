@@ -19,11 +19,13 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from import_export.admin import ImportExportModelAdmin
+
 from accounts.models import User, Employees
 from .models import Department
+
 csrf_protect_m = method_decorator(csrf_protect)
 sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
-from core.api import save_employees_data_admin, sync_employees_data
+from core.api import sync_employees_data
 
 @admin.register(Employees)
 class EmployeeAdmin(ImportExportModelAdmin, admin.ModelAdmin):

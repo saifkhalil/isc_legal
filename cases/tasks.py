@@ -1,12 +1,13 @@
+from celery import Celery
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from celery import Celery
 from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
 from core.threading import send_html_mail
+
 app = Celery()
 logger = get_task_logger(__name__)
 from cases.models import LitigationCases

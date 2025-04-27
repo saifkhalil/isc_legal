@@ -1,7 +1,8 @@
-import pghistory
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
 import json
+
+from asgiref.sync import async_to_sync
+from auditlog.models import LogEntry as OriginalLogEntry
+from channels.layers import get_channel_layer
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
@@ -17,8 +18,6 @@ from .events import (
     event_path_deleted, event_path_document_added, event_path_document_removed
 )
 from .model_mixins import ExtraDataModelMixin, HooksModelMixin
-from auditlog.models import LogEntry as OriginalLogEntry
-from django.contrib.admin.utils import flatten_fieldsets
 
 
 class priorities(models.Model):
@@ -289,9 +288,30 @@ class Path(MPTTModel):
 
 
 class Status(models.Model):
+    theme_colors= (
+        ("primary","primary"),
+        ("secondary","secondary"),
+        ("success","success"),
+        ("info","info"),
+        ("warning","warning"),
+        ("danger","danger"),
+        ("light","light"),
+        ("dark","dark")
+    )
+    
     id = models.AutoField(primary_key=True, )
     status = models.CharField(
         max_length=250, blank=False, null=False, verbose_name=_('Status'))
+    icon = models.CharField(default='bi bi-bootstrap',
+        max_length=250, blank=False, null=False, verbose_name=_('Icon'))
+    color = models.CharField(choices=theme_colors, default='primary',
+        max_length=250, blank=False, null=False, verbose_name=_('Color'))
+    is_deleted = models.BooleanField(
+        default=False, verbose_name=_("Is Deleted"))
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    modified_at = models.DateTimeField(auto_now=True, editable=False)
+    created_by = models.ForeignKey(
+        User, related_name='%(class)s_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
     is_completed = models.BooleanField(default=False, verbose_name=_("Is Completed"))
     is_done = models.BooleanField(default=False, verbose_name=_("Is Done"))
 

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {% load i18n %}
-{% get_current_language as CURRENT_LANGUAGE %}
+{% with CURRENT_LANGUAGE=user.language %}
 {% get_available_languages as AVAILABLE_LANGUAGES %}
 {% get_language_info_list for AVAILABLE_LANGUAGES as languages %}
 {% load static %}
@@ -23,7 +23,7 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="http://isclegal.qi.iq/en/">
+    <meta property="og:url" content="http://isclegal.qi.iq/">
     <meta property="og:title"
         content="{% trans 'ISC Legal App' %}">
     <meta property="og:description" content="{% trans 'ISC Legal App' %}">
@@ -31,7 +31,7 @@
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="http://isclegal.qi.iq/en/">
+    <meta property="twitter:url" content="http://isclegal.qi.iq/">
     <meta property="twitter:title"
         content="{% trans 'ISC Legal App' %}">
     <meta property="twitter:description" content="{% trans 'ISC Legal App' %}">
@@ -60,7 +60,7 @@
 </head>
 <body class="d-flex flex-column h-100">
 {% if user.is_authenticated %}
-    <nav class="navbar navbar-expand-md qi-light mt-3 qi-{% if CURRENT_LANGUAGE == 'en' %}e{% else %}a{% endif %}nav">
+    <nav test="{{ user.language }}" class="navbar navbar-expand-md qi-light mt-3 qi-{% if CURRENT_LANGUAGE == 'en' %}e{% else %}a{% endif %}nav">
         <div class="container-fluid">
             <a class="navbar-brand" href="#"><img src="{% static 'images/qilogo.svg' %}" width="40"
                 height="40" alt="alternative"> </a>
@@ -151,7 +151,7 @@
               </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
               <li>
-                <a class="dropdown-item user-item" href="{% url 'logout' %}">{% trans 'Logout' %}</a>
+                <a class="dropdown-item user-item" href="{% url 'account_logout' %}">{% trans 'Logout' %}</a>
               </li>
             </ul>
 
@@ -187,7 +187,9 @@
      data-path="{% trans 'Path' %}"
 >
 </div>
+
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/tinymce/tinymce.min.js' %}"></script>
     <script src="{% static 'js/custom.js' %}?v=1.1"></script>
     <script src="{% static 'js/swiper.min.js' %}"></script>
     <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
@@ -197,7 +199,6 @@
     <script src="{% static 'js/jquery.easypiechart.min.js' %}"></script>
     <script src="{% static 'js/jquery-ui.min.js' %}"></script>
     <script src="{% static 'js/owl.carousel.min.js' %}"></script>
-    <script src="{% static 'js/tinymce/tinymce.min.js' %}"></script>
     <script src="{% static 'js/isotope.min.js' %}"></script>
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
@@ -406,3 +407,4 @@
 
 </body>
 </html>
+{% endwith %}

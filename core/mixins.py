@@ -1,5 +1,3 @@
-from rest_framework import renderers
-
 from core.renderers import LegalCSVRenderer, StreamingCSVRenderer
 
 

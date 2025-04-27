@@ -12,7 +12,7 @@
         </tr>
     </thead>
        <tbody>
-    {% for hearing in case.hearing.all  %}
+    {% for hearing in hearings  %}
               <tr {% if user.enable_transision %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
               <td class="pt-2 pb-2">{{ forloop.counter }}</td>
                 <td class="pt-2 pb-2"><a href="{% url 'hearing_view' hearing.id %}" target="_blank">{{ hearing.name }}</a></td>

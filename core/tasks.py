@@ -1,6 +1,6 @@
 from celery import shared_task
 from celery.utils.log import get_task_logger
-import datetime
+
 logger = get_task_logger(__name__)
 from cases.models import Notation
 

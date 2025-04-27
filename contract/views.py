@@ -1,30 +1,32 @@
+import json
+from datetime import timedelta, datetime
+from urllib.parse import urlencode
+
 from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 from django.views.decorators.http import require_POST
-from django_celery_beat.models import ClockedSchedule, PeriodicTask
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import permissions
 from rest_framework import viewsets, status
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
-from datetime import timedelta, datetime
+from rest_framework.response import Response
+
+from accounts.models import User
+from cases.permissions import Manager_SuperUser, MyPermission
+from core.classes import StandardResultsSetPagination
+from core.classes import dict_item, GetUniqueDictionaries
 from core.models import Notification
 from .models import Contract, Type, Payment, Duration
 from .serializers import ContractSerializer, PaymentSerializer, DurationSerializer, TypeSerializer
-from rest_framework.authentication import TokenAuthentication, SessionAuthentication
-from core.classes import StandardResultsSetPagination
-from rest_framework import permissions
-from cases.permissions import Manager_SuperUser, MyPermission
-from accounts.models import User
-from django.utils import timezone
-from django.contrib.contenttypes.models import ContentType
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from core.classes import dict_item, GetUniqueDictionaries
-import json
-from django.db.models import Q
-from django.core.cache import cache
-from urllib.parse import urlencode
+
 
 class ContractViewSet(viewsets.ModelViewSet):
     model = Contract

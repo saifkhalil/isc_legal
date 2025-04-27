@@ -1,6 +1,6 @@
 import requests
-import json
 from django.conf import settings
+
 from accounts.models import Employees
 
 

@@ -1,9 +1,10 @@
 {% load i18n %}
 {% load file_filters %}
 {% load static %}
+<div class="row mx-0">
 <div class="card shadow-sm p-3">
     <p class="pb-3">{% trans 'Files and documents related to the case' %}</p>
-    <table class="table {% if hearings|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
+    <table class="table {% if paths|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
     <thead {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
         <tr class="bg-gray-100">
           <td class="pt-3 pb-3 text-bold"></td>
@@ -14,11 +15,11 @@
         </tr>
     </thead>
     <tbody>
-    {% for path in case.paths.all  %}
+    {% for path in paths  %}
               <tr {% if user.enable_transision %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
               <td class="pt-2 pb-2"><button  data-bs-toggle="collapse" data-bs-target="#parent_case_{{ path.id }}" aria-expanded="false" aria-controls="parent_path_{{ path.id }}" style="cursor: pointer;"><i class="bi bi-folder-fill text-warning"></i></button></td>
               <td class="pt-2 pb-2">{{ forloop.counter }}</td>
-              <td class="pt-2 pb-2 text-bold">{{ path.name }}</td>
+              <td class="pt-2 pb-2 text-bold">{{ path.name|truncatechars:20 }}</td>
               <td class="pt-2 pb-2">{{ path.documents.all|length }}</td>
                         <td class="pt-2 pb-2">
               {% if user.is_manager or user.is_superuser %}
@@ -32,7 +33,7 @@
             <tr class="collapse qi-light" id="parent_case_{{ path.id }}" >
             <td></td>
           <td class="pt-2 pb-2">{{ forloop.counter }}</td>
-              <td class="pt-2 pb-2"><a class="btn btn-primary btn-sm" href="{{ doc.attachment.url }}" target="_blank"><i class="bi {{ doc.attachment.url|file_icon }}"></i> {{ doc.name }} </a></td>
+              <td class="pt-2 pb-2"><a class="btn btn-primary btn-sm" href="{{ doc.attachment.url }}" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ doc.name }}"><i class="bi {{ doc.attachment.url|file_icon }}"></i> {{ doc.name|truncatechars:35 }} </a></td>
           <td class="pt-2 pb-2">{{ doc.created_at|date:"Y-m-d" }}</td>
             <td class="pt-2 pb-2">
               {% if user.is_manager or user.is_superuser %}
@@ -52,3 +53,4 @@
     </tbody>
     </table>
     </div>
+</div>

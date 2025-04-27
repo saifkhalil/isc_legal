@@ -1,20 +1,21 @@
 from auditlog.models import LogEntry
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from drf_dynamic_fields import DynamicFieldsMixin
 from pghistory.models import Events
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework_recursive.fields import RecursiveField
-from django.db.models import Q
 
 from accounts.models import User
 from cases.models import LitigationCases, Notation, AdministrativeInvestigation, Folder
 from contract.models import Contract
 from core.models import comments, replies, priorities, contracts, documents, Status, Path, Notification
 from rest_api.relations import FilteredPrimaryKeyRelatedField
-from django.core.cache import cache
+
 
 class JSONSerializerField(serializers.Field):
     """ Serializer for JSONField -- required to make field writable"""

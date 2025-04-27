@@ -1,8 +1,9 @@
 # from django.utils.encoding import force_text
 # from django.utils.hashcompat import md5_constructor
 from django.core.cache import cache
-from django.shortcuts import get_object_or_404
 from django.db.models import Model
+from django.shortcuts import get_object_or_404
+
 
 # def cache_key_func(view_instance, view_method, request, args, kwargs):
 #     path = request.build_absolute_uri()

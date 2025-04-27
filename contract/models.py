@@ -1,15 +1,13 @@
-import pghistory
+from datetime import timedelta
+
+from auditlog.registry import auditlog
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from core.models import priorities, comments, Path
+
 from accounts.models import User
 from cases.models import ImportantDevelopment
-from django.urls import reverse
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.utils import timezone
-from datetime import timedelta
-from auditlog.registry import auditlog
+from core.models import priorities, comments, Path
 
 
 class Contract(models.Model):

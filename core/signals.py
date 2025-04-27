@@ -1,16 +1,15 @@
 # signals.py
+from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.signals import m2m_changed
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils import timezone
-from django.core.cache import cache
 from django.utils.deprecation import MiddlewareMixin
-from django.db.models.signals import post_save,pre_delete
-from django.dispatch import receiver
-from django.contrib.contenttypes.models import ContentType
-from .models import Notification
-from accounts.models import User
 
+from accounts.models import User
+from .models import Notification
 
 ALLOWED_APPS = {"activities", "cases", "contract", "core"}
 
@@ -18,7 +17,7 @@ ALLOWED_APPS = {"activities", "cases", "contract", "core"}
 def get_users_to_notify(instance, action_by):
     users_to_notify = set()
     if hasattr(instance, "assignee") and instance.assignee:
-        if type(instance.assignee) == int:
+        if type(instance.assignee) == User:
             users_to_notify.add(instance.assignee)
         else:
             for user in instance.assignee.all():

@@ -1,11 +1,11 @@
-from accounts.models import Employees
-from django.db import models
-from haystack import signals
-from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.dispatch import receiver
 from auditlog.models import LogEntry
-from django.utils.timezone import now
+from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.contrib.contenttypes.models import ContentType
+from django.db import models
+from django.dispatch import receiver
+from haystack import signals
+
+from accounts.models import Employees
 
 
 # def get_client_ip(request):

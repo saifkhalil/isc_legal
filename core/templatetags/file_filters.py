@@ -1,5 +1,7 @@
-from django import template
 import os
+
+from django import template
+from django.urls import NoReverseMatch, reverse
 
 register = template.Library()
 
@@ -34,3 +36,17 @@ def file_icon(file_path):
 @register.filter
 def dict_get(d, key):
     return d.get(key)
+
+@register.filter
+def attr(obj, field):
+    try:
+        return getattr(obj, field)
+    except Exception:
+        return ""
+
+@register.simple_tag
+def url_from_name(name, *args, **kwargs):
+    try:
+        return reverse(name, args=args, kwargs=kwargs)
+    except NoReverseMatch:
+        return '#'

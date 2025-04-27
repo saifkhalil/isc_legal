@@ -1,4 +1,3 @@
-import pghistory
 from auditlog.registry import auditlog
 from django.db import models
 from django.db.models.signals import post_save, m2m_changed
@@ -7,6 +6,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
 from accounts.models import User, Employees
 from activities.models import task, hearing
 from core.models import priorities, comments, documents, court, Status, Path
@@ -16,7 +16,7 @@ from core.threading import send_html_mail
 class DefaultManager(models.Manager):
     """ Custom manager to exclude deleted records """
     def get_queryset(self):
-        return super().get_queryset().filter(is_deleted=False)
+        return super().get_queryset()
 
 class BaseModel(models.Model):
     """ Abstract base model to apply the default manager to all models """

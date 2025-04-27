@@ -17,10 +17,9 @@
      <form method="post">
   {% csrf_token %}
   <table class="form form-table">
-      {% include "includes/_form_buttons.html" with obj_edit="case_edit" obj_id=case.id objs_list="cases_list" %}
-    <button type="button" class="btn btn-primary pulse-primary mx-3" data-bs-toggle="modal" data-bs-target="#CaseHistory"><i class="bi bi-clock-history"></i> {% trans 'Case History' %}</button>
+      {% include "includes/_form_buttons.html" with obj_create_url=obj_create.url obj_edit="case_edit" obj_id=case.id objs_list="cases_list" %}
            {% bootstrap_form form  %}
-    {% include "includes/_form_buttons.html" with obj_edit="case_edit" obj_id=case.id objs_list="cases_list" %}
+    {% include "includes/_form_buttons.html" with obj_create_url=obj_create.url obj_edit="case_edit" obj_id=case.id objs_list="cases_list" %}
   </table>
 </form>
   </div>
@@ -41,9 +40,8 @@
   {% endif %}
  </div>
   </div>
-{% include "includes/_case_history.html" with case=case logs=logs %}
+{% include "includes/_case_history.html" with obj=case logs=logs %}
   <script src="{% static 'js/jquery.min.js' %}"></script>
 <script src="{% static 'js/select2.min.js' %}"></script>
 <script src="{% static 'js/case.js' %}"></script>
-
 {% endblock %}

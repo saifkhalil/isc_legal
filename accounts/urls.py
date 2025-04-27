@@ -17,6 +17,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.urls import path, include
 from rest_framework import routers
+
 from accounts.views import (
     registration_view,
     account_view,
@@ -28,11 +29,10 @@ from accounts.views import (
     UserSetPasswordView,
     EmployeesViewSet,
     SearchEmployeesAPIView,
-    SearchEmployeeAPIView,
     login_view,
     logout_view
 )
-from django.views.decorators.cache import cache_page
+
 router = routers.DefaultRouter()
 router.register(r'employees', EmployeesViewSet, "employees")
 

@@ -3,15 +3,17 @@ import json
 from audioop import reverse
 from datetime import datetime
 from datetime import timedelta
+
 import django_filters.rest_framework
 from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
 from django.db.models import Count
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.dateparse import parse_date
 from django_celery_beat.models import ClockedSchedule, PeriodicTask
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -21,13 +23,15 @@ from rest_framework.authentication import TokenAuthentication, SessionAuthentica
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
-from accounts.models import User
+
 from accounts.models import User
 from cases.permissions import Manager_SuperUser, Manager_SuperUser_Sub_Manager
 from contract.models import Contract
 from core.classes import StandardResultsSetPagination
 from core.classes import dict_item, GetUniqueDictionaries
+from core.mixins import CSVRendererMixin, CSVRendererMixin2
 from core.models import Notification, priorities
+from core.utils import LegalCache
 from .forms import CaseForm
 from .models import LitigationCases, stages, case_type, court, client_position, opponent_position, Folder, \
     ImportantDevelopment, Status, AdministrativeInvestigation, Notation, characteristic
@@ -35,11 +39,8 @@ from .permissions import MyPermission
 from .serializers import LitigationCasesSerializer, stagesSerializer, case_typeSerializer, courtSerializer, \
     client_positionSerializer, opponent_positionSerializer, FoldersSerializer, \
     ImportantDevelopmentsSerializer, AdministrativeInvestigationsSerializer, NotationSerializer, \
-    characteristicSerializer, LitigationCaseStatisticsSerializer, CombinedStatisticsSerializer
-from core.mixins import CSVRendererMixin, CSVRendererMixin2
-from django.utils.dateparse import parse_date
-from django.core.cache import cache
-from core.utils import LegalCache
+    characteristicSerializer, CombinedStatisticsSerializer
+
 
 def manager_superuser_check(request):
     return Response(data={"detail": "انت غير مصرح بالمسح"}, status=status.HTTP_401_UNAUTHORIZED)

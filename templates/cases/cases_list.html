@@ -1,314 +1,96 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block content %}
-{% load static %}
+  {% load static %}
 
-<div class="card shadow-sm m-5 mb-3 mt-3 " {% if user.enable_transision %}  data-aos="zoom-in" {% endif %}>
-  <div class="card-body">
-    <form method="GET">
-      <div class="row g-3">
-        <div class="col-md">
-          <div class="form-floating">
-            <input type="text" class="form-control" id="keywords" name="keywords" placeholder="Search keywords">
-            <label for="keywords">{% trans 'Search keywords' %}</label>
-          </div>
-        </div>
-        <div class="col-md">
-          <div class="form-floating">
-            <select class="form-select" id="type" name="type" onchange="javascript:this.form.submit()">
-              <option value='0'>{% trans 'All' %}</option>
-              {% for type in types %}
-                <option value="{{ type.id }}">{{ type.name }}</option>
-              {% endfor %}
-            </select>
-            <label for="type">{% trans 'Type' %}</label>
-          </div>
-        </div>
-        <div class="col-md">
-          <div class="form-floating">
-            <select class="form-select" name="stage" id="stage" onchange="javascript:this.form.submit()">
-              <option value='0'>{% trans 'All' %}</option>
-              {% for stage in stages %}
-                <option value="{{ stage.id }}">{{ stage.name }}</option>
-              {% endfor %}
-            </select>
-            <label for="stage">{% trans 'Stage' %}</label>
-          </div>
-        </div>
-        <div class="col-md">
-          <div class="form-floating">
-            <select class="form-select" name="status" id="case_status" onchange="javascript:this.form.submit()">
-              <option value='0'>{% trans 'All' %}</option>
-              {% for status in statuses %}
-                <option value="{{ status.id }}">{{ status.name }}</option>
-              {% endfor %}
-            </select>
-            <label for="status">{% trans 'Status' %}</label>
-          </div>
-        </div>
-        <div class="col-md">
-          <div class="form-floating">
-            <select class="form-select" name="assignee" id="assignee" onchange="javascript:this.form.submit()">
-              <option value='0'>{% trans 'All' %}</option>
-              {% for assign in assignees %}
-                <option value="{{ assign.id }}">{{ assign.name }}</option>
-              {% endfor %}
-            </select>
-            <label for="assignee">{% trans 'Assignee' %}</label>
-          </div>
-      </div>
-                  <div class="col-md">
-              <div class="form-floating">
-                <select class="form-control" placeholder="Number of records" id="number_of_records" onchange="javascript:this.form.submit()"
-                  name="number_of_records" aria-label="priority">
-                  <option value='10'>{% trans '10 records' %}</option>
-                  <option value='25'>{% trans '25 records' %}</option>
-                  <option value='50'>{% trans '50 records' %}</option>
-                </select>
-                <label for="id" class="form-label">{% trans 'Number of records' %}</label>
-              </div>
-            </div>
-          <div class="col-md mt-4 text-center">
-            <div class="start-50">
-              <button type="submit" name="search" value="search" class="btn btn-warning"><i class="bi bi-search"></i> {% trans 'Search' %}</button>
-            <button type="submit" name="clear" value="clear" class="btn btn-danger text-dark"><i class="bi bi-x-circle-fill"></i> {% trans 'Clear' %}</button>
-            </div>
-
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
-<div class="row px-5 pb-2">
-  <div class="col">
-    <a role="button" class="btn btn-primary pulse-primary" href="{% url 'case_create' %}" {% if user.enable_transision %}  data-aos="zoom-in" {% endif %}><i class="bi bi-file-earmark-plus"></i> {% trans 'New Case' %}</a>
-  </div>
-</div>
+{% include "includes/_render_filter_form.html" with filters=filter_fields session=session %}
   <div class="row px-5 pb-2">
-  <p>{% trans 'Cases Count:' %}: {{ cases_count|default:0 }}</p>
-</div>
-  <section class="px-5 pb-5" >
-    <table class="table {% if cases|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
-    <thead {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
-        <tr class="bg-gray-100">
-          <td class="pt-3 pb-3 text-bold">{% trans 'Number' %}</td>
-          <td class="pt-3 pb-3 text-bold">{% trans 'Subject' %}</td>
-          <td class="pt-3 pb-3 text-bold">{% trans 'Type' %}</td>
-          <td class="pt-3 pb-3 text-bold">{% trans 'Stage' %}</td>
-          <td class="pt-3 pb-3 text-bold">{% trans 'Court' %}</td>
-          <td class="pt-3 pb-3 text-bold">{% trans 'Status' %}</td>
-          <td class="pt-3 pb-3 text-bold">{% trans 'Assignee' %}</td>
-          <td class="pt-3 pb-3 text-bold">{% trans 'Created At' %}</td>
-          <td class="pt-3 pb-3 text-bold">{% trans 'Category' %}</td>
-          <td class="pt-3 pb-3 text-bold">{% trans 'Characteristic' %}</td>
-          <td class="pt-3 pb-3 text-bold">{% trans 'Priority' %}</td>
-          <td class="pt-3 pb-3 text-bold">{% trans 'Outcome' %}</td>
-          <td class="pt-3 pb-3 text-bold">{% trans 'Actions' %}</td>
-        </tr>
-    </thead>
-    <tbody>
-      {% if cases|length <= 0 %}
-        <tr class="bg-white">
-        <td class="p-5 text-center" colspan="13"><i class="bi bi-inbox-fill"></i> {% trans 'No data available in table' %}</td>
-        </tr>
-      {% else %}
-      {% for case in cases %}
-        <tr class="bg-white" {% if user.enable_transision %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
-          <td class="pt-2 pb-2"><button data-bs-toggle="collapse" data-bs-target="#parent_case_{{ case.id }}" aria-expanded="false" aria-controls="parent_case_{{ case.id }}" style="cursor: pointer;"><i class="bi bi-plus-circle-fill"></i></button> {{ case.id }}</td>
-          <td class="pt-2 pb-2" data-toggle="tooltip" data-placement="top" title="{{ case.name|default:''}}"><a href="{% url 'case_view' case.id %}">{{ case.name|truncatechars:40 }}</a><a class="mx-1" href="{% url 'case_edit' case.id %}"><i class="bi bi-pencil-square text-primary"></i></a> </td>
-          <td class="pt-2 pb-2">{{ case.case_type|default:'' }}</td>
-          <td class="pt-2 pb-2">{{ case.Stage|default:'' }}</td>
-          <td class="pt-2 pb-2" data-toggle="tooltip" data-placement="top" title="{{ case.court|default:'' }}">{{ case.court|default:''|truncatechars:40 }}</td>
-          <td class="pt-2 pb-2"><button class="cursor-default btn btn-sm btn-{% if case.case_status.id == 1 %}light{% elif case.case_status.id == 2 %}warning text-dark{% elif case.case_status.id == 3 or case.case_status.id == 5 or case.case_status.id == 6 %}danger{% elif case.case_status.id == 4 or case.case_status.id == 7 %}success{% else %}light text-dark{% endif %}">
-            <span style="width:24px" class="{% if case.case_status.id == 1 %}bi bi-asterisk{% elif case.case_status.id == 2 %}fas fa-spinner fa-spin{% elif case.case_status.id == 3 or case.case_status.id == 5 or case.case_status.id == 6 %}bi bi-x-circle{% elif case.case_status.id == 4 or case.case_status.id == 7 %}bi bi-check2-all{% else %}bi bi-x-circle{% endif %}" role="status" aria-hidden="true"></span>
-            {{ case.case_status|default:'' }}</button></td>
-          <td class="pt-2 pb-2">{{ case.assignee.username|default:'' }}</td>
-          <td class="pt-2 pb-2">{{ case.created_at|date:"Y-m-d" }}</td>
-          <td class="pt-2 pb-2">{% trans case.case_category %}</td>
-          <td class="pt-2 pb-2">{{ case.characteristic|default:'' }}</td>
-          <td class="pt-2 pb-2">{{ case.priority|default:'' }}</td>
-          <td class="pt-2 pb-2">{{ case.case_close_status|default:'' }}</td>
-          <td class="pt-2 pb-2">
-              {% if user.is_manager or user.is_superuser %}
-                  <button class="btn btn-sm btn-danger delete-case" data-case-id="{{ case.id }}"><i class="bi bi-trash3-fill"></i></button>
-              {% else %}
-                  <button class="btn btn-sm btn-danger" disabled>{% trans 'Delete' %}</button>
-              {% endif %}
-          <button class="btn btn-sm btn-success" data-bs-toggle="popover" title="{% trans 'اخر تطور مهم' %}" data-bs-content="{{ case.ImportantDevelopment.last|default:'لا يوجد' }} {% if case.ImportantDevelopment.last %} <br> بتاريخ: {{ case.ImportantDevelopment.last.created_at|date:'Y:m:d' }}{% endif %}"><i class="bi bi-card-list"></i></button>
-          </td>
-        </tr>
-            <tr class="collapse qi-light" id="parent_case_{{ case.id }}" >
-          <td class="pt-2 pb-2">{{ case.id }}</td>
-          <td class="pt-2 pb-2">{{ case.name }}</td>
-          <td class="pt-2 pb-2">{{ case.case_type }}</td>
-          <td class="pt-2 pb-2">{{ case.Stage }}</td>
-          <td class="pt-2 pb-2">{{ case.court }}</td>
-          <td class="pt-2 pb-2"><span class="pt-2 pb-2 badge bg-{% if case.case_status.id == 1 %}success{% elif case.case_status.id == 2 %}warning text-dark{% elif case.case_status.id == 3 or case.case_status.id == 4 or case.case_status.id == 5 %}secondary{% else %}light text-dark{% endif %}">{{ case.case_status }}</span></td>
-          <td class="pt-2 pb-2">{{ case.assignee.username }}</td>
-          <td class="pt-2 pb-2">{{ case.created_at|date:"Y-m-d" }}</td>
-          <td class="pt-2 pb-2">{% trans case.case_category %}</td>
-          <td class="pt-2 pb-2">{{ case.characteristic }}</td>
-          <td class="pt-2 pb-2">{{ case.priority }}</td>
-          <td class="pt-2 pb-2">{{ case.case_close_status }}</td>
-          <td class="pt-2 pb-2">
-              {% if user.is_manager or user.is_superuser %}
-                  <button class="btn btn-sm btn-danger delete-case" data-case-id="{{ case.id }}"><i class="bi bi-trash3-fill"></i></button>
-              {% else %}
-                  <button class="btn btn-sm btn-danger" disabled>{% trans 'Delete' %}</button>
-              {% endif %}
-                  <button class="btn btn-sm btn-success" data-bs-toggle="popover" title="{% trans 'اخر تطور مهم' %}" data-bs-content="{{ case.ImportantDevelopment.last|default:'لا يوجد' }} {% if case.ImportantDevelopment.last %} <br> بتاريخ: {{ case.ImportantDevelopment.last.created_at|date:'Y:m:d' }}{% endif %}"><i class="bi bi-card-list"></i></button>
-          </td>
-    </tr>
-<tr class="collapse qi-light" id="parent_case_{{ case.id }}" >
-          <td class="pt-2 pb-2">{{ case.id }}</td>
-          <td class="pt-2 pb-2">{{ case.name }}</td>
-          <td class="pt-2 pb-2">{{ case.case_type }}</td>
-          <td class="pt-2 pb-2">{{ case.Stage }}</td>
-          <td class="pt-2 pb-2">{{ case.court }}</td>
-          <td class="pt-2 pb-2"><span class="pt-2 pb-2 badge bg-{% if case.case_status.id == 1 %}success{% elif case.case_status.id == 2 %}warning text-dark{% elif case.case_status.id == 3 or case.case_status.id == 4 or case.case_status.id == 5 %}secondary{% else %}light text-dark{% endif %}">{{ case.case_status }}</span></td>
-          <td class="pt-2 pb-2">{{ case.assignee.username }}</td>
-          <td class="pt-2 pb-2">{{ case.created_at|date:"Y-m-d" }}</td>
-          <td class="pt-2 pb-2">{% trans case.case_category %}</td>
-          <td class="pt-2 pb-2">{{ case.characteristic }}</td>
-          <td class="pt-2 pb-2">{{ case.priority }}</td>
-          <td class="pt-2 pb-2">{{ case.case_close_status }}</td>
-          <td class="pt-2 pb-2">
-              {% if user.is_manager or user.is_superuser %}
-                  <button class="btn btn-sm btn-danger delete-case" data-case-id="{{ case.id }}"><i class="bi bi-trash3-fill"></i></button>
-              {% else %}
-                  <button class="btn btn-sm btn-danger" disabled>{% trans 'Delete' %}</button>
-              {% endif %}
-                  <button class="btn btn-sm btn-success" data-bs-toggle="popover" title="{% trans 'اخر تطور مهم' %}" data-bs-content="{{ case.ImportantDevelopment.last|default:'لا يوجد' }} {% if case.ImportantDevelopment.last %} <br> بتاريخ: {{ case.ImportantDevelopment.last.created_at|date:'Y:m:d' }}{% endif %}"><i class="bi bi-card-list"></i></button>
-          </td>
-    </tr>
-      {% endfor %}
-    {% endif %}
-      <tbody>
-      </table>
-          <!-- Start of Pagination -->
-    <nav aria-label="Page navigation shadow-sm">
-<ul class="pagination justify-content-center flex-wrap">
-{% if cases.has_previous %}
-  <li class="page-item">
-    <a class="btn btn-light" href="?{{ filter_query }}&page={{ cases.previous_page_number }}">{% trans 'Previous' %}</a>
-  </li>
-{% else %}
-  <li class="page-item disabled">
-    <button class="btn btn-light " disabled aria-disabled="true">{% trans 'Previous' %}</button>
-  </li>
-{% endif %}
+    <div class="col">
+      <a role="button" class="btn btn-primary pulse-primary" href="{% url 'case_create' %}"
+        {% if user.enable_transision %}  data-aos="zoom-in" {% endif %}><i
+        class="bi bi-file-earmark-plus"></i> {% trans 'New Case' %}</a>
+    </div>
+  </div>
+  <div class="row px-5 pb-2">
+    <p>{% trans 'Cases Count:' %}: {{ cases_count|default:0 }}</p>
+  </div>
+  <section class="px-5 pb-5">
+{% include "includes/_render_table.html" with objs=cases headers=headers fields_to_show=fields_to_show filter_query=filter_query page_range=page_range %}
+  </section>
 
-{% for i in page_range %}
-  {% if cases.number == i %}
-    <li class="page-item active">
-      <span class="btn btn-secondary">{{ i }} <span class="visually-hidden">{% trans 'current' %}</span></span>
-    </li>
-  {% else %}
-    {% if i == cases.paginator.ELLIPSIS %}
-      <button class="page-item disabled" aria-disabled="true"><span class="btn btn-light">{{ i }}</span></button>
-    {% else %}
-      <li class="page-item">
-        <a class="btn btn-light" href="?{{ filter_query }}&page={{ i }}">{{ i }}</a>
-      </li>
-    {% endif %}
-  {% endif %}
-{% endfor %}
-
-{% if cases.has_next %}
-  <li class="page-item">
-    <a class="btn btn-light" href="?{{ filter_query }}&page={{ cases.next_page_number }}">{% trans 'Next' %}</a>
-  </li>
-{% else %}
-  <li class="page-item disabled">
-    <button class="btn btn-light " disabled aria-disabled="true">{% trans 'Next' %}</button>
-  </li>
-{% endif %}
-</ul>
-</nav>
-
-      <!-- End of Pagination -->
-
-</section>
-
-<script type="text/javascript">
-  var sessionData = JSON.parse('{{ session | escapejs }}');
-  window.addEventListener('load', function () {
-    if (sessionData.number_of_records !== undefined) {
-      document.getElementById('number_of_records').value = sessionData.number_of_records;
-    }
-    else {
-       document.getElementById('number_of_records').value = 10
-    }
-    if (sessionData.keywords !== undefined) {
-      document.getElementById('keywords').value = sessionData.keywords;
-    }
-    else{
-      document.getElementById('keywords').value = '';
-    }
-    if (sessionData.type !== undefined) {
-      document.getElementById('type').value = sessionData.type;
-    }
-    else {
-      document.getElementById('type').value = 0;
-    }
-    if (sessionData.stage !== undefined) {
-      document.getElementById('stage').value  = sessionData.stage;
-    }
-    else {
-      document.getElementById('stage').value = 0;
-    }
-    if (sessionData.case_status !== undefined) {
-      document.getElementById('case_status').value = sessionData.case_status;
-    }
-    else {
-      document.getElementById('case_status').value = 0;
-    }
-    // Optionally handle additional keys:
-    if (sessionData.assignee !== undefined) {
-      document.getElementById('assignee').value = sessionData.assignee;
-    }
-    else {
-      document.getElementById('assignee').value = 0;
-    }
-    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
-var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-  return new bootstrap.Popover(popoverTriggerEl, {html : true,trigger : 'hover click'})
-})
-  });
-</script>
-<script type="text/javascript">
-  document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.delete-case').forEach(function(button) {
-      button.addEventListener('click', function() {
-        const caseId = this.getAttribute('data-case-id');
-        if (confirm('{% trans 'Are you sure you want to delete?' %}')) {
-          fetch("{% url 'delete_case' 0 %}".replace("0", caseId), {
-            method: 'POST',
-            headers: {
-              'X-CSRFToken': '{{ csrf_token }}',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({})
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              alert(data.message);
-              // Option 1: Remove the row from the table
-              this.closest('tr').remove();
-              // Option 2: Or, reload the page to reflect changes:
-              // window.location.reload();
-            } else {
-              alert('Error: ' + data.message);
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            alert('{% trans 'An error occurred while deleting.' %}');
-          });
-        }
+  <script type="text/javascript">
+    var sessionData = JSON.parse('{{ session | escapejs }}');
+    window.addEventListener("load", function() {
+      if (sessionData.number_of_records !== undefined) {
+        document.getElementById("number_of_records").value = sessionData.number_of_records;
+      } else {
+        document.getElementById("number_of_records").value = 10;
+      }
+      if (sessionData.keywords !== undefined) {
+        document.getElementById("keywords").value = sessionData.keywords;
+      } else {
+        document.getElementById("keywords").value = "";
+      }
+      if (sessionData.type !== undefined) {
+        document.getElementById("type").value = sessionData.type;
+      } else {
+        document.getElementById("type").value = 0;
+      }
+      if (sessionData.stage !== undefined) {
+        document.getElementById("stage").value = sessionData.stage;
+      } else {
+        document.getElementById("stage").value = 0;
+      }
+      if (sessionData.status !== undefined || sessionData.status !== null) {
+        document.getElementById("status").value = sessionData.status;
+      } else {
+        document.getElementById("status").value = 0;
+      }
+      // Optionally handle additional keys:
+      if (sessionData.assignee !== undefined) {
+        document.getElementById("assignee").value = sessionData.assignee;
+      } else {
+        document.getElementById("assignee").value = 0;
+      }
+      var popoverTriggerList = [].slice.call(document.querySelectorAll("[data-bs-toggle=\"popover\"]"));
+      var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl, { html: true, trigger: "hover click" });
       });
     });
-  });
-</script>
+  </script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+      document.querySelectorAll(".delete-case").forEach(function(button) {
+        button.addEventListener("click", function() {
+          const caseId = this.getAttribute("data-case-id");
+          if (confirm('{% trans 'Are you sure you want to delete?' %}')) {
+            fetch("{% url 'delete_case' 0 %}".replace("0", caseId), {
+              method: "POST",
+              headers: {
+                "X-CSRFToken": '{{ csrf_token }}',
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({})
+            })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  alert(data.message);
+                  // Option 1: Remove the row from the table
+                  this.closest("tr").remove();
+                  // Option 2: Or, reload the page to reflect changes:
+                  // window.location.reload();
+                } else {
+                  alert("Error: " + data.message);
+                }
+              })
+              .catch(error => {
+                console.error("Error:", error);
+                alert('{% trans 'An error occurred while deleting.' %}');
+              });
+          }
+        });
+      });
+    });
+  </script>
 {% endblock %}

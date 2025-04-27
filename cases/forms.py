@@ -1,6 +1,8 @@
-from django.forms import ModelForm, DateInput,Select,SelectMultiple, RadioSelect
+from django.forms import ModelForm, DateInput, Select, SelectMultiple, RadioSelect
 from django_select2 import forms as s2forms
+
 from cases.models import LitigationCases
+
 
 class UserWidget(s2forms.ModelSelect2Widget):
     search_fields = [

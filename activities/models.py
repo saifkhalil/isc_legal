@@ -1,10 +1,10 @@
-import pghistory
 from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from accounts.models import User
 from core.models import comments, court, Status, documents, priorities
+
 
 class hearing(models.Model):
     id = models.AutoField(primary_key=True, )

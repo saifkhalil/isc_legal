@@ -1,0 +1,67 @@
+{% load i18n %}
+{% load static %}
+<form method="GET">
+  <div class="card shadow-sm m-5 mb-3 mt-3" {% if user.enable_transision %}data-aos="zoom-in"{% endif %}>
+    <div class="card-body">
+      <div class="row g-3">
+        {% for field in filters %}
+          <div class="col-md">
+            <div class="form-floating">
+              {% if field.type == "text" %}
+                <input type="text"
+                       class="form-control"
+                       id="{{ field.name }}"
+                       name="{{ field.name }}"
+                       placeholder="{{ field.label }}"
+                       value="{{ field.value|default:'' }}">
+                <label for="{{ field.name }}">{{ field.label }}</label>
+              {% elif field.type == "select" %}
+                <select class="form-select"
+                        id="{{ field.name }}"
+                        name="{{ field.name }}"
+                        onchange="this.form.submit()">
+                  <option value="0">{% trans 'All' %}</option>
+                  {% for option in field.options %}
+                    <option value="{{ option.id }}"
+                      {% if option.id|stringformat:"s" == field.value|stringformat:"s" %}selected{% endif %}>
+                      {{ option.name }}
+                    </option>
+                  {% endfor %}
+                </select>
+                <label for="{{ field.name }}">{{ field.label }}</label>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+
+        <!-- Record Count Field -->
+        <div class="col-md">
+          <div class="form-floating">
+            <select class="form-control"
+                    id="number_of_records"
+                    onchange="this.form.submit()"
+                    name="number_of_records"
+                    aria-label="number_of_records">
+              <option value="10" {% if session.number_of_records == 10 %}selected{% endif %}>{% trans '10 records' %}</option>
+              <option value="25" {% if session.number_of_records == 25 %}selected{% endif %}>{% trans '25 records' %}</option>
+              <option value="50" {% if session.number_of_records == 50 %}selected{% endif %}>{% trans '50 records' %}</option>
+            </select>
+            <label for="number_of_records">{% trans 'Number of records' %}</label>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="col-md mt-4 text-center">
+          <div class="start-50">
+            <button type="submit" name="search" value="search" class="btn btn-warning">
+              <i class="bi bi-search"></i> {% trans 'Search' %}
+            </button>
+            <button type="submit" name="clear" value="clear" class="btn btn-danger text-dark">
+              <i class="bi bi-x-circle-fill"></i> {% trans 'Clear' %}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

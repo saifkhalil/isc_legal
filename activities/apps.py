@@ -1,7 +1,8 @@
 from django.apps import AppConfig
-from django.utils.translation import gettext_lazy as _
 from django.db.models import ManyToManyField
 from django.db.models.signals import m2m_changed
+from django.utils.translation import gettext_lazy as _
+
 
 class ActivitiesConfig(AppConfig):
     name = 'activities'

@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from drf_dynamic_fields import DynamicFieldsMixin
 from rest_framework import serializers
@@ -17,7 +18,6 @@ from cases.models import (
 )
 from core.models import Status, priorities
 from core.serializers import commentsSerializer, documentsSerializer, PathSerializer
-from django.core.cache import cache
 
 
 class case_typeSerializer(serializers.ModelSerializer):

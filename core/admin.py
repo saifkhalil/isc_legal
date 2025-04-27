@@ -31,7 +31,7 @@ class documentsAdmin(admin.ModelAdmin):
 
 
 class StatusAdmin(admin.ModelAdmin):
-    list_display = ('id', 'status', 'is_completed', 'is_done')
+    list_display = ('id', 'status','color', 'icon', 'is_completed', 'is_done')
 
 
 class NotificationsAdmin(admin.ModelAdmin):

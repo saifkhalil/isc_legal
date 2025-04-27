@@ -27,17 +27,17 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView
 )
 
+from accounts.views import SearchEmployeeAPIView
 from activities.views import tasks_list, delete_task, hearings_list, delete_hearing, task_view, hearing_view
+from cases.views import cases_list, delete_case, notations_list, delete_notation, AdministrativeInvestigations_list, \
+    delete_AdministrativeInvestigation, case_view, get_stages_for_case_type
 from contract.views import contracts_list, delete_contract
 from . import views
 from .consumers import NotificationConsumer
 from .views import (
     APIPathListView, APIPathView, myhome, about, load_more_notifications, read_all_notifications, read_notification,
-    delete_all_notifications,delete_notification
+    delete_all_notifications, delete_notification
 )
-from accounts.views import SearchEmployeeAPIView
-from cases.views import cases_list, delete_case, notations_list, delete_notation, AdministrativeInvestigations_list, \
-    delete_AdministrativeInvestigation, case_view, get_stages_for_case_type
 
 
 def handler404(request, *args, **argv):
@@ -127,7 +127,8 @@ urlpatterns += i18n_patterns(
     path('admin/', admin.site.urls),
     path('sentry-debug/', trigger_error),
     # path('account/', include('django.contrib.auth.urls')),
-    path('accounts/', include('accounts.urls')),
+    path('accounts/', include('allauth.urls')),
+    path('service-worker.js', views.service_worker_view)
 )
 
 websocket_urlpatterns = [

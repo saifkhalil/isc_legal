@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load i18n %}
+{% load static %}
+{% load file_filters %}
+{% load humanize %}
+{% block content %}
+<link href="{% static 'css/select2.min.css' %}" rel="stylesheet">
+<link href="{% static 'css/select2-bootstrap-5-theme.min.css' %}" rel="stylesheet">
+<style>
+    input, select {
+        width: 100%
+    }
+</style>
+<div class="content m-5">
+  <div class="row mb-50">
+    <div class="col-sm-12 col-md-6 col-lg-6">
+      {% bootstrap_messages %}
+      <form method="post">
+        {% csrf_token %}
+        <table class="form form-table">
+          {% include "includes/_form_buttons.html" with obj_create_url=obj_create.url obj_edit=obj_edit obj_id=obj.id objs_list=objs_list %}
+          {% bootstrap_form form %}
+          {% include "includes/_form_buttons.html" with obj_create_url=obj_create.url obj_edit=obj_edit obj_id=obj.id objs_list=objs_list %}
+        </table>
+      </form>
+    </div>
+    {% if mode == "edit" or mode == "view" %}
+      <div class="col-sm-12 col-md-6 col-lg-6">
+        {% include "includes/_paths.html" with paths=obj.paths.all user=user %}
+        <div class="row mt-3">
+          <div class="col-12 col-md-6 col-lg-6">
+            {% include "includes/_hearings.html" with hearings=obj.hearing.all user=user %}
+          </div>
+          <div class="col-12 col-md-6 col-lg-6">
+            {% include "includes/_tasks.html" with obj=obj.tasks.all user=user %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% include "includes/_obj_history.html" with obj=obj logs=logs %}
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/select2.min.js' %}"></script>
+<script src="{% static 'js/obj.js' %}"></script>
+{% endblock %}

@@ -1,6 +1,6 @@
 import os.path
 from io import BytesIO
-import pghistory
+
 from PIL import Image
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
