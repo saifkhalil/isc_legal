@@ -1,0 +1,45 @@
+{% load i18n static %}
+<head>
+    <!-- Primary Meta Tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% trans 'ISC Legal App' %}</title>
+    <meta name="title"
+        content="{% trans 'ISC Legal App' %}">
+    <meta name="description"
+        content="{% trans 'ISC Legal App' %}">
+    <meta name="keywords"
+        content="{% trans 'ISC Legal App' %}">
+    <meta name="author" content="Saif AlKhateeb">
+    <link rel="shortcut icon" href="{% static 'images/qilogo.svg' %}" type="image/x-icon">
+    <link rel="apple-touch-icon-precomposed" href="{% static 'images/apple-touch-icon.png' %}">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://isclegal.qi.iq/">
+    <meta property="og:title"
+        content="{% trans 'ISC Legal App' %}">
+    <meta property="og:description" content="{% trans 'ISC Legal App' %}">
+    <meta property="og:image" content="{% static 'images/details-2-background.jpg' %}">
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="http://isclegal.qi.iq/">
+    <meta property="twitter:title"
+        content="{% trans 'ISC Legal App' %}">
+    <meta property="twitter:description" content="{% trans 'ISC Legal App' %}">
+    <meta property="twitter:image" content="{% static 'images/details-2-background.jpg' %}">
+
+    <!-- CSS links -->
+    <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
+    {% if CURRENT_LANGUAGE == 'en' %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+    {% else %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.rtl.min.css' %}">
+    {% endif %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/qi-colors.css' %}?v=0.0.9">
+    <link href="{% static 'css/fontawesome-all.css' %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'icon/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/legal.css' %}?v=0.0.9">
+<link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}">
+<link href="{% static 'css/aos.css' %}" rel="stylesheet">
+
+</head>

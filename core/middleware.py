@@ -1,3 +1,4 @@
+import os.path
 import threading
 
 from auditlog.context import set_actor
@@ -14,7 +15,7 @@ from core.models import Notification
 from django.shortcuts import redirect
 from django.utils.translation import get_language
 from django.urls import translate_url
-
+from urllib import parse
 
 class LanguageMiddleware(MiddlewareMixin):
 
@@ -22,8 +23,9 @@ class LanguageMiddleware(MiddlewareMixin):
         if request.user.is_authenticated:
             user_language = request.user.language
             cur_language = get_language()
-            if cur_language != user_language:
-                path = request.get_full_path()
+            path = request.get_full_path()
+            fist_segment = parse.urlparse(path).path.split('/')[1]
+            if cur_language != user_language and fist_segment not in ['media','static','lang','load-more-notifications']:
                 url = translate_url(path,user_language)
                 return redirect(url)
 

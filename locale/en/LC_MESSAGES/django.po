@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-27 03:18+0300\n"
-"PO-Revision-Date: 2025-02-23 11:57+0300\n"
+"POT-Creation-Date: 2025-04-28 12:43+0300\n"
+"PO-Revision-Date: 2025-04-28 12:42+0300\n"
 "Last-Translator: Saif AlKhateeb <saif.ibrahim@qi.iq>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -17,30 +17,30 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Translated-Using: django-rosetta 0.10.1\n"
+"X-Translated-Using: django-rosetta 0.10.2\n"
 
-#: .\accounts\admin.py:50
+#: .\accounts\admin.py:52
 msgid "Personal info"
 msgstr ""
 
-#: .\accounts\admin.py:52
+#: .\accounts\admin.py:54
 msgid "Permissions"
 msgstr ""
 
-#: .\accounts\admin.py:71
+#: .\accounts\admin.py:73
 msgid "Important dates"
 msgstr ""
 
-#: .\accounts\admin.py:168
+#: .\accounts\admin.py:170
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-#: .\accounts\admin.py:181
+#: .\accounts\admin.py:183
 msgid "Password changed successfully."
 msgstr ""
 
-#: .\accounts\admin.py:202
+#: .\accounts\admin.py:204
 #, python-format
 msgid "Change password: %s"
 msgstr ""
@@ -49,23 +49,24 @@ msgstr ""
 msgid "Accounts"
 msgstr ""
 
-#: .\accounts\forms.py:31 .\templates\account\register.html:47
+#: .\accounts\forms.py:32 .\templates\account\login.html:18
+#: .\templates\account\register.html:47
 msgid "Password"
 msgstr ""
 
-#: .\accounts\forms.py:31
+#: .\accounts\forms.py:32
 msgid "Enter your password"
 msgstr ""
 
-#: .\accounts\forms.py:32 .\templates\account\register.html:21
+#: .\accounts\forms.py:33 .\templates\account\register.html:21
 msgid "Email"
 msgstr ""
 
-#: .\accounts\forms.py:32
+#: .\accounts\forms.py:33
 msgid "Enter your email"
 msgstr ""
 
-#: .\accounts\forms.py:43
+#: .\accounts\forms.py:44
 msgid "Invalid login"
 msgstr ""
 
@@ -87,8 +88,8 @@ msgstr "Account has been created"
 
 #: .\accounts\models.py:71 .\activities\models.py:11 .\cases\models.py:32
 #: .\cases\models.py:52 .\cases\models.py:68 .\cases\models.py:87
-#: .\contract\models.py:127 .\core\models.py:104 .\core\models.py:121
-#: .\core\models.py:137 .\rest_api\serializers.py:45
+#: .\contract\models.py:125 .\core\models.py:103 .\core\models.py:120
+#: .\core\models.py:136 .\rest_api\serializers.py:45
 #: .\templates\activities\hearings_list.html:81
 #: .\templates\contracts\contracts_list.html:102
 #: .\templates\includes\_paths.html:12
@@ -108,11 +109,11 @@ msgstr ""
 msgid "Departments"
 msgstr ""
 
-#: .\accounts\models.py:86 .\core\settings.py:237
+#: .\accounts\models.py:86 .\core\settings.py:239
 msgid "English"
 msgstr ""
 
-#: .\accounts\models.py:87 .\core\settings.py:236
+#: .\accounts\models.py:87 .\core\settings.py:238
 msgid "Arabic"
 msgstr ""
 
@@ -136,7 +137,8 @@ msgstr ""
 msgid "Thumbnail image"
 msgstr ""
 
-#: .\accounts\models.py:99 .\templates\account\register.html:25
+#: .\accounts\models.py:99 .\templates\account\login.html:15
+#: .\templates\account\register.html:25
 msgid "Username"
 msgstr ""
 
@@ -216,19 +218,19 @@ msgstr ""
 msgid "Please confirm that you read and agree to our terms & conditions"
 msgstr ""
 
-#: .\accounts\models.py:123 .\templates\includes\_case_history.html:21
+#: .\accounts\models.py:123 .\templates\includes\_obj_history.html:21
 msgid "Created at"
 msgstr ""
 
-#: .\accounts\models.py:124 .\templates\includes\_case_history.html:31
+#: .\accounts\models.py:124 .\templates\includes\_obj_history.html:31
 msgid "Modified at"
 msgstr ""
 
-#: .\accounts\models.py:126 .\templates\includes\_case_history.html:17
+#: .\accounts\models.py:126 .\templates\includes\_obj_history.html:17
 msgid "Created by"
 msgstr ""
 
-#: .\accounts\models.py:128 .\templates\includes\_case_history.html:27
+#: .\accounts\models.py:128 .\templates\includes\_obj_history.html:27
 msgid "Modified by"
 msgstr ""
 
@@ -260,67 +262,67 @@ msgstr ""
 msgid "Employees"
 msgstr ""
 
-#: .\accounts\views.py:74
+#: .\accounts\views.py:66
 msgid "Email is not verified, please check your email inbox"
 msgstr ""
 
-#: .\accounts\views.py:78
+#: .\accounts\views.py:70
 msgid ""
 "It looks like your account has been blocked Please contact "
 "saif.ibrahim@qi.iq for more information."
 msgstr ""
 
-#: .\accounts\views.py:110
+#: .\accounts\views.py:102
 msgid "Change user password"
 msgid_plural "Change users passwords"
 msgstr[0] ""
 msgstr[1] ""
 
-#: .\accounts\views.py:121
+#: .\accounts\views.py:113
 #, python-format
 msgid "Change password for user: %s"
 msgstr ""
 
-#: .\accounts\views.py:145
+#: .\accounts\views.py:137
 #, python-format
 msgid "Successful password reset for user: %s."
 msgstr ""
 
-#: .\accounts\views.py:151
+#: .\accounts\views.py:143
 #, python-format
 msgid "Error reseting password for user \"%(user)s\": %(error)s"
 msgstr ""
 
-#: .\accounts\views.py:221
+#: .\accounts\views.py:213
 msgid ""
 "User registered successfully, verification email has been sent, please check "
 "it "
 msgstr ""
 
-#: .\accounts\views.py:247
+#: .\accounts\views.py:239
 msgid "Profile Updated"
 msgstr ""
 
-#: .\accounts\views.py:280
+#: .\accounts\views.py:272
 msgid "Email Verified, you can now login"
 msgstr ""
 
-#: .\accounts\views.py:283
+#: .\accounts\views.py:275
 msgid "Email Verification erorr, please try agin"
 msgstr ""
 
-#: .\activities\apps.py:8
+#: .\activities\apps.py:9
 msgid "Activities"
 msgstr ""
 
 #: .\activities\models.py:12 .\activities\models.py:63 .\cases\models.py:225
-#: .\core\models.py:141 .\core\models.py:175 .\templates\base.html:183
-#: .\templates\includes\_case_history.html:61
+#: .\core\models.py:140 .\core\models.py:174 .\templates\base.html:117
+#: .\templates\includes\_obj_history.html:61
 msgid "Litigation Case"
 msgstr ""
 
 #: .\activities\models.py:13 .\activities\models.py:64 .\cases\models.py:286
-#: .\cases\models.py:333 .\core\models.py:145 .\core\models.py:177
+#: .\cases\models.py:333 .\core\models.py:144 .\core\models.py:176
 msgid "Folder"
 msgstr ""
 
@@ -329,8 +331,8 @@ msgid "Hearing Date"
 msgstr ""
 
 #: .\activities\models.py:15 .\cases\models.py:188 .\cases\models.py:303
-#: .\cases\models.py:403 .\cases\models.py:452 .\cases\views.py:209
-#: .\cases\views.py:242 .\contract\models.py:37
+#: .\cases\models.py:403 .\cases\models.py:452 .\cases\views.py:211
+#: .\cases\views.py:244 .\contract\models.py:35
 #: .\templates\activities\hearings_list.html:46
 #: .\templates\activities\hearings_list.html:83
 #: .\templates\activities\tasks_list.html:46
@@ -354,10 +356,10 @@ msgstr ""
 #: .\activities\models.py:19 .\activities\models.py:69 .\cases\models.py:34
 #: .\cases\models.py:69 .\cases\models.py:103 .\cases\models.py:210
 #: .\cases\models.py:318 .\cases\models.py:412 .\cases\models.py:459
-#: .\contract\models.py:41 .\contract\models.py:75 .\contract\models.py:106
-#: .\contract\models.py:128 .\core\models.py:46 .\core\models.py:79
-#: .\core\models.py:125 .\core\models.py:151 .\core\models.py:311
-#: .\core\models.py:371
+#: .\contract\models.py:39 .\contract\models.py:73 .\contract\models.py:104
+#: .\contract\models.py:126 .\core\models.py:45 .\core\models.py:78
+#: .\core\models.py:124 .\core\models.py:150 .\core\models.py:310
+#: .\core\models.py:370
 msgid "Is Deleted"
 msgstr ""
 
@@ -370,7 +372,7 @@ msgid "Hearing Status"
 msgstr ""
 
 #: .\activities\models.py:26 .\activities\models.py:67 .\cases\models.py:180
-#: .\cases\models.py:300 .\core\models.py:172
+#: .\cases\models.py:300 .\core\models.py:171
 msgid "Documents"
 msgstr ""
 
@@ -379,11 +381,11 @@ msgid "Remind Date"
 msgstr ""
 
 #: .\activities\models.py:44 .\cases\models.py:203 .\cases\models.py:311
-#: .\core\models.py:149 .\templates\base.html:185
+#: .\core\models.py:148 .\templates\base.html:119
 msgid "Hearing"
 msgstr ""
 
-#: .\activities\models.py:45 .\templates\base.html:89
+#: .\activities\models.py:45 .\templates\base.html:79
 #: .\templates\includes\_hearings.html:5
 msgid "Hearings"
 msgstr ""
@@ -425,11 +427,11 @@ msgid "Assign date"
 msgstr ""
 
 #: .\activities\models.py:84 .\cases\models.py:204 .\cases\models.py:312
-#: .\core\models.py:147 .\templates\base.html:184
+#: .\core\models.py:146 .\templates\base.html:118
 msgid "Task"
 msgstr ""
 
-#: .\activities\models.py:85 .\templates\base.html:86
+#: .\activities\models.py:85 .\templates\base.html:76
 #: .\templates\includes\_tasks.html:4
 msgid "Tasks"
 msgstr ""
@@ -438,8 +440,8 @@ msgstr ""
 msgid "You have been assigned with you below case details"
 msgstr "لقد تم تعيينك كمحامي للدعوى ادناه"
 
-#: .\cases\apps.py:9 .\templates\activities\hearings_list.html:24
-#: .\templates\activities\tasks_list.html:24 .\templates\base.html:83
+#: .\cases\apps.py:10 .\templates\activities\hearings_list.html:24
+#: .\templates\activities\tasks_list.html:24 .\templates\base.html:73
 msgid "Cases"
 msgstr ""
 
@@ -460,7 +462,7 @@ msgid "Case characteristics"
 msgstr ""
 
 #: .\cases\models.py:81 .\cases\models.py:82 .\cases\models.py:194
-#: .\cases\views.py:208 .\cases\views.py:228
+#: .\cases\views.py:210 .\cases\views.py:230
 msgid "Stage"
 msgstr ""
 
@@ -473,12 +475,12 @@ msgid "Client Positions"
 msgstr ""
 
 #: .\cases\models.py:102 .\cases\models.py:167 .\cases\models.py:293
-#: .\contract\models.py:21 .\rest_api\serializers.py:129
+#: .\contract\models.py:19 .\rest_api\serializers.py:129
 msgid "Title"
 msgstr ""
 
 #: .\cases\models.py:125 .\cases\models.py:206 .\cases\models.py:310
-#: .\cases\models.py:411 .\cases\models.py:449 .\contract\models.py:39
+#: .\cases\models.py:411 .\cases\models.py:449 .\contract\models.py:37
 msgid "Important Development"
 msgstr ""
 
@@ -507,7 +509,7 @@ msgid "خاسرة"
 msgstr "Lost"
 
 #: .\cases\models.py:170 .\cases\models.py:294 .\cases\models.py:394
-#: .\cases\models.py:436 .\cases\views.py:208 .\contract\models.py:24
+#: .\cases\models.py:436 .\cases\views.py:210 .\contract\models.py:22
 #: .\templates\cases\AdministrativeInvestigations_list.html:59
 #: .\templates\cases\notations_list.html:81
 #: .\templates\includes\_hearings.html:10 .\templates\includes\_tasks.html:9
@@ -527,13 +529,13 @@ msgid "Case type"
 msgstr ""
 
 #: .\cases\models.py:182 .\cases\models.py:301 .\cases\models.py:397
-#: .\cases\models.py:442 .\contract\models.py:36 .\core\events.py:6
-#: .\core\models.py:203
+#: .\cases\models.py:442 .\contract\models.py:34 .\core\events.py:6
+#: .\core\models.py:202
 msgid "Paths"
 msgstr ""
 
 #: .\cases\models.py:190 .\cases\models.py:305 .\cases\models.py:405
-#: .\cases\models.py:454 .\contract\models.py:38
+#: .\cases\models.py:454 .\contract\models.py:36
 msgid "Shared With"
 msgstr ""
 
@@ -573,12 +575,12 @@ msgstr ""
 msgid "You have been shared with you below case details"
 msgstr "لقد تمت مشاركة الدعوى ادناه معك"
 
-#: .\cases\models.py:287 .\templates\base.html:98
+#: .\cases\models.py:287 .\templates\base.html:88
 msgid "Administrative investigations"
 msgstr ""
 
-#: .\cases\models.py:288 .\cases\models.py:474 .\core\models.py:180
-#: .\templates\base.html:186
+#: .\cases\models.py:288 .\cases\models.py:474 .\core\models.py:179
+#: .\templates\base.html:120
 msgid "Notation"
 msgstr ""
 
@@ -620,8 +622,8 @@ msgstr ""
 msgid "Committee members"
 msgstr ""
 
-#: .\cases\models.py:407 .\cases\models.py:456 .\cases\views.py:210
-#: .\core\models.py:27 .\core\models.py:36
+#: .\cases\models.py:407 .\cases\models.py:456 .\cases\views.py:212
+#: .\core\models.py:26 .\core\models.py:35
 #: .\templates\cases\AdministrativeInvestigations_list.html:24
 #: .\templates\cases\AdministrativeInvestigations_list.html:60
 #: .\templates\cases\notations_list.html:35
@@ -629,8 +631,8 @@ msgstr ""
 msgid "Priority"
 msgstr ""
 
-#: .\cases\models.py:427 .\cases\views.py:591 .\core\models.py:179
-#: .\templates\base.html:187
+#: .\cases\models.py:427 .\cases\views.py:593 .\core\models.py:178
+#: .\templates\base.html:121
 msgid "Administrative Investigation"
 msgstr ""
 
@@ -656,15 +658,15 @@ msgstr ""
 msgid "Start Time"
 msgstr ""
 
-#: .\cases\models.py:475 .\templates\base.html:95
+#: .\cases\models.py:475 .\templates\base.html:85
 msgid "Notations"
 msgstr ""
 
-#: .\cases\tasks.py:49
+#: .\cases\tasks.py:50
 msgid "توجد دعوى متأخرة لمدة شهر من تاريخ الإنشاء"
 msgstr ""
 
-#: .\cases\views.py:208 .\templates\activities\hearings_list.html:80
+#: .\cases\views.py:210 .\templates\activities\hearings_list.html:80
 #: .\templates\activities\tasks_list.html:80
 #: .\templates\cases\AdministrativeInvestigations_list.html:58
 #: .\templates\cases\notations_list.html:80
@@ -674,28 +676,28 @@ msgstr ""
 msgid "Number"
 msgstr "رقم الدعوى:"
 
-#: .\cases\views.py:208 .\cases\views.py:221 .\contract\models.py:102
-#: .\contract\models.py:143 .\templates\contracts\contracts_list.html:24
+#: .\cases\views.py:210 .\cases\views.py:223 .\contract\models.py:100
+#: .\contract\models.py:141 .\templates\contracts\contracts_list.html:24
 #: .\templates\contracts\contracts_list.html:103
 msgid "Type"
 msgstr ""
 
-#: .\cases\views.py:208 .\core\models.py:113
+#: .\cases\views.py:210 .\core\models.py:112
 #: .\templates\activities\hearings_list.html:85
 #: .\templates\cases\notations_list.html:24
 #: .\templates\cases\notations_list.html:82
 msgid "Court"
 msgstr ""
 
-#: .\cases\views.py:209 .\cases\views.py:235 .\core\models.py:305
-#: .\core\models.py:326 .\templates\activities\hearings_list.html:35
+#: .\cases\views.py:211 .\cases\views.py:237 .\core\models.py:304
+#: .\core\models.py:325 .\templates\activities\hearings_list.html:35
 #: .\templates\activities\hearings_list.html:82
 #: .\templates\activities\tasks_list.html:35
 #: .\templates\activities\tasks_list.html:82
 msgid "Status"
 msgstr ""
 
-#: .\cases\views.py:209 .\templates\activities\hearings_list.html:84
+#: .\cases\views.py:211 .\templates\activities\hearings_list.html:84
 #: .\templates\activities\tasks_list.html:85
 #: .\templates\cases\AdministrativeInvestigations_list.html:61
 #: .\templates\cases\notations_list.html:85
@@ -704,21 +706,21 @@ msgstr ""
 msgid "Created At"
 msgstr ""
 
-#: .\cases\views.py:209 .\templates\activities\tasks_list.html:86
+#: .\cases\views.py:211 .\templates\activities\tasks_list.html:86
 #, fuzzy
 #| msgid "Case Category:"
 msgid "Category"
 msgstr "فئة الدعوى:"
 
-#: .\cases\views.py:210
+#: .\cases\views.py:212
 msgid "Characteristic"
 msgstr ""
 
-#: .\cases\views.py:210
+#: .\cases\views.py:212
 msgid "Outcome"
 msgstr ""
 
-#: .\cases\views.py:210 .\templates\activities\hearings_list.html:87
+#: .\cases\views.py:212 .\templates\activities\hearings_list.html:87
 #: .\templates\activities\tasks_list.html:89
 #: .\templates\cases\AdministrativeInvestigations_list.html:63
 #: .\templates\cases\notations_list.html:87
@@ -727,7 +729,7 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
-#: .\cases\views.py:215 .\templates\activities\hearings_list.html:13
+#: .\cases\views.py:217 .\templates\activities\hearings_list.html:13
 #: .\templates\activities\tasks_list.html:13
 #: .\templates\cases\AdministrativeInvestigations_list.html:13
 #: .\templates\cases\notations_list.html:13
@@ -735,16 +737,16 @@ msgstr ""
 msgid "Search keywords"
 msgstr ""
 
-#: .\cases\views.py:248 .\cases\views.py:270
+#: .\cases\views.py:250 .\cases\views.py:272
 #: .\templates\cases\cases_list.html:11
 msgid "New Case"
 msgstr ""
 
-#: .\cases\views.py:288
+#: .\cases\views.py:290
 msgid "Add"
 msgstr ""
 
-#: .\cases\views.py:289 .\templates\activities\hearings_list.html:106
+#: .\cases\views.py:291 .\templates\activities\hearings_list.html:106
 #: .\templates\activities\tasks_list.html:110
 #: .\templates\cases\AdministrativeInvestigations_list.html:86
 #: .\templates\cases\notations_list.html:112
@@ -754,108 +756,108 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: .\cases\views.py:591
+#: .\cases\views.py:593
 msgid "has been deleted successfully."
 msgstr ""
 
-#: .\contract\models.py:25
+#: .\contract\models.py:23
 msgid "type"
 msgstr ""
 
-#: .\contract\models.py:26
+#: .\contract\models.py:24
 msgid "Company Name"
 msgstr ""
 
-#: .\contract\models.py:27
+#: .\contract\models.py:25
 msgid "Out Side Iraq"
 msgstr ""
 
-#: .\contract\models.py:28
+#: .\contract\models.py:26
 msgid "Total amount"
 msgstr ""
 
-#: .\contract\models.py:31 .\templates\contracts\contracts_list.html:106
+#: .\contract\models.py:29 .\templates\contracts\contracts_list.html:106
 msgid "First Party"
 msgstr ""
 
-#: .\contract\models.py:32 .\templates\contracts\contracts_list.html:107
+#: .\contract\models.py:30 .\templates\contracts\contracts_list.html:107
 msgid "Second Party"
 msgstr ""
 
-#: .\contract\models.py:33
+#: .\contract\models.py:31
 msgid "Third Party"
 msgstr ""
 
-#: .\contract\models.py:34 .\templates\contracts\contracts_list.html:66
+#: .\contract\models.py:32 .\templates\contracts\contracts_list.html:66
 #: .\templates\contracts\contracts_list.html:105
 msgid "Auto Renewal"
 msgstr ""
 
-#: .\contract\models.py:35
+#: .\contract\models.py:33
 msgid "Penal clause"
 msgstr ""
 
-#: .\contract\models.py:54 .\contract\models.py:71 .\core\models.py:181
+#: .\contract\models.py:52 .\contract\models.py:69 .\core\models.py:180
 msgid "Contract"
 msgstr ""
 
-#: .\contract\models.py:55 .\templates\base.html:92
+#: .\contract\models.py:53 .\templates\base.html:82
 msgid "Contracts"
 msgstr ""
 
-#: .\contract\models.py:72
+#: .\contract\models.py:70
 msgid "Amount"
 msgstr ""
 
-#: .\contract\models.py:88
+#: .\contract\models.py:86
 msgid "Payment"
 msgstr ""
 
-#: .\contract\models.py:89
+#: .\contract\models.py:87
 msgid "Payments"
 msgstr ""
 
-#: .\contract\models.py:103
+#: .\contract\models.py:101
 msgid "No of days"
 msgstr ""
 
-#: .\contract\models.py:104
+#: .\contract\models.py:102
 msgid "Reminder days"
 msgstr ""
 
-#: .\contract\models.py:105
+#: .\contract\models.py:103
 msgid "Is recurring"
 msgstr ""
 
-#: .\contract\models.py:121
+#: .\contract\models.py:119
 msgid "Duration"
 msgstr ""
 
-#: .\contract\models.py:122
+#: .\contract\models.py:120
 msgid "Durations"
 msgstr ""
 
-#: .\contract\models.py:144
+#: .\contract\models.py:142
 msgid "Types"
 msgstr ""
 
-#: .\contract\models.py:150
+#: .\contract\models.py:148
 msgid "Reminder Date"
 msgstr ""
 
-#: .\contract\models.py:151
+#: .\contract\models.py:149
 msgid "Is Sent"
 msgstr ""
 
-#: .\contract\models.py:162
+#: .\contract\models.py:160
 msgid "Reminder"
 msgstr ""
 
-#: .\contract\models.py:163
+#: .\contract\models.py:161
 msgid "Reminders"
 msgstr ""
 
-#: .\core\apps.py:9
+#: .\core\apps.py:10
 msgid "Core"
 msgstr ""
 
@@ -884,108 +886,154 @@ msgstr ""
 msgid "Unknown or obsolete event type: %s"
 msgstr ""
 
-#: .\core\models.py:37
+#: .\core\models.py:36
 msgid "Priorities"
 msgstr ""
 
-#: .\core\models.py:43 .\core\models.py:61 .\core\models.py:70
+#: .\core\models.py:42 .\core\models.py:60 .\core\models.py:69
 msgid "Reply"
 msgstr ""
 
-#: .\core\models.py:62
+#: .\core\models.py:61
 msgid "Replies"
 msgstr ""
 
-#: .\core\models.py:68 .\core\models.py:96
+#: .\core\models.py:67 .\core\models.py:95
 msgid "Comment"
 msgstr ""
 
-#: .\core\models.py:97
+#: .\core\models.py:96
 msgid "Comments"
 msgstr ""
 
-#: .\core\models.py:114
+#: .\core\models.py:113
 msgid "Courts"
 msgstr ""
 
-#: .\core\models.py:122 .\core\models.py:138
+#: .\core\models.py:121 .\core\models.py:137
 msgid "Attachment"
 msgstr ""
 
-#: .\core\models.py:143 .\core\models.py:202 .\core\models.py:273
-#: .\templates\base.html:188
+#: .\core\models.py:142 .\core\models.py:201 .\core\models.py:272
+#: .\templates\base.html:122
 msgid "Path"
 msgstr ""
 
-#: .\core\models.py:274
+#: .\core\models.py:273
 msgid "Parent and Name"
 msgstr ""
 
-#: .\core\models.py:281
+#: .\core\models.py:280
 #, python-format
 msgid "%(model_name)s with this %(field_names)s already exists."
 msgstr ""
 
-#: .\core\models.py:307
+#: .\core\models.py:306
 msgid "Icon"
 msgstr ""
 
-#: .\core\models.py:309
+#: .\core\models.py:308
 msgid "Color"
 msgstr ""
 
-#: .\core\models.py:316
+#: .\core\models.py:315
 msgid "Is Completed"
 msgstr ""
 
-#: .\core\models.py:317
+#: .\core\models.py:316
 msgid "Is Done"
 msgstr ""
 
-#: .\core\models.py:327
+#: .\core\models.py:326
 msgid "Statuses"
 msgstr ""
 
-#: .\core\models.py:347 .\templates\base.html:137 .\templates\base.html:177
+#: .\core\models.py:346 .\templates\base.html:111
+#: .\templates\includes\_notifications.html:33
 msgid "create"
 msgstr ""
 
-#: .\core\models.py:348 .\templates\base.html:137 .\templates\base.html:178
+#: .\core\models.py:347 .\templates\base.html:112
+#: .\templates\includes\_notifications.html:34
 msgid "update"
 msgstr ""
 
-#: .\core\models.py:349 .\templates\base.html:137 .\templates\base.html:179
+#: .\core\models.py:348 .\templates\base.html:113
+#: .\templates\includes\_notifications.html:34
 msgid "delete"
 msgstr ""
 
-#: .\core\models.py:350
+#: .\core\models.py:349
 msgid "access"
 msgstr ""
 
-#: .\core\models.py:388
+#: .\core\models.py:387
 msgid "Notification"
 msgstr ""
 
-#: .\core\models.py:389 .\templates\base.html:122
+#: .\core\models.py:388 .\templates\includes\_notifications.html:13
 msgid "Notifications"
 msgstr ""
 
-#: .\core\search\serializers.py:341 .\core\serializers.py:341
+#: .\core\search\serializers.py:342 .\core\serializers.py:342
 #: .\rest_api\serializers.py:77
 msgid "URL"
 msgstr ""
 
-#: .\core\search\serializers.py:453 .\core\serializers.py:454
+#: .\core\search\serializers.py:454 .\core\serializers.py:455
 msgid "Primary key of the document to add to the Path."
 msgstr ""
 
-#: .\core\search\serializers.py:454 .\core\search\serializers.py:462
-#: .\core\serializers.py:455 .\core\serializers.py:463
+#: .\core\search\serializers.py:455 .\core\search\serializers.py:463
+#: .\core\serializers.py:456 .\core\serializers.py:464
 msgid "Document ID"
 msgstr ""
 
-#: .\core\search\serializers.py:461 .\core\serializers.py:462
+#: .\core\search\serializers.py:462 .\core\serializers.py:463
 msgid "Primary key of the document to remove from the Path."
+msgstr ""
+
+#: .\core\settings.py:463
+msgid "Incorrect email or password"
+msgstr ""
+
+#: .\core\settings.py:464
+msgid "Username is inactive"
+msgstr ""
+
+#: .\core\settings.py:465
+msgid "Incorrect Token"
+msgstr ""
+
+#: .\core\settings.py:466
+msgid "Invalid user id or user doesn't exist."
+msgstr ""
+
+#: .\core\settings.py:467
+msgid "Stale token for given user."
+msgstr ""
+
+#: .\core\settings.py:468
+msgid "Password is not Mismatch"
+msgstr ""
+
+#: .\core\settings.py:469
+#, python-brace-format
+msgid "The two {0} fields didn't match."
+msgstr ""
+
+#: .\core\settings.py:470
+#, fuzzy
+#| msgid "This password is too short."
+msgid "The current password is incorrect"
+msgstr "كلمة المرور هذه قصيرة جدًا."
+
+#: .\core\settings.py:471
+msgid "Email is not found"
+msgstr ""
+
+#: .\core\settings.py:472
+msgid "The account cannot be created"
 msgstr ""
 
 #: .\rest_api\fields.py:30
@@ -1123,21 +1171,61 @@ msgstr ""
 msgid "ddvTest"
 msgstr ""
 
-#: .\templates\account\login.html:5 .\templates\socialaccount\login.html:4
+#: .\templates\account\login.html:5 .\templates\account\login.html:28
+#: .\templates\socialaccount\login.html:4
 msgid "Sign In"
 msgstr ""
 
-#: .\templates\account\login.html:17
-msgid "Please select method to login to system"
+#: .\templates\account\login.html:10 .\templates\socialaccount\login.html:9
+msgid "Login"
 msgstr ""
 
-#: .\templates\account\logout.html:4 .\templates\account\logout.html:8
-#: .\templates\account\logout.html:21
+#: .\templates\account\login.html:21
+msgid "Forgot your password?"
+msgstr ""
+
+#: .\templates\account\login.html:25
+msgid "Remember Me"
+msgstr ""
+
+#: .\templates\account\login.html:37
+msgid "Sign in with a passkey"
+msgstr ""
+
+#: .\templates\account\login.html:42
+msgid "Send me a sign-in code"
+msgstr ""
+
+#: .\templates\account\logout.html:5 .\templates\account\logout.html:10
+#: .\templates\account\logout.html:19
 msgid "Sign Out"
 msgstr ""
 
 #: .\templates\account\logout.html:11
 msgid "Are you sure you want to sign out?"
+msgstr ""
+
+#: .\templates\account\password_reset.html:4
+#: .\templates\account\password_reset.html:9
+msgid "Password Reset"
+msgstr ""
+
+#: .\templates\account\password_reset.html:14
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll send you "
+"an email allowing you to reset it."
+msgstr ""
+
+#: .\templates\account\password_reset.html:21
+msgid "Email address"
+msgstr ""
+
+#: .\templates\account\password_reset.html:26
+msgid "Reset My Password"
+msgstr ""
+
+#: .\templates\account\password_reset.html:30
+msgid "Please contact us if you have any trouble resetting your password."
 msgstr ""
 
 #: ⁨.\templates\account\register copy.html⁩:15
@@ -1355,47 +1443,39 @@ msgstr ""
 msgid "Due Date"
 msgstr ""
 
-#: .\templates\base.html:13 .\templates\base.html:15 .\templates\base.html:17
-#: .\templates\base.html:19 .\templates\base.html:28 .\templates\base.html:29
-#: .\templates\base.html:36 .\templates\base.html:37
+#: .\templates\base.html:12 .\templates\base.html:14 .\templates\base.html:16
+#: .\templates\base.html:18 .\templates\base.html:26 .\templates\base.html:27
+#: .\templates\base.html:33 .\templates\base.html:34
 msgid "ISC Legal App"
 msgstr ""
 
-#: .\templates\base.html:80
+#: .\templates\base.html:70
 msgid "Home"
 msgstr ""
 
-#: .\templates\base.html:124
-msgid "Read All"
-msgstr ""
-
-#: .\templates\base.html:127
-msgid "Delete All"
-msgstr ""
-
-#: .\templates\base.html:155
+#: .\templates\base.html:98
 msgid "Logout"
 msgstr ""
 
-#: .\templates\base.html:264
+#: .\templates\base.html:200
 #, fuzzy
 #| msgid "Legal App New Case #"
 msgid "Legal App - New Notification"
 msgstr "رقم الدعوى الجديدة"
 
-#: .\templates\base.html:347
+#: .\templates\base.html:283
 msgid "Are you sure you want to read all notifications?"
 msgstr ""
 
-#: .\templates\base.html:370
+#: .\templates\base.html:306
 msgid "An error occurred while read all notifications"
 msgstr ""
 
-#: .\templates\base.html:377
+#: .\templates\base.html:313
 msgid "Are you sure you want to delete all notifications?"
 msgstr ""
 
-#: .\templates\base.html:400
+#: .\templates\base.html:336
 msgid "An error occurred while delete all notifications"
 msgstr ""
 
@@ -1505,40 +1585,8 @@ msgstr ""
 msgid "Latest important development"
 msgstr ""
 
-#: .\templates\includes\_case_history.html:9
-#: .\templates\includes\_form_buttons.html:16
-#, fuzzy
-#| msgid "Case Category:"
-msgid "Case History"
-msgstr "فئة الدعوى:"
-
-#: .\templates\includes\_case_history.html:40
-msgid "Case History List"
-msgstr ""
-
-#: .\templates\includes\_case_history.html:40
-msgid "sorted from newest to oldest"
-msgstr ""
-
-#: .\templates\includes\_case_history.html:52
-msgid "fields"
-msgstr ""
-
-#: .\templates\includes\_case_history.html:52
-msgid "field"
-msgstr ""
-
-#: .\templates\includes\_case_history.html:59
-#: .\templates\includes\_case_history.html:62
-msgid "See more"
-msgstr ""
-
-#: .\templates\includes\_case_history.html:82
-msgid "from"
-msgstr ""
-
-#: .\templates\includes\_case_history.html:89
-msgid "to"
+#: .\templates\includes\_footer.html:7
+msgid "ISC ©"
 msgstr ""
 
 #: .\templates\includes\_form_buttons.html:9
@@ -1549,9 +1597,53 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
+#: .\templates\includes\_form_buttons.html:16
+#: .\templates\includes\_obj_history.html:9
+#, fuzzy
+#| msgid "Case Category:"
+msgid "Case History"
+msgstr "فئة الدعوى:"
+
 #: .\templates\includes\_hearings.html:9 .\templates\includes\_paths.html:11
 #: .\templates\includes\_tasks.html:8
 msgid "Sequence"
+msgstr ""
+
+#: .\templates\includes\_notifications.html:17
+msgid "Read All"
+msgstr ""
+
+#: .\templates\includes\_notifications.html:22
+msgid "Delete All"
+msgstr ""
+
+#: .\templates\includes\_obj_history.html:40
+msgid "Case History List"
+msgstr ""
+
+#: .\templates\includes\_obj_history.html:40
+msgid "sorted from newest to oldest"
+msgstr ""
+
+#: .\templates\includes\_obj_history.html:52
+msgid "fields"
+msgstr ""
+
+#: .\templates\includes\_obj_history.html:52
+msgid "field"
+msgstr ""
+
+#: .\templates\includes\_obj_history.html:59
+#: .\templates\includes\_obj_history.html:62
+msgid "See more"
+msgstr ""
+
+#: .\templates\includes\_obj_history.html:82
+msgid "from"
+msgstr ""
+
+#: .\templates\includes\_obj_history.html:89
+msgid "to"
 msgstr ""
 
 #: .\templates\includes\_paths.html:6
@@ -1566,19 +1658,19 @@ msgstr ""
 msgid "Welcome to ISC Legal App"
 msgstr ""
 
-#: .\templates\socialaccount\login.html:14
-msgid "Login"
-msgstr ""
-
-#: .\templates\socialaccount\login.html:16
+#: .\templates\socialaccount\login.html:10
 msgid "To stay connected with us please login with your Qi email"
 msgstr ""
 
+#: .\templates\socialaccount\snippets\login.html:8
+msgid "Or use a third-party"
+msgstr ""
+
+#~ msgid "ISC © 2022 Company, Inc"
+#~ msgstr "ISC © 2025"
+
 #~ msgid "This password is too short. It must contain at least 8 characters."
 #~ msgstr "كلمة المرور هذه قصيرة جدًا. يجب أن يحتوي على 8 أحرف على الأقل."
-
-#~ msgid "This password is too short."
-#~ msgstr "كلمة المرور هذه قصيرة جدًا."
 
 #~ msgid "It must contain at least 8 characters."
 #~ msgstr "يجب أن يحتوي على 8 أحرف على الأقل."

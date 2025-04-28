@@ -1,0 +1,52 @@
+{% load static i18n %}
+<nav class="navbar fixed-top navbar-expand-md qi-nav mt-3 qi-{% if CURRENT_LANGUAGE == 'en' %}e{% else %}a{% endif %}nav">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><img src="{% static 'images/qilogo.svg' %}" width="40"
+                height="40" alt="alternative"> </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title" id="offcanvasNavbarLabel"> <a class="navbar-brand" href="#"><img src="{% static 'images/qilogo.svg' %}" width="40"
+                height="40" alt="alternative"> </a></h5>
+              <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+              <ul class="navbar-nav flex-grow-1 pe-3">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}">{% trans 'Home' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'cases_list' %}">{% trans 'Cases' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'tasks_list' %}">{% trans 'Tasks' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'hearings_list' %}">{% trans 'Hearings' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'contracts_list' %}">{% trans 'Contracts' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'notations_list' %}">{% trans 'Notations' %}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'AdministrativeInvestigations_list' %}">{% trans 'Administrative investigations' %}</a>
+                </li>
+              </ul>
+              {% include 'includes/_languages_selection.html' %}
+              {% include 'includes/_notifications.html' %}
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ user.username }}
+              </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+              <li>
+                <a class="dropdown-item user-item" href="{% url 'account_logout' %}">{% trans 'Logout' %}</a>
+              </li>
+            </ul>
+            </div>
+          </div>
+        </div>
+      </nav>

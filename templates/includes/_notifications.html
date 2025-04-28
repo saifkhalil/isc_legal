@@ -1,0 +1,48 @@
+{% load i18n %}
+<div class="dropdown">
+  <button class="fs-5 mx-4 mt-2" type="button" id="notificationDropdown" data-bs-toggle="dropdown"
+          aria-expanded="false">
+    <i class="bi bi-bell position-relative">
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+    <span id="notificationCount">{{ request.not_read_notifications_count }}</span>
+    <span class="visually-hidden">unread notifications</span>
+  </span></i>
+  </button>
+  <div class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
+    <div class="row mx-1 notification-header">
+      <p class="col col-auto mt-1 fs-5 fw-bolder text-dark text-center">{% trans 'Notifications' %}</p>
+      {% if request.not_read_notifications_count > 0 %}
+        <div class="col-auto mt-1"><a class="link-success link-zoom fs-7 text-center top-50 start-50" href="#"
+                                      id="read_all_notifications"><i
+          class="bi bi-check2-all"></i> {% trans 'Read All' %}</a></div>
+      {% endif %}
+      {% if request.not_deleted_notifications_count > 0 %}
+        <div class="col-auto mt-1"><a class="link-danger link-zoom fs-7 text-center top-50 start-50" href="#"
+                                      id="delete_all_notifications"><i
+          class="bi bi-x-circle"></i> {% trans 'Delete All' %}</a></div>
+      {% endif %}
+    </div>
+    <div>
+      <ul aria-labelledby="notificationDropdown" id="notificationItems">
+
+        {% for notification in request.notifications %}
+
+          <li class="{% if notification.is_read %}opacity-75{% endif %}">
+            <a class="dropdown-item notification-item" href="" data-id="{{ notification.id }}">
+              <p class="{% if not notification.is_read %}fw-bolder text-dark{% else %}text-muted {% endif %}">
+                {% if notification.action == 'created' %}{% trans 'create' %}{% elif notification.action == 'updated' %}
+                  {% trans 'update' %}{% else %}{% trans 'delete' %}{% endif %} {{ notification.content_type.name }} <i
+                class="text-primary">({{ notification.object_name }})</i></p>
+              <small
+                class="text-muted d-block"><strong>{{ notification.action_by.username }}</strong> {{ notification.action_at|date:"Y-m-d H:m:s" }}
+              </small>
+            </a>
+          </li>
+        {% empty %}
+          <li id="no_notifications" class="dropdown-item text-muted">No notifications</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  </div>
+</div>

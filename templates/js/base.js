@@ -1,0 +1,202 @@
+{% load i18n %}
+$(document).ready(function() {
+     AOS.init();
+     var tab_url = window.location.pathname.replace(/^((?:[^\/]*\/){3}).*$/, "$1");
+     var active_tab = document.querySelectorAll(`a[href='${tab_url}']`);
+    active_tab[0].classList.add('active');
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+        // Request permission for browser notifications
+        if ("Notification" in window) {
+            Notification.requestPermission().then((result) => {
+                console.log("Notification permission:", result);
+            });
+        }
+    });
+     var socket = new WebSocket("ws://" + window.location.host + "/ws/notifications/");
+             var translations = document.getElementById("translations");
+        var translatedActions = {
+            "created": translations.dataset.created,
+            "updated": translations.dataset.updated,
+            "deleted": translations.dataset.deleted
+        };
+                  var models = document.getElementById("models");
+          var translatedModels = {
+              "administrativeinvestigation": models.dataset.administrativeinvestigation,
+              "notation": models.dataset.notation,
+              "task": models.dataset.task,
+              "hearing": models.dataset.hearing,
+              "litigationcases": models.dataset.litigationcases,
+              "path": models.dataset.path,
+          };
+    socket.onmessage = function (event) {
+        var notification = JSON.parse(event.data);
+        console.log(notification);
+        var modelTranslated = translatedModels[notification.content_type] || notification.content_type; // Default to action if not found
+        var notificationDropdown = document.getElementById("notificationItems");
+        var actionTranslated = translatedActions[notification.action] || notification.action; // Default to action if not found
+        var newItem = document.createElement("li");
+        var liClass = "";
+        var pClass = "";
+                    if (notification.is_read === true )
+                    {
+                      liClass = "opacity-75";
+                      pClass = "text-muted";
+                    }
+                    else {
+                      pClass = "fw-bolder text-dark";
+                    }
+        newItem.className = liClass;
+        newItem.innerHTML = `<a class="dropdown-item" href="#">
+                            <p class="${ pClass }">${actionTranslated} ${ modelTranslated } <i class="text-primary">(${ notification.object_name })</i></p>
+                            <small class="text-muted d-block"><strong>${ notification.action_by }</strong> ${ notification.timestamp }</small>
+                        </a>`;
+        const no_notifications = document.getElementById("no_notifications");
+        if(no_notifications) {
+          document.getElementById("no_notifications").remove();
+        }
+        notificationDropdown.insertBefore(newItem, notificationDropdown.firstChild.nextSibling);
+        document.getElementById("notificationCount").innerText++;
+                if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("{% trans 'Legal App - New Notification' %}", {
+                body: `${notification.action_by} ${actionTranslated} ${notification.object_name}`,
+                icon: "/static/images/qilogo.svg",  // Optional: Add your own notification icon
+                requireInteraction: true,  // Keeps the notification on screen until user dismisses
+            });
+        }
+    };
+
+
+    socket.onclose = function () {
+        console.log("WebSocket closed.");
+    };
+
+     var page = 1;  // Track the current page
+    var loading = false;  // Prevent multiple requests
+    var hasMore = true;  // Indicates if there are more notifications to load
+
+    function loadMoreNotifications() {
+        if (!hasMore || loading) return;  // Stop if no more notifications or already loading
+
+        loading = true;
+        page += 1;
+
+        fetch(`/load-more-notifications/?page=${page}`)
+            .then(response => response.json())
+            .then(data => {
+                var notificationDropdown = document.getElementById("notificationItems");
+                             var translations = document.getElementById("translations");
+        var translatedActions = {
+            "created": translations.dataset.created,
+            "updated": translations.dataset.updated,
+            "deleted": translations.dataset.deleted
+        };
+          var models = document.getElementById("models");
+          var translatedModels = {
+              "administrativeinvestigation": models.dataset.administrativeinvestigation,
+              "notation": models.dataset.notation,
+              "task": models.dataset.task,
+              "hearing": models.dataset.hearing,
+              "litigationcases": models.dataset.litigationcases,
+              "path": models.dataset.path,
+          };
+
+                data.notifications.forEach(notification => {
+                    var actionTranslated = translatedActions[notification.action] || notification.action; // Default to action if not found
+                    var modelTranslated = translatedModels[notification.content_type] || notification.content_type; // Default to action if not found
+                    var liClass = "";
+                    var pClass = "";
+                    if (notification.is_read === true )
+                    {
+                      liClass = "opacity-75";
+                      pClass = "text-muted";
+                    }
+                    else {
+                      pClass = "fw-bolder text-dark";
+                    }
+                    var newItem = document.createElement("li");
+                    newItem.className = liClass;
+                    newItem.innerHTML = `<a class="dropdown-item" href="#">
+                            <p class="${ pClass }">${actionTranslated} ${ modelTranslated } <i class="text-primary">(${ notification.object_name })</i></p>
+                            <small class="text-muted d-block"><strong>${ notification.action_by }</strong> ${ notification.timestamp }</small>
+                        </a>`;
+                    notificationDropdown.appendChild(newItem);
+                });
+
+                hasMore = data.has_more;  // Update if more notifications are available
+                loading = false;
+            })
+            .catch(error => {
+                console.error("Error loading more notifications:", error);
+                loading = false;
+            });
+    }
+
+    // Listen for scroll event on the notifications dropdown
+    document.getElementById("notificationItems").addEventListener("scroll", function () {
+        var dropdown = this;
+        if (dropdown.scrollTop + dropdown.clientHeight >= dropdown.scrollHeight - 5) {
+            loadMoreNotifications();  // Load more notifications when reaching the bottom
+        }
+    });
+  {% if request.not_read_notifications_count > 0 %}
+    document.getElementById("read_all_notifications").addEventListener('click', function() {
+        if (confirm('{% trans 'Are you sure you want to read all notifications?' %}')) {
+          fetch("{% url 'read_all_notifications'  %}", {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              alert(data.message);
+              // Option 1: Remove the row from the table
+              //this.closest('tr').remove();
+              // Option 2: Or, reload the page to reflect changes:
+              window.location.reload();
+            } else {
+              alert('Error: ' + data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('{% trans 'An error occurred while read all notifications' %}');
+          });
+        }
+      });
+  {% endif %}
+{% if request.not_deleted_notifications_count > 0 %}
+    document.getElementById("delete_all_notifications").addEventListener('click', function() {
+        if (confirm('{% trans 'Are you sure you want to delete all notifications?' %}')) {
+          fetch("{% url 'delete_all_notifications'  %}", {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              alert(data.message);
+              // Option 1: Remove the row from the table
+              //this.closest('tr').remove();
+              // Option 2: Or, reload the page to reflect changes:
+              window.location.reload();
+            } else {
+              alert('Error: ' + data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('{% trans 'An error occurred while delete all notifications' %}');
+          });
+        }
+      });
+  {% endif %}

@@ -136,13 +136,13 @@ MIDDLEWARE = [
 
 SITE_ID = 1
 
-LOGIN_URL = '/accounts/microsoft/login/'
+LOGIN_URL = '/accounts/login/'
 
 # ACCOUNT_ADAPTER = 'accounts.adapters.NoSignupAdapter'
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = env(envr+'_HTTP_PROTOCOL')
 ACCOUNT_CHANGE_EMAIL = False
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-SOCIALACCOUNT_ONLY  = True
+SOCIALACCOUNT_ONLY  = False
 ACCOUNT_MAX_EMAIL_ADDRESSES = 1
 MICROSOFT_AUTHORIZATION_URL = f"https://login.microsoftonline.com/{env('MICROSOFT_TENANT')}/oauth2/v2.0/authorize"
 MICROSOFT_TOKEN_URL = f"https://login.microsoftonline.com/{env('MICROSOFT_TENANT')}/oauth2/v2.0/token"
@@ -165,6 +165,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
@@ -232,8 +233,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-SITE_ID = 1
 
 LANGUAGES = (
     ('ar', _('Arabic')),
@@ -397,7 +396,7 @@ CELERY_RESULT_BACKEND = "redis://localhost:6379"
 accept_content = ['application/json']
 result_serializer = 'json'
 task_serializer = 'json'
-result_backend = 'django-db'
+result_backend = 'legal-db'
 timezone = 'Asia/Baghdad'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
@@ -423,7 +422,6 @@ JAZZMIN_SETTINGS = {
         "authtoken.tokenproxy": "fa fa-magic",
         "cases.case_type": "fa fa-trello",
         "cases.client_position": "fa fa-user",
-        "auth.group": "fa fa-users",
         "admin.logentry": "fa fa-file-text",
 
     },
@@ -462,16 +460,16 @@ JAZZMIN_UI_TWEAKS = {
 
 
 class Messages(object):
-    INVALID_CREDENTIALS_ERROR = "البريد او كلمة المرور غير صحيحة"
-    INACTIVE_ACCOUNT_ERROR = "اسم المستخدم متوقف"
-    INVALID_TOKEN_ERROR = "خطا في التوكن"
-    INVALID_UID_ERROR = "Invalid user id or user doesn't exist."
-    STALE_TOKEN_ERROR = "Stale token for given user."
-    PASSWORD_MISMATCH_ERROR = "كلمة المرور غير متوافقة"
-    USERNAME_MISMATCH_ERROR = "The two {0} fields didn't match."
-    INVALID_PASSWORD_ERROR = "كلمة المرور الحالية غير صحيحة"
-    EMAIL_NOT_FOUND = "البريد الالكتروني غير متوفر"
-    CANNOT_CREATE_USER_ERROR = "لا يمكن تكوين الحساب"
+    INVALID_CREDENTIALS_ERROR = _("Incorrect email or password")
+    INACTIVE_ACCOUNT_ERROR = _("Username is inactive")
+    INVALID_TOKEN_ERROR = _("Incorrect Token")
+    INVALID_UID_ERROR = _("Invalid user id or user doesn't exist.")
+    STALE_TOKEN_ERROR = _("Stale token for given user.")
+    PASSWORD_MISMATCH_ERROR = _("Password is not Mismatch")
+    USERNAME_MISMATCH_ERROR = _("The two {0} fields didn't match.")
+    INVALID_PASSWORD_ERROR = _("The current password is incorrect")
+    EMAIL_NOT_FOUND = _("Email is not found")
+    CANNOT_CREATE_USER_ERROR = _("The account cannot be created")
 
 
 DJOSER = {

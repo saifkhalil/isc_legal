@@ -93,7 +93,7 @@ urlpatterns = [
                   path('api/accounts/search/', SearchEmployeeAPIView.as_view(), name='search-employees'),
                   
 
-              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+              ]
 urlpatterns += i18n_patterns(
     path('i18n/', include('django.conf.urls.i18n')),
     path('set-language/',views.set_language, name='set_language'),
@@ -129,7 +129,7 @@ urlpatterns += i18n_patterns(
     # path('account/', include('django.contrib.auth.urls')),
     path('accounts/', include('allauth.urls')),
     path('service-worker.js', views.service_worker_view)
-)
+)+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 websocket_urlpatterns = [
     path("ws/notifications/", NotificationConsumer.as_asgi()),
