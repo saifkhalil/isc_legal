@@ -13,33 +13,53 @@
     }
 </style>
 <div class="content m-5">
+{% bootstrap_messages %}
   <div class="row mb-50">
-    <div class="col-sm-12 col-md-6 col-lg-6">
-      {% bootstrap_messages %}
+    <div class="col-sm-12 col-md-12 col-lg-4 mb-3">
       <form method="post">
+            {% include "includes/_form_buttons.html" with obj_status=obj_status obj_create_url=obj_create.url obj_edit=obj_edit obj_id=obj.id objs_list=objs_list %}
         {% csrf_token %}
         <table class="form form-table">
-          {% include "includes/_form_buttons.html" with obj_create_url=obj_create.url obj_edit=obj_edit obj_id=obj.id objs_list=objs_list %}
+          {% if obj_status %}
+            <span class="col-auto cursor-default btn btn-{{ obj_status.color }} mb-3">
+            <span style="width:24px" class="{{ obj_status.icon }}" role="status" aria-hidden="true"></span>
+            {{ obj_status }}
+          </span>
+            <br>
+        {% endif %}
+          <div class="card shadow-sm p-3" {% if user.enable_transision %} data-aos="zoom-in-left" {% endif %}>
+          <p class="pb-3">{% trans 'Basic Information' %}</p>
           {% bootstrap_form form %}
-          {% include "includes/_form_buttons.html" with obj_create_url=obj_create.url obj_edit=obj_edit obj_id=obj.id objs_list=objs_list %}
+          </div>
         </table>
       </form>
     </div>
+
     {% if mode == "edit" or mode == "view" %}
-      <div class="col-sm-12 col-md-6 col-lg-6">
-        {% include "includes/_paths.html" with paths=obj.paths.all user=user %}
-        <div class="row mt-3">
-          <div class="col-12 col-md-6 col-lg-6">
+      <div class="col-sm-12 col-md-12 col-lg-4">
+        {% if obj.ImportantDevelopment %}
+        {% include 'includes/_important_developments_list.html' with new_ImportantDevelopment=new_ImportantDevelopment obj_id=obj.id ImportantDevelopments=obj.ImportantDevelopment.all %}
+        {% endif %}
+      {% if obj.comments %}
+        {% include 'includes/_comments_list.html' with obj_new_comment=obj_new_comment obj_id=obj.id comments=obj.comments.all %}
+        {% endif %}
+      </div>
+      <div class="col-sm-12 col-md-12 col-lg-4">
+        {% if obj.paths %}
+        {% include "includes/_paths.html" with new_path=new_path obj_id=obj.id paths=obj.paths.all user=user %}
+        {% endif %}
+      {% if obj.hearing %}
             {% include "includes/_hearings.html" with hearings=obj.hearing.all user=user %}
-          </div>
-          <div class="col-12 col-md-6 col-lg-6">
+        {% endif %}
+      {% if obj.tasks %}
             {% include "includes/_tasks.html" with obj=obj.tasks.all user=user %}
-          </div>
+        {% endif %}
         </div>
       </div>
     {% endif %}
   </div>
-</div>
+
+
 {% include "includes/_obj_history.html" with obj=obj logs=logs %}
 <script src="{% static 'js/jquery.min.js' %}"></script>
 <script src="{% static 'js/select2.min.js' %}"></script>

@@ -1,8 +1,7 @@
 {% load static i18n %}
 <nav class="navbar fixed-top navbar-expand-md qi-nav mt-3 qi-{% if CURRENT_LANGUAGE == 'en' %}e{% else %}a{% endif %}nav">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#"><img src="{% static 'images/qilogo.svg' %}" width="40"
-                height="40" alt="alternative"> </a>
+            <a class="navbar-brand" href="#"><i class="fa fa-balance-scale" aria-hidden="true"></i> </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -15,25 +14,25 @@
             <div class="offcanvas-body">
               <ul class="navbar-nav flex-grow-1 pe-3">
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'home' %}">{% trans 'Home' %}</a>
+                    <a class="nav-link" href="{% url 'home' %}"><i class="bi bi-house"></i> {% trans 'Home' %}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'cases_list' %}">{% trans 'Cases' %}</a>
+                    <a class="nav-link" href="{% url 'cases_list' %}"><i class="bi bi-briefcase"></i> {% trans 'Cases' %}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'tasks_list' %}">{% trans 'Tasks' %}</a>
+                    <a class="nav-link" href="{% url 'tasks_list' %}"><i class="bi bi-list-task"></i> {% trans 'Tasks' %}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'hearings_list' %}">{% trans 'Hearings' %}</a>
+                    <a class="nav-link" href="{% url 'hearings_list' %}"><i class="fa fa-gavel" aria-hidden="true"></i> {% trans 'Hearings' %}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'contracts_list' %}">{% trans 'Contracts' %}</a>
+                    <a class="nav-link" href="{% url 'contracts_list' %}"><i class="fa fa-file-text-o" aria-hidden="true"></i> {% trans 'Contracts' %}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'notations_list' %}">{% trans 'Notations' %}</a>
+                    <a class="nav-link" href="{% url 'notations_list' %}"><i class="bi bi-pen"></i> {% trans 'Notations' %}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'AdministrativeInvestigations_list' %}">{% trans 'Administrative investigations' %}</a>
+                    <a class="nav-link" href="{% url 'administrative_investigations_list' %}"><i class="fa fa-eercast" aria-hidden="true"></i> {% trans 'Administrative investigations' %}</a>
                 </li>
               </ul>
               {% include 'includes/_languages_selection.html' %}

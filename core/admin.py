@@ -6,16 +6,16 @@ from .models import comments, priorities, replies, court, contracts, documents, 
 
 
 class commentsAdmin(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('id', 'comment', 'case_id',
-                    'task_id', 'hearing_id', 'is_deleted')
-
-
+    list_display = ('comment', 'case_id',
+                    'task_id', 'hearing_id', 'is_deleted','created_by','created_at')
+    fields = list_display
+    readonly_fields = ('created_at','created_by')
 class courtAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ('id', 'name')
 
 
 class repliesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'reply', 'is_deleted')
+    list_display = ('id', 'reply', 'is_deleted','created_by','created_at')
 
 
 class prioritiesAdmin(ImportExportModelAdmin, admin.ModelAdmin):

@@ -124,7 +124,7 @@ class ImportantDevelopment(BaseModel):
     class Meta:
         verbose_name = _('Important Development')
         verbose_name_plural = _('Important Developments')
-        ordering = ["created_at"]
+        ordering = ["-created_at"]
 
 
 class opponent_position(models.Model):
@@ -205,15 +205,15 @@ class LitigationCases(BaseModel):
     ImportantDevelopment = models.ManyToManyField(ImportantDevelopment, related_name='%(class)s_ImportantDevelopment',
                                                   blank=True, verbose_name=_('Important Development'))
     comments = models.ManyToManyField(comments, verbose_name="Comments", blank=True)
-    start_time = models.DateTimeField(null=True, blank=True)
-    end_time = models.DateTimeField(null=True, blank=True)
+    start_time = models.DateTimeField(null=True, blank=True,verbose_name=_('Start time'))
+    end_time = models.DateTimeField(null=True, blank=True,verbose_name=_('End time'))
     is_deleted = models.BooleanField(default=False, verbose_name=_("Is Deleted"))
-    created_at = models.DateTimeField(editable=False)
-    modified_at = models.DateTimeField(auto_now=True, editable=False)
+    created_at = models.DateTimeField(editable=False,verbose_name=_('Created At'))
+    modified_at = models.DateTimeField(auto_now=True, editable=False, verbose_name=_('Modified at'))
     created_by = models.ForeignKey(
-        User, related_name='%(class)s_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
+        User, related_name='%(class)s_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False,verbose_name=_('Created At'))
     modified_by = models.ForeignKey(
-        User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False)
+        User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False,verbose_name=_('Modified by'))
 
     def __str__(self):
         return self.name

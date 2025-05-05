@@ -50,3 +50,7 @@ def url_from_name(name, *args, **kwargs):
         return reverse(name, args=args, kwargs=kwargs)
     except NoReverseMatch:
         return '#'
+
+@register.filter
+def model_name(value):
+    return value.__class__.__name__

@@ -1,11 +1,12 @@
 {% load file_filters i18n %}
 {% load static %}
 <section class="px-5 pb-5">
+<div class="table-responsive">
 <table class="table table-hover shadow-sm" {% if user.enable_transision %}data-aos="zoom-in"{% endif %}>
   <thead>
-    <tr class="bg-gray-100">
+    <tr class="bg-gray-100 fw-bold">
       {% for header in headers %}
-        <td class="pt-3 pb-3 text-bold">{{ header }}</td>
+        <td class="pt-3 pb-3 text-bold qi-light">{{ header }}</td>
       {% endfor %}
     </tr>
   </thead>
@@ -18,7 +19,7 @@
       </tr>
     {% else %}
       {% for obj in objs %}
-        <tr class="bg-white" {% if user.enable_transision %}data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00"{% endif %}>
+        <tr class="table-row bg-white" {% if user.enable_transision %}data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00"{% endif %}>
           {% for field in fields_to_show %}
   <td class="pt-2 pb-2">
     {% with value=obj|attr:field %}
@@ -30,7 +31,7 @@
         {% trans value %}
       {% elif field == 'assignee' %}
         {{ value.username }}
-      {% elif field == 'case_status' %}
+      {% elif field == 'case_status' or field == 'hearing_status' or field == 'task_status' %}
         {% if value %}
           <button
             class="cursor-default btn btn-sm btn-{{ value.color }}">
@@ -41,7 +42,7 @@
           </button>
         {% endif %}
       {% else %}
-        {{ value }}
+        {{ value|default:"" }}
       {% endif %}
     {% endwith %}
   </td>
@@ -54,6 +55,7 @@
     {% endif %}
   </tbody>
 </table>
+</div>
     <!-- Start of Pagination -->
     <nav aria-label="Page navigation shadow-sm">
       <ul class="pagination justify-content-center flex-wrap">

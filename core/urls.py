@@ -28,15 +28,20 @@ from rest_framework_simplejwt.views import (
 )
 
 from accounts.views import SearchEmployeeAPIView
-from activities.views import tasks_list, delete_task, hearings_list, delete_hearing, task_view, hearing_view
+from activities.views import tasks_list, delete_task, hearings_list, delete_hearing, task_view, hearing_view, \
+    new_hearing_comment
 from cases.views import cases_list, delete_case, notations_list, delete_notation, AdministrativeInvestigations_list, \
-    delete_AdministrativeInvestigation, case_view, get_stages_for_case_type
+    delete_AdministrativeInvestigation, case_view, get_stages_for_case_type, new_case_path, \
+    new_case_ImportantDevelopment, new_case_comment, notation_view, new_notation_comment, new_notation_path, \
+    new_notation_ImportantDevelopment, AdministrativeInvestigations_view, new_AdministrativeInvestigation_path, \
+    new_AdministrativeInvestigation_ImportantDevelopment
 from contract.views import contracts_list, delete_contract
 from . import views
 from .consumers import NotificationConsumer
 from .views import (
     APIPathListView, APIPathView, myhome, about, load_more_notifications, read_all_notifications, read_notification,
-    delete_all_notifications, delete_notification
+    delete_all_notifications, delete_notification, new_path_docs, new_case_comment_reply,
+    new_comment_reply
 )
 
 
@@ -104,16 +109,38 @@ urlpatterns += i18n_patterns(
     path("get-stages/", get_stages_for_case_type, name="get_stages"),
     path('cases/<int:pk>/',login_required(delete_case),name='delete_case'),
     path('cases/<int:case_id>/edit/', login_required(case_view), {'mode': 'edit'}, name='case_edit'),
-    path('cases/<int:case_id>/view/', login_required(case_view), {'mode': 'view'}, name='case_view'),    path('notations/', notations_list, name='notations_list'),
+    path('cases/<int:case_id>/view/', login_required(case_view), {'mode': 'view'}, name='case_view'),
+    path('cases/<int:case_id>/new_path/', login_required(new_case_path), name='new_case_path'),
+    path('cases/<int:case_id>/new_id/', login_required(new_case_ImportantDevelopment), name='new_case_ImportantDevelopment'),
+    path('cases/<int:case_id>/new_comment/', login_required(new_case_comment), name='new_case_comment'),
+    path('cases/<int:case_id>/comments/<int:comment_id>/new_reply', login_required(new_case_comment_reply), name='new_case_comment_reply'),
+    path('notations/', notations_list, name='notations_list'),
     path('notations/<int:pk>/', login_required(delete_notation), name='delete_notation'),
-    path('AdministrativeInvestigations/', login_required(AdministrativeInvestigations_list), name='AdministrativeInvestigations_list'),
+    path('notations/create/', login_required(notation_view), {'mode': 'create'}, name='notation_create'),
+    path('notations/<int:notation_id>/edit/', login_required(notation_view), {'mode': 'edit'}, name='notation_edit'),
+    path('notations/<int:notation_id>/new_path/', login_required(new_notation_path),  name='new_notation_path'),
+    path('notations/<int:notation_id>/new_id/', login_required(new_notation_ImportantDevelopment),  name='new_notation_ImportantDevelopment'),
+    path('notations/<int:notation_id>/view/', login_required(notation_view), {'mode': 'view'}, name='notation_view'),
+    path('notations/<int:notation_id>/new_comment/', login_required(new_notation_comment), name='new_notation_comment'),
+    # path('paths/<int:path_id>/', login_required(path), name='path_vew'),
+    path('paths/<int:path_id>/new_docs', login_required(new_path_docs), name='new_path_docs'),
+    path('AdministrativeInvestigations/', login_required(AdministrativeInvestigations_list), name='administrative_investigations_list'),
+    path('AdministrativeInvestigations/create/', login_required(AdministrativeInvestigations_view), {'mode': 'create'}, name='administrative_investigation_create'),
+    path('AdministrativeInvestigations/<int:administrative_investigation_id>/edit/', login_required(AdministrativeInvestigations_view), {'mode': 'edit'}, name='administrative_investigation_edit'),
+    path('AdministrativeInvestigations/<int:administrative_investigation_id>/new_path/', login_required(new_AdministrativeInvestigation_path), name='new_administrative_investigation_path'),
+    path('AdministrativeInvestigations/<int:administrative_investigation_id>/view/', login_required(AdministrativeInvestigations_view), {'mode': 'view'}, name='administrative_investigation_view'),
+    path('AdministrativeInvestigations/<int:administrative_investigation_id>/new_id/', login_required(new_AdministrativeInvestigation_ImportantDevelopment),  name='new_AdministrativeInvestigation_ImportantDevelopment'),
     path('AdministrativeInvestigations/<int:pk>/', login_required(delete_AdministrativeInvestigation), name='delete_AdministrativeInvestigation'),
     path('tasks/', login_required(tasks_list), name='tasks_list'),
     path('tasks/<int:pk>/', login_required(delete_task), name='delete_task'),
-    path('tasks/<int:task_id>/view/', login_required(task_view), name='task_view'),
+    path('tasks/<int:task_id>/edit/', login_required(task_view),{'mode': 'edit'}, name='task_edit'),
+    path('tasks/<int:task_id>/view/', login_required(task_view),{'mode': 'view'},name= 'task_view'),
     path('hearings/', login_required(hearings_list), name='hearings_list'),
     path('hearing/<int:pk>/', login_required(delete_hearing), name='delete_hearing'),
-    path('hearings/<int:hearing_id>/view', login_required(hearing_view), name='hearing_view'),
+    path('comments/<int:comment_id>/new_reply', login_required(new_comment_reply), name='new_comment_reply'),
+    path('hearings/<int:hearing_id>/edit', login_required(hearing_view),{'mode':'edit'}, name='hearing_edit'),
+    path('hearings/<int:hearing_id>/view', login_required(hearing_view),{'mode':'view'}, name='hearing_view'),
+    path('hearings/<int:hearing_id>/new_comment', login_required(new_hearing_comment), name='new_hearing_comment'),
     path('contracts/', login_required(contracts_list), name='contracts_list'),
     path('contracts/<int:pk>/', login_required(delete_contract), name='delete_contract'),
     path("load-more-notifications/", load_more_notifications, name="load_more_notifications"),

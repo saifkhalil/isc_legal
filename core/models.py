@@ -59,6 +59,7 @@ class replies(models.Model):
     class Meta:
         verbose_name = _('Reply')
         verbose_name_plural = _('Replies')
+        ordering = ['-created_at']
 
 
 class comments(models.Model):
@@ -94,7 +95,7 @@ class comments(models.Model):
     class Meta:
         verbose_name = _('Comment')
         verbose_name_plural = _('Comments')
-
+        ordering = ['-created_at']
 
 
 class court(models.Model):

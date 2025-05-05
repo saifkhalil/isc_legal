@@ -37,7 +37,7 @@ from core.classes import StandardResultsSetPagination
 from core.classes import dict_item, GetUniqueDictionaries
 from core.mixins import CSVRendererMixin, CSVRendererMixin2
 from core.models import Notification, priorities
-from .forms import CaseForm
+from .forms import CaseForm, NotationForm, AdministrativeInvestigationForm
 from .models import LitigationCases, stages, case_type, court, client_position, opponent_position, Folder, \
     ImportantDevelopment, Status, AdministrativeInvestigation, Notation, characteristic
 from .permissions import MyPermission
@@ -54,7 +54,6 @@ def manager_superuser_check(request):
     if not (current_user.is_manager or current_user.is_superuser):
         return Response(data={"detail": "انت غير مصرح بالمسح"}, status=status.HTTP_401_UNAUTHORIZED)
 
-
 def get_stages_for_case_type(request):
     case_type_id = request.GET.get('case_type_id')
 
@@ -65,7 +64,6 @@ def get_stages_for_case_type(request):
         return JsonResponse({"stages": list(stage_queryset)})
 
     return JsonResponse({"stages": []})
-
 
 @login_required
 def cases_list(request):
@@ -264,7 +262,6 @@ def cases_list(request):
     }
     return render(request, 'objs_list.html', context)
 
-
 def case_view(request, case_id=None, mode='view'):
     log = {}
     field_translations = {}
@@ -319,11 +316,15 @@ def case_view(request, case_id=None, mode='view'):
         'logs': log,
         'obj_edit':'case_edit',
         'objs_list':'cases_list',
+        'new_path':'new_case_path',
+
+        'obj_new_comment':'new_case_comment',
+        'new_ImportantDevelopment': 'new_case_ImportantDevelopment',
+        'obj_status':instance.case_status,
         'field_translations': field_translations,
         'operation_translations':OPERATION_TRANSLATIONS,
     }
     return render(request, 'obj.html', context)
-
 
 @require_POST
 def delete_case(request, pk=None):
@@ -339,6 +340,24 @@ def delete_case(request, pk=None):
     instance.save()
     return JsonResponse({'success': True, 'message': 'Case has been deleted successfully.'},status=200)
 
+@require_POST
+def new_case_path(request, case_id=None):
+    instance = get_object_or_404(LitigationCases, pk=case_id)
+    instance.paths.create(name=request.POST.get('name'))
+    return redirect('case_view',case_id=case_id)
+
+@require_POST
+def new_case_ImportantDevelopment(request, case_id=None):
+    url = request.POST.get('url')
+    instance = get_object_or_404(LitigationCases, pk=case_id)
+    instance.ImportantDevelopment.create(title=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
+    return redirect(url)
+
+@require_POST
+def new_case_comment(request, case_id=None):
+    instance = get_object_or_404(LitigationCases, pk=case_id)
+    instance.comments.create(comment=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
+    return redirect('case_view',case_id=case_id)
 
 @login_required
 def notations_list(request):
@@ -466,6 +485,88 @@ def notations_list(request):
     return render(request, 'cases/notations_list.html', context)
 
 @require_POST
+def new_notation_path(request, notation_id=None):
+    instance = get_object_or_404(Notation, pk=notation_id)
+    instance.paths.create(name=request.POST.get('name'))
+    return redirect('notation_view',notation_id=notation_id)
+
+@require_POST
+def new_notation_ImportantDevelopment(request, notation_id=None):
+    url = request.POST.get('url')
+    instance = get_object_or_404(Notation, pk=notation_id)
+    instance.ImportantDevelopment.create(title=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
+    return redirect(url)
+
+@require_POST
+def new_notation_comment(request, notation_id=None):
+    instance = get_object_or_404(Notation, pk=notation_id)
+    instance.comments.create(comment=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
+    return redirect('notation_view',notation_id=notation_id)
+
+def notation_view(request, notation_id=None, mode='view'):
+    log = {}
+    field_translations = {}
+    OPERATION_TRANSLATIONS = {}
+    cases_create = {'name': _('New Case'), 'url': 'case_create'}
+    if notation_id:
+        instance = get_object_or_404(Notation, pk=notation_id)
+        if request.method == 'POST':
+            if mode == 'edit':  # Allow editing only if mode is 'edit'
+                form = NotationForm(request.POST, instance=instance, mode=mode)
+                if form.is_valid():
+                    instance = form.save(commit=False)  # Don't save yet, update fields first
+                    instance.modified_by = request.user  # ✅ Correctly update modified_by
+                    instance.modified_at = timezone.now()  # ✅ Correctly update modified_at
+                    instance.save()  # Now save the instance with updated fields
+                    return redirect('notations_list')
+            else:
+                form = NotationForm(instance=instance, mode=mode)  # Read-only form
+        else:
+            form = NotationForm(instance=instance, mode=mode)
+            if mode == 'view':
+                OPERATION_TRANSLATIONS = {
+                    'add': _('Add'),
+                    'delete': _('Delete'),
+                }
+                field_translations = {
+                    field.name: _(field.verbose_name)
+                    for field in Notation._meta.fields
+                }
+                field_translations.update({
+                    field.name: _(field.verbose_name)
+                    for field in Notation._meta.many_to_many
+                })
+                log = LogEntry.objects.filter(content_type__model='notations',object_id=instance.pk)
+                for field in form.fields:
+                    form.fields[field].widget.attrs['disabled'] = True  # Disable all fields
+
+    else:
+        mode = 'create'  # If no `case_id`, it's a new case
+        instance = Notation()
+        form = NotationForm(request.POST or None, instance=instance, mode=mode)
+        if request.method == 'POST' and form.is_valid():
+            instance = form.save(commit=False)  # ✅ Correct way to update before saving
+            instance.created_by = request.user  # ✅ Correctly update created_by
+            instance.created_at = timezone.now()  # ✅ Correctly update created_at
+            instance.save()  # ✅ Now save the instance
+            return redirect('notations_list')
+    context = {
+        'form': form,
+        'obj': instance,
+        'mode': mode,
+        'logs': log,
+        'obj_edit':'notation_edit',
+        'objs_list':'notations_list',
+        'new_path':'new_notation_path',
+        'new_ImportantDevelopment':'new_notation_ImportantDevelopment',
+        'obj_new_comment':'new_notation_comment',
+        'field_translations': field_translations,
+        'operation_translations':OPERATION_TRANSLATIONS,
+    }
+    return render(request, 'obj.html', context)
+
+
+@require_POST
 def delete_notation(request, pk=None):
     instance = Notation.objects.get(pk=pk)
     if not (request.user.is_manager or request.user.is_superuser):
@@ -579,6 +680,68 @@ def AdministrativeInvestigations_list(request):
     }
     return render(request, 'cases/AdministrativeInvestigations_list.html', context)
 
+
+def AdministrativeInvestigations_view(request, administrative_investigation_id=None, mode='view'):
+    log = {}
+    field_translations = {}
+    OPERATION_TRANSLATIONS = {}
+    if administrative_investigation_id:
+        instance = get_object_or_404(AdministrativeInvestigation, pk=administrative_investigation_id)
+        if request.method == 'POST':
+            if mode == 'edit':  # Allow editing only if mode is 'edit'
+                form = AdministrativeInvestigationForm(request.POST, instance=instance, mode=mode)
+                if form.is_valid():
+                    instance = form.save(commit=False)  # Don't save yet, update fields first
+                    instance.modified_by = request.user  # ✅ Correctly update modified_by
+                    instance.modified_at = timezone.now()  # ✅ Correctly update modified_at
+                    instance.save()  # Now save the instance with updated fields
+                    return redirect('administrative_investigations_list')
+            else:
+                form = AdministrativeInvestigationForm(instance=instance, mode=mode)  # Read-only form
+        else:
+            form = AdministrativeInvestigationForm(instance=instance, mode=mode)
+            if mode == 'view':
+                OPERATION_TRANSLATIONS = {
+                    'add': _('Add'),
+                    'delete': _('Delete'),
+                }
+                field_translations = {
+                    field.name: _(field.verbose_name)
+                    for field in AdministrativeInvestigation._meta.fields
+                }
+                field_translations.update({
+                    field.name: _(field.verbose_name)
+                    for field in AdministrativeInvestigation._meta.many_to_many
+                })
+                log = LogEntry.objects.filter(content_type__model='AdministrativeInvestigation',object_id=instance.pk)
+                for field in form.fields:
+                    form.fields[field].widget.attrs['disabled'] = True  # Disable all fields
+
+    else:
+        mode = 'create'  # If no `case_id`, it's a new case
+        instance = AdministrativeInvestigation()
+        form = AdministrativeInvestigationForm(request.POST or None, instance=instance, mode=mode)
+        if request.method == 'POST' and form.is_valid():
+            instance = form.save(commit=False)  # ✅ Correct way to update before saving
+            instance.created_by = request.user  # ✅ Correctly update created_by
+            instance.created_at = timezone.now()  # ✅ Correctly update created_at
+            instance.save()  # ✅ Now save the instance
+            return redirect('administrative_investigations_list')
+    context = {
+        'form': form,
+        'obj': instance,
+        'mode': mode,
+        'logs': log,
+        'obj_edit':'administrative_investigation_edit',
+        'objs_list':'administrative_investigations_list',
+        'new_path':'new_administrative_investigation_path',
+        'new_ImportantDevelopment':'new_AdministrativeInvestigation_ImportantDevelopment',
+        'field_translations': field_translations,
+        'operation_translations':OPERATION_TRANSLATIONS,
+    }
+    return render(request, 'obj.html', context)
+
+
 @require_POST
 def delete_AdministrativeInvestigation(request, pk=None):
     instance = AdministrativeInvestigation.objects.get(pk=pk)
@@ -592,7 +755,18 @@ def delete_AdministrativeInvestigation(request, pk=None):
     instance.save()
     return JsonResponse({'success': True, 'message': f'{_("Administrative Investigation")} {_("has been deleted successfully.")}'},status=200)
 
+@require_POST
+def new_AdministrativeInvestigation_ImportantDevelopment(request, administrative_investigation_id=None):
+    url = request.POST.get('url')
+    instance = get_object_or_404(AdministrativeInvestigation, pk=administrative_investigation_id)
+    instance.ImportantDevelopment.create(title=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
+    return redirect(url)
 
+@require_POST
+def new_AdministrativeInvestigation_path(request, administrative_investigation_id=None):
+    instance = get_object_or_404(AdministrativeInvestigation, pk=administrative_investigation_id)
+    instance.paths.create(name=request.POST.get('name'))
+    return redirect('administrative_investigation_view',notation_id=administrative_investigation_id)
 
 def filter_cases(queryset, created_at_after=None, created_at_before=None, assignee_id=None):
     """Filter cases based on date range and assignee."""

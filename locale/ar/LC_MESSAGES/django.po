@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-28 12:43+0300\n"
-"PO-Revision-Date: 2025-04-28 12:44+0300\n"
+"POT-Creation-Date: 2025-05-04 13:11+0300\n"
+"PO-Revision-Date: 2025-05-04 13:12+0300\n"
 "Last-Translator: Saif AlKhateeb <saif.ibrahim@qi.iq>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -88,11 +88,11 @@ msgstr "تم انشاء الحساب الخاص بك على النظام الق�
 
 #: .\accounts\models.py:71 .\activities\models.py:11 .\cases\models.py:32
 #: .\cases\models.py:52 .\cases\models.py:68 .\cases\models.py:87
-#: .\contract\models.py:125 .\core\models.py:103 .\core\models.py:120
-#: .\core\models.py:136 .\rest_api\serializers.py:45
+#: .\contract\models.py:125 .\core\models.py:104 .\core\models.py:121
+#: .\core\models.py:137 .\rest_api\serializers.py:45
 #: .\templates\activities\hearings_list.html:81
 #: .\templates\contracts\contracts_list.html:102
-#: .\templates\includes\_paths.html:12
+#: .\templates\includes\_docs.html:12 .\templates\includes\_paths.html:16
 msgid "Name"
 msgstr "الاسم"
 
@@ -222,15 +222,18 @@ msgstr "يرجى تأكيد أنك قرأت ووافقت على الشروط و�
 msgid "Created at"
 msgstr "تاريخ الانشاء"
 
-#: .\accounts\models.py:124 .\templates\includes\_obj_history.html:31
+#: .\accounts\models.py:124 .\cases\models.py:212
+#: .\templates\includes\_obj_history.html:31
 msgid "Modified at"
 msgstr "تاريخ التعديل"
 
-#: .\accounts\models.py:126 .\templates\includes\_obj_history.html:17
+#: .\accounts\models.py:126 .\templates\includes\_action_buttons.html:9
+#: .\templates\includes\_obj_history.html:17
 msgid "Created by"
 msgstr "أنشئ بواسطة"
 
-#: .\accounts\models.py:128 .\templates\includes\_obj_history.html:27
+#: .\accounts\models.py:128 .\cases\models.py:216
+#: .\templates\includes\_obj_history.html:27
 msgid "Modified by"
 msgstr "عدل بواسطة"
 
@@ -324,13 +327,13 @@ msgid "Activities"
 msgstr "الانشطة"
 
 #: .\activities\models.py:12 .\activities\models.py:63 .\cases\models.py:225
-#: .\core\models.py:140 .\core\models.py:174 .\templates\base.html:117
+#: .\core\models.py:141 .\core\models.py:175 .\templates\base.html:22
 #: .\templates\includes\_obj_history.html:61
 msgid "Litigation Case"
 msgstr "دعوى"
 
 #: .\activities\models.py:13 .\activities\models.py:64 .\cases\models.py:286
-#: .\cases\models.py:333 .\core\models.py:144 .\core\models.py:176
+#: .\cases\models.py:333 .\core\models.py:145 .\core\models.py:177
 msgid "Folder"
 msgstr "ملف"
 
@@ -339,8 +342,8 @@ msgid "Hearing Date"
 msgstr "تاريخ الجلسة"
 
 #: .\activities\models.py:15 .\cases\models.py:188 .\cases\models.py:303
-#: .\cases\models.py:403 .\cases\models.py:452 .\cases\views.py:211
-#: .\cases\views.py:244 .\contract\models.py:35
+#: .\cases\models.py:403 .\cases\models.py:452 .\cases\views.py:209
+#: .\cases\views.py:242 .\contract\models.py:35
 #: .\templates\activities\hearings_list.html:46
 #: .\templates\activities\hearings_list.html:83
 #: .\templates\activities\tasks_list.html:46
@@ -365,9 +368,9 @@ msgstr "ملخص الجلسة حسب المرافعين"
 #: .\cases\models.py:69 .\cases\models.py:103 .\cases\models.py:210
 #: .\cases\models.py:318 .\cases\models.py:412 .\cases\models.py:459
 #: .\contract\models.py:39 .\contract\models.py:73 .\contract\models.py:104
-#: .\contract\models.py:126 .\core\models.py:45 .\core\models.py:78
-#: .\core\models.py:124 .\core\models.py:150 .\core\models.py:310
-#: .\core\models.py:370
+#: .\contract\models.py:126 .\core\models.py:45 .\core\models.py:79
+#: .\core\models.py:125 .\core\models.py:151 .\core\models.py:311
+#: .\core\models.py:371
 msgid "Is Deleted"
 msgstr "محذوف"
 
@@ -380,7 +383,8 @@ msgid "Hearing Status"
 msgstr "الحالة"
 
 #: .\activities\models.py:26 .\activities\models.py:67 .\cases\models.py:180
-#: .\cases\models.py:300 .\core\models.py:171
+#: .\cases\models.py:300 .\core\models.py:172
+#: .\templates\includes\_paths.html:105
 msgid "Documents"
 msgstr "الملفات"
 
@@ -389,11 +393,11 @@ msgid "Remind Date"
 msgstr "تاريخ التذكير"
 
 #: .\activities\models.py:44 .\cases\models.py:203 .\cases\models.py:311
-#: .\core\models.py:148 .\templates\base.html:119
+#: .\core\models.py:149 .\templates\base.html:24
 msgid "Hearing"
 msgstr "مرافعة"
 
-#: .\activities\models.py:45 .\templates\base.html:79
+#: .\activities\models.py:45 .\templates\includes\_base_nav.html:26
 #: .\templates\includes\_hearings.html:5
 msgid "Hearings"
 msgstr "المرافعات"
@@ -435,12 +439,12 @@ msgid "Assign date"
 msgstr "تاريخ الاحالة"
 
 #: .\activities\models.py:84 .\cases\models.py:204 .\cases\models.py:312
-#: .\core\models.py:146 .\templates\base.html:118
+#: .\core\models.py:147 .\templates\base.html:23
 msgid "Task"
 msgstr "مهمة"
 
-#: .\activities\models.py:85 .\templates\base.html:76
-#: .\templates\includes\_tasks.html:4
+#: .\activities\models.py:85 .\templates\includes\_base_nav.html:23
+#: .\templates\includes\_tasks.html:5
 msgid "Tasks"
 msgstr "المهام"
 
@@ -448,8 +452,26 @@ msgstr "المهام"
 msgid "You have been assigned with you below case details"
 msgstr "لقد تم تعيينك كمحامي للدعوى ادناه"
 
+#: .\activities\views.py:879 .\activities\views.py:1083 .\cases\views.py:287
+#: .\cases\views.py:512
+msgid "Add"
+msgstr "اضافة"
+
+#: .\activities\views.py:880 .\activities\views.py:1084 .\cases\views.py:288
+#: .\cases\views.py:513 .\templates\activities\hearings_list.html:106
+#: .\templates\activities\tasks_list.html:111
+#: .\templates\cases\AdministrativeInvestigations_list.html:86
+#: .\templates\cases\notations_list.html:113
+#: .\templates\contracts\contracts_list.html:145
+#: .\templates\includes\_action_buttons.html:6
+#: .\templates\includes\_docs.html:30 .\templates\includes\_paths.html:39
+#: .\templates\includes\_paths.html:56
+msgid "Delete"
+msgstr "حذف"
+
 #: .\cases\apps.py:10 .\templates\activities\hearings_list.html:24
-#: .\templates\activities\tasks_list.html:24 .\templates\base.html:73
+#: .\templates\activities\tasks_list.html:24
+#: .\templates\includes\_base_nav.html:20
 msgid "Cases"
 msgstr "الدعاوى"
 
@@ -470,7 +492,7 @@ msgid "Case characteristics"
 msgstr "صفات الدعوى"
 
 #: .\cases\models.py:81 .\cases\models.py:82 .\cases\models.py:194
-#: .\cases\views.py:210 .\cases\views.py:230
+#: .\cases\views.py:208 .\cases\views.py:228
 msgid "Stage"
 msgstr "مرحلة الدعوى"
 
@@ -489,12 +511,13 @@ msgstr "العنوان"
 
 #: .\cases\models.py:125 .\cases\models.py:206 .\cases\models.py:310
 #: .\cases\models.py:411 .\cases\models.py:449 .\contract\models.py:37
+#: .\templates\includes\_important_developments_list.html:34
 msgid "Important Development"
-msgstr "تطور مهمة"
+msgstr "التطور مهمة"
 
 #: .\cases\models.py:126
 msgid "Important Developments"
-msgstr "تطورات مهمة"
+msgstr "التطورات مهمة"
 
 #: .\cases\models.py:132
 msgid "Position"
@@ -517,10 +540,10 @@ msgid "خاسرة"
 msgstr "خاسرة"
 
 #: .\cases\models.py:170 .\cases\models.py:294 .\cases\models.py:394
-#: .\cases\models.py:436 .\cases\views.py:210 .\contract\models.py:22
+#: .\cases\models.py:436 .\cases\views.py:208 .\contract\models.py:22
 #: .\templates\cases\AdministrativeInvestigations_list.html:59
 #: .\templates\cases\notations_list.html:81
-#: .\templates\includes\_hearings.html:10 .\templates\includes\_tasks.html:9
+#: .\templates\includes\_hearings.html:10 .\templates\includes\_tasks.html:10
 msgid "Subject"
 msgstr "الموضوع"
 
@@ -538,7 +561,7 @@ msgstr "نوع الدعوى"
 
 #: .\cases\models.py:182 .\cases\models.py:301 .\cases\models.py:397
 #: .\cases\models.py:442 .\contract\models.py:34 .\core\events.py:6
-#: .\core\models.py:202
+#: .\core\models.py:203
 msgid "Paths"
 msgstr "الملفات"
 
@@ -567,6 +590,26 @@ msgstr "حالة غلق الدعوى"
 msgid "Case Close Comment"
 msgstr "تعليق غلق الدعوى"
 
+#: .\cases\models.py:208
+msgid "Start time"
+msgstr "تاريخ البدء"
+
+#: .\cases\models.py:209
+msgid "End time"
+msgstr "تاريخ الانتهاء"
+
+#: .\cases\models.py:211 .\cases\models.py:214 .\cases\views.py:209
+#: .\templates\activities\hearings_list.html:84
+#: .\templates\activities\tasks_list.html:85
+#: .\templates\cases\AdministrativeInvestigations_list.html:61
+#: .\templates\cases\notations_list.html:85
+#: .\templates\contracts\contracts_list.html:110
+#: .\templates\includes\_action_buttons.html:9
+#: .\templates\includes\_docs.html:13 .\templates\includes\_hearings.html:11
+#: .\templates\includes\_tasks.html:11
+msgid "Created At"
+msgstr "تاريخ الانشاء"
+
 #: .\cases\models.py:226
 msgid "Litigation Cases"
 msgstr "دعاوى"
@@ -583,12 +626,12 @@ msgstr "رقم الدعوى الجديدة"
 msgid "You have been shared with you below case details"
 msgstr "تمت مشاركة الدعوى ادناه معك"
 
-#: .\cases\models.py:287 .\templates\base.html:88
+#: .\cases\models.py:287 .\templates\includes\_base_nav.html:35
 msgid "Administrative investigations"
 msgstr "التحقيقات الإدارية"
 
-#: .\cases\models.py:288 .\cases\models.py:474 .\core\models.py:179
-#: .\templates\base.html:120
+#: .\cases\models.py:288 .\cases\models.py:474 .\core\models.py:180
+#: .\templates\base.html:25
 msgid "Notation"
 msgstr "تدوين"
 
@@ -628,7 +671,7 @@ msgstr "رئيس اللجنة"
 msgid "Committee members"
 msgstr "أعضاء اللجنة"
 
-#: .\cases\models.py:407 .\cases\models.py:456 .\cases\views.py:212
+#: .\cases\models.py:407 .\cases\models.py:456 .\cases\views.py:210
 #: .\core\models.py:26 .\core\models.py:35
 #: .\templates\cases\AdministrativeInvestigations_list.html:24
 #: .\templates\cases\AdministrativeInvestigations_list.html:60
@@ -637,8 +680,8 @@ msgstr "أعضاء اللجنة"
 msgid "Priority"
 msgstr "الأولوية"
 
-#: .\cases\models.py:427 .\cases\views.py:593 .\core\models.py:178
-#: .\templates\base.html:121
+#: .\cases\models.py:427 .\cases\views.py:676 .\core\models.py:179
+#: .\templates\base.html:26
 msgid "Administrative Investigation"
 msgstr "تحقيق إداري"
 
@@ -662,7 +705,7 @@ msgstr "الرقم المصرح به"
 msgid "Start Time"
 msgstr "تاريخ البدء"
 
-#: .\cases\models.py:475 .\templates\base.html:85
+#: .\cases\models.py:475 .\templates\includes\_base_nav.html:32
 msgid "Notations"
 msgstr "التدوينات"
 
@@ -670,7 +713,7 @@ msgstr "التدوينات"
 msgid "توجد دعوى متأخرة لمدة شهر من تاريخ الإنشاء"
 msgstr "توجد دعوى متأخرة لمدة شهر من تاريخ الإنشاء"
 
-#: .\cases\views.py:210 .\templates\activities\hearings_list.html:80
+#: .\cases\views.py:208 .\templates\activities\hearings_list.html:80
 #: .\templates\activities\tasks_list.html:80
 #: .\templates\cases\AdministrativeInvestigations_list.html:58
 #: .\templates\cases\notations_list.html:80
@@ -678,58 +721,49 @@ msgstr "توجد دعوى متأخرة لمدة شهر من تاريخ الإن�
 msgid "Number"
 msgstr "رقم"
 
-#: .\cases\views.py:210 .\cases\views.py:223 .\contract\models.py:100
+#: .\cases\views.py:208 .\cases\views.py:221 .\contract\models.py:100
 #: .\contract\models.py:141 .\templates\contracts\contracts_list.html:24
 #: .\templates\contracts\contracts_list.html:103
 msgid "Type"
 msgstr "النوع"
 
-#: .\cases\views.py:210 .\core\models.py:112
+#: .\cases\views.py:208 .\core\models.py:113
 #: .\templates\activities\hearings_list.html:85
 #: .\templates\cases\notations_list.html:24
 #: .\templates\cases\notations_list.html:82
 msgid "Court"
 msgstr "المحكمة"
 
-#: .\cases\views.py:211 .\cases\views.py:237 .\core\models.py:304
-#: .\core\models.py:325 .\templates\activities\hearings_list.html:35
+#: .\cases\views.py:209 .\cases\views.py:235 .\core\models.py:305
+#: .\core\models.py:326 .\templates\activities\hearings_list.html:35
 #: .\templates\activities\hearings_list.html:82
 #: .\templates\activities\tasks_list.html:35
 #: .\templates\activities\tasks_list.html:82
 msgid "Status"
 msgstr "الحالة"
 
-#: .\cases\views.py:211 .\templates\activities\hearings_list.html:84
-#: .\templates\activities\tasks_list.html:85
-#: .\templates\cases\AdministrativeInvestigations_list.html:61
-#: .\templates\cases\notations_list.html:85
-#: .\templates\contracts\contracts_list.html:110
-#: .\templates\includes\_hearings.html:11 .\templates\includes\_tasks.html:10
-msgid "Created At"
-msgstr "تاريخ الانشاء"
-
-#: .\cases\views.py:211 .\templates\activities\tasks_list.html:86
+#: .\cases\views.py:209 .\templates\activities\tasks_list.html:86
 msgid "Category"
 msgstr "الفئة"
 
-#: .\cases\views.py:212
+#: .\cases\views.py:210
 msgid "Characteristic"
 msgstr "صفة الخصم"
 
-#: .\cases\views.py:212
+#: .\cases\views.py:210
 msgid "Outcome"
 msgstr "نتيجة الدعوى"
 
-#: .\cases\views.py:212 .\templates\activities\hearings_list.html:87
+#: .\cases\views.py:210 .\templates\activities\hearings_list.html:87
 #: .\templates\activities\tasks_list.html:89
 #: .\templates\cases\AdministrativeInvestigations_list.html:63
 #: .\templates\cases\notations_list.html:87
 #: .\templates\contracts\contracts_list.html:111
-#: .\templates\includes\_paths.html:14
+#: .\templates\includes\_docs.html:14 .\templates\includes\_paths.html:18
 msgid "Actions"
 msgstr "اجراءات"
 
-#: .\cases\views.py:217 .\templates\activities\hearings_list.html:13
+#: .\cases\views.py:215 .\templates\activities\hearings_list.html:13
 #: .\templates\activities\tasks_list.html:13
 #: .\templates\cases\AdministrativeInvestigations_list.html:13
 #: .\templates\cases\notations_list.html:13
@@ -737,26 +771,12 @@ msgstr "اجراءات"
 msgid "Search keywords"
 msgstr "كلمات البحث الرئيسية"
 
-#: .\cases\views.py:250 .\cases\views.py:272
+#: .\cases\views.py:248 .\cases\views.py:269 .\cases\views.py:494
 #: .\templates\cases\cases_list.html:11
 msgid "New Case"
 msgstr "دعوى جديدة"
 
-#: .\cases\views.py:290
-msgid "Add"
-msgstr "اضافة"
-
-#: .\cases\views.py:291 .\templates\activities\hearings_list.html:106
-#: .\templates\activities\tasks_list.html:110
-#: .\templates\cases\AdministrativeInvestigations_list.html:86
-#: .\templates\cases\notations_list.html:112
-#: .\templates\contracts\contracts_list.html:145
-#: .\templates\includes\_action_buttons.html:6
-#: .\templates\includes\_paths.html:28 .\templates\includes\_paths.html:42
-msgid "Delete"
-msgstr "حذف"
-
-#: .\cases\views.py:593
+#: .\cases\views.py:676
 msgid "has been deleted successfully."
 msgstr "تم المسح بنجاح"
 
@@ -797,11 +817,11 @@ msgstr "تجديد تلقائي"
 msgid "Penal clause"
 msgstr "بند جزائي"
 
-#: .\contract\models.py:52 .\contract\models.py:69 .\core\models.py:180
+#: .\contract\models.py:52 .\contract\models.py:69 .\core\models.py:181
 msgid "Contract"
 msgstr "عقد"
 
-#: .\contract\models.py:53 .\templates\base.html:82
+#: .\contract\models.py:53 .\templates\includes\_base_nav.html:29
 msgid "Contracts"
 msgstr "عقود"
 
@@ -890,7 +910,8 @@ msgstr ""
 msgid "Priorities"
 msgstr "الأولويات"
 
-#: .\core\models.py:42 .\core\models.py:60 .\core\models.py:69
+#: .\core\models.py:42 .\core\models.py:60 .\core\models.py:70
+#: .\templates\includes\_comments_list.html:40
 msgid "Reply"
 msgstr "رد"
 
@@ -898,80 +919,81 @@ msgstr "رد"
 msgid "Replies"
 msgstr "ردود"
 
-#: .\core\models.py:67 .\core\models.py:95
+#: .\core\models.py:68 .\core\models.py:96
+#: .\templates\includes\_comments_list.html:60
 msgid "Comment"
 msgstr "ملاحظات"
 
-#: .\core\models.py:96
+#: .\core\models.py:97 .\templates\includes\_comments_list.html:6
 msgid "Comments"
-msgstr "ملاحظات"
+msgstr "الملاحظات"
 
-#: .\core\models.py:113
+#: .\core\models.py:114
 msgid "Courts"
 msgstr "المحاكم"
 
-#: .\core\models.py:121 .\core\models.py:137
+#: .\core\models.py:122 .\core\models.py:138
 msgid "Attachment"
 msgstr "المرفقة"
 
-#: .\core\models.py:142 .\core\models.py:201 .\core\models.py:272
-#: .\templates\base.html:122
+#: .\core\models.py:143 .\core\models.py:202 .\core\models.py:273
+#: .\templates\base.html:27
 msgid "Path"
 msgstr "مجلد"
 
-#: .\core\models.py:273
+#: .\core\models.py:274
 msgid "Parent and Name"
 msgstr "اسم الاب"
 
-#: .\core\models.py:280
+#: .\core\models.py:281
 #, python-format
 msgid "%(model_name)s with this %(field_names)s already exists."
 msgstr ""
 
-#: .\core\models.py:306
+#: .\core\models.py:307
 msgid "Icon"
 msgstr "الرمز التعبيري"
 
-#: .\core\models.py:308
+#: .\core\models.py:309
 msgid "Color"
 msgstr "اللون"
 
-#: .\core\models.py:315
+#: .\core\models.py:316
 msgid "Is Completed"
 msgstr "مكتمل"
 
-#: .\core\models.py:316
+#: .\core\models.py:317
 msgid "Is Done"
 msgstr "تم"
 
-#: .\core\models.py:326
+#: .\core\models.py:327
 msgid "Statuses"
 msgstr "الحالات"
 
-#: .\core\models.py:346 .\templates\base.html:111
+#: .\core\models.py:347 .\templates\base.html:17
 #: .\templates\includes\_notifications.html:33
 msgid "create"
 msgstr "أنشأ"
 
-#: .\core\models.py:347 .\templates\base.html:112
+#: .\core\models.py:348 .\templates\base.html:18
 #: .\templates\includes\_notifications.html:34
 msgid "update"
 msgstr "حدث"
 
-#: .\core\models.py:348 .\templates\base.html:113
+#: .\core\models.py:349 .\templates\base.html:19
 #: .\templates\includes\_notifications.html:34
 msgid "delete"
 msgstr "حذف"
 
-#: .\core\models.py:349
+#: .\core\models.py:350
 msgid "access"
 msgstr "دخول"
 
-#: .\core\models.py:387
+#: .\core\models.py:388
 msgid "Notification"
 msgstr "اشعار"
 
-#: .\core\models.py:388 .\templates\includes\_notifications.html:13
+#: .\core\models.py:389 .\templates\includes\_notifications.html:13
 msgid "Notifications"
 msgstr "اشعارات"
 
@@ -1357,76 +1379,80 @@ msgid "Related Case"
 msgstr "الدعوى المتعلقة"
 
 #: .\templates\activities\hearings_list.html:115
-#: .\templates\activities\tasks_list.html:119
+#: .\templates\activities\tasks_list.html:120
 #: .\templates\cases\AdministrativeInvestigations_list.html:72
 #: .\templates\cases\notations_list.html:96
 #: .\templates\contracts\contracts_list.html:120
-#: .\templates\includes\_hearings.html:23 .\templates\includes\_paths.html:50
-#: .\templates\includes\_render_table.html:16
-#: .\templates\includes\_tasks.html:22
+#: .\templates\includes\_docs.html:37 .\templates\includes\_hearings.html:23
+#: .\templates\includes\_paths.html:65
+#: .\templates\includes\_render_table.html:17
+#: .\templates\includes\_tasks.html:23
 msgid "No data available in table"
 msgstr "لا توجد بيانات في الجدول"
 
 #: .\templates\activities\hearings_list.html:125
 #: .\templates\activities\hearings_list.html:129
-#: .\templates\activities\tasks_list.html:129
-#: .\templates\activities\tasks_list.html:133
+#: .\templates\activities\tasks_list.html:130
+#: .\templates\activities\tasks_list.html:134
 #: .\templates\cases\AdministrativeInvestigations_list.html:99
 #: .\templates\cases\AdministrativeInvestigations_list.html:103
-#: .\templates\cases\notations_list.html:126
-#: .\templates\cases\notations_list.html:130
+#: .\templates\cases\notations_list.html:127
+#: .\templates\cases\notations_list.html:131
 #: .\templates\contracts\contracts_list.html:159
 #: .\templates\contracts\contracts_list.html:163
-#: .\templates\includes\_render_table.html:63
-#: .\templates\includes\_render_table.html:67
+#: .\templates\includes\_render_table.html:65
+#: .\templates\includes\_render_table.html:69
 msgid "Previous"
 msgstr "السابق"
 
 #: .\templates\activities\hearings_list.html:136
-#: .\templates\activities\tasks_list.html:140
+#: .\templates\activities\tasks_list.html:141
 #: .\templates\cases\AdministrativeInvestigations_list.html:110
-#: .\templates\cases\notations_list.html:137
+#: .\templates\cases\notations_list.html:138
 #: .\templates\contracts\contracts_list.html:170
-#: .\templates\includes\_render_table.html:73
+#: .\templates\includes\_render_table.html:75
 msgid "current"
 msgstr "الحالي"
 
 #: .\templates\activities\hearings_list.html:151
 #: .\templates\activities\hearings_list.html:155
-#: .\templates\activities\tasks_list.html:155
-#: .\templates\activities\tasks_list.html:159
+#: .\templates\activities\tasks_list.html:156
+#: .\templates\activities\tasks_list.html:160
 #: .\templates\cases\AdministrativeInvestigations_list.html:125
 #: .\templates\cases\AdministrativeInvestigations_list.html:129
-#: .\templates\cases\notations_list.html:152
-#: .\templates\cases\notations_list.html:156
+#: .\templates\cases\notations_list.html:153
+#: .\templates\cases\notations_list.html:157
 #: .\templates\contracts\contracts_list.html:185
 #: .\templates\contracts\contracts_list.html:189
-#: .\templates\includes\_render_table.html:88
-#: .\templates\includes\_render_table.html:92
+#: .\templates\includes\_render_table.html:90
+#: .\templates\includes\_render_table.html:94
 msgid "Next"
 msgstr "التالي"
 
 #: .\templates\activities\hearings_list.html:209
-#: .\templates\activities\tasks_list.html:213
+#: .\templates\activities\tasks_list.html:214
 #: .\templates\cases\AdministrativeInvestigations_list.html:170
 #: .\templates\cases\cases_list.html:66
-#: .\templates\cases\notations_list.html:210
+#: .\templates\cases\notations_list.html:211
 #: .\templates\contracts\contracts_list.html:255
 msgid "Are you sure you want to delete?"
 msgstr "هل انت متاكد من الحذف؟"
 
 #: .\templates\activities\hearings_list.html:232
-#: .\templates\activities\tasks_list.html:236
+#: .\templates\activities\tasks_list.html:237
 #: .\templates\cases\AdministrativeInvestigations_list.html:193
 #: .\templates\cases\cases_list.html:89
-#: .\templates\cases\notations_list.html:233
+#: .\templates\cases\notations_list.html:234
 #: .\templates\contracts\contracts_list.html:278
 msgid "An error occurred while deleting."
 msgstr "حدث خطأ عند عملية الحذف."
 
 #: .\templates\activities\obj_view.html:11
-#: .\templates\activities\task_view.html:11
+#: .\templates\includes\_comments_list.html:43
+#: .\templates\includes\_comments_list.html:63
 #: .\templates\includes\_form_buttons.html:6
+#: .\templates\includes\_important_developments_list.html:37
+#: .\templates\includes\_paths.html:87 .\templates\includes\_paths.html:109
 msgid "Submit"
 msgstr "حفظ"
 
@@ -1443,40 +1469,6 @@ msgstr "تاريخ البدء"
 #: .\templates\cases\notations_list.html:86
 msgid "Due Date"
 msgstr "تاريخ الانتهاء"
-
-#: .\templates\base.html:12 .\templates\base.html:14 .\templates\base.html:16
-#: .\templates\base.html:18 .\templates\base.html:26 .\templates\base.html:27
-#: .\templates\base.html:33 .\templates\base.html:34
-msgid "ISC Legal App"
-msgstr "النظام القانوني"
-
-#: .\templates\base.html:70
-msgid "Home"
-msgstr "الصفحة الرئيسية"
-
-#: .\templates\base.html:98
-msgid "Logout"
-msgstr "تسجيل الخروج"
-
-#: .\templates\base.html:200
-msgid "Legal App - New Notification"
-msgstr "النظام القانوني - اشعار جديد"
-
-#: .\templates\base.html:283
-msgid "Are you sure you want to read all notifications?"
-msgstr "هل انت متاكد من جعل كل الاشعارات مقروءة؟"
-
-#: .\templates\base.html:306
-msgid "An error occurred while read all notifications"
-msgstr "حدث خطأ عند عملية جعل كل الاشعارات مقروءة."
-
-#: .\templates\base.html:313
-msgid "Are you sure you want to delete all notifications?"
-msgstr "هل انت متاكد من حذف كل الاشعارات؟"
-
-#: .\templates\base.html:336
-msgid "An error occurred while delete all notifications"
-msgstr "حدث خطأ عند عملية الحذف كل الاشعارات."
 
 #: .\templates\cases\AdministrativeInvestigations_list.html:51
 msgid "New Administrative Investigation"
@@ -1539,7 +1531,7 @@ msgstr "رقم الدعوى:"
 msgid "New notation"
 msgstr "تدوين جديد"
 
-#: .\templates\cases\notations_list.html:114
+#: .\templates\cases\notations_list.html:115
 #: .\templates\contracts\contracts_list.html:147
 msgid "اخر تطور مهم"
 msgstr ""
@@ -1580,27 +1572,58 @@ msgstr "عقد جديد"
 msgid "Latest important development"
 msgstr "اخر تطور مهم"
 
-#: .\templates\includes\_footer.html:7
+#: .\templates\includes\_base_footer.html:7
 msgid "ISC ©"
 msgstr "كي كارد ©"
+
+#: .\templates\includes\_base_header.html:6
+#: .\templates\includes\_base_header.html:8
+#: .\templates\includes\_base_header.html:10
+#: .\templates\includes\_base_header.html:12
+#: .\templates\includes\_base_header.html:20
+#: .\templates\includes\_base_header.html:21
+#: .\templates\includes\_base_header.html:27
+#: .\templates\includes\_base_header.html:28
+msgid "ISC Legal App"
+msgstr "النظام القانوني"
+
+#: .\templates\includes\_base_nav.html:17
+msgid "Home"
+msgstr "الصفحة الرئيسية"
+
+#: .\templates\includes\_base_nav.html:45
+msgid "Logout"
+msgstr "تسجيل الخروج"
+
+#: .\templates\includes\_comments_list.html:53
+#: .\templates\includes\_important_developments_list.html:27
+msgid "No data available"
+msgstr "لا توجد بيانات"
+
+#: .\templates\includes\_docs.html:6 .\templates\includes\_paths.html:6
+msgid "Files and documents related to the case"
+msgstr "المجلدات و المستندات المتعلقة بالدعوى"
+
+#: .\templates\includes\_docs.html:11 .\templates\includes\_hearings.html:9
+#: .\templates\includes\_paths.html:15 .\templates\includes\_tasks.html:9
+msgid "Sequence"
+msgstr "التسلسل"
 
 #: .\templates\includes\_form_buttons.html:9
 msgid "Cancel"
 msgstr "الغاء"
 
-#: .\templates\includes\_form_buttons.html:14
+#: .\templates\includes\_form_buttons.html:15
 msgid "Edit"
 msgstr "تعديل"
 
-#: .\templates\includes\_form_buttons.html:16
-#: .\templates\includes\_obj_history.html:9
+#: .\templates\includes\_form_buttons.html:17
 msgid "Case History"
 msgstr "تعديلات الدعوى"
 
-#: .\templates\includes\_hearings.html:9 .\templates\includes\_paths.html:11
-#: .\templates\includes\_tasks.html:8
-msgid "Sequence"
-msgstr "التسلسل"
+#: .\templates\includes\_important_developments_list.html:6
+msgid "Important developments"
+msgstr "تطورات مهمة"
 
 #: .\templates\includes\_notifications.html:17
 msgid "Read All"
@@ -1610,9 +1633,15 @@ msgstr "قراءة الكل"
 msgid "Delete All"
 msgstr "حذف الكل"
 
+#: .\templates\includes\_obj_history.html:9
+#| msgid "Case History"
+msgid "History"
+msgstr "التعديلات"
+
 #: .\templates\includes\_obj_history.html:40
-msgid "Case History List"
-msgstr "قائمة تعديلات الدعوى"
+#| msgid "Case History List"
+msgid "History List"
+msgstr "قائمة التعديلات"
 
 #: .\templates\includes\_obj_history.html:40
 msgid "sorted from newest to oldest"
@@ -1639,17 +1668,30 @@ msgstr "من"
 msgid "to"
 msgstr "الى"
 
-#: .\templates\includes\_paths.html:6
-msgid "Files and documents related to the case"
-msgstr "المجلدات و المستندات المتعلقة بالدعوى"
-
-#: .\templates\includes\_paths.html:13
+#: .\templates\includes\_paths.html:17
 msgid "Document Count"
 msgstr "عدد الملفات"
+
+#: .\templates\includes\_paths.html:77
+msgid "New Path"
+msgstr "مجلد جديد"
+
+#: .\templates\includes\_paths.html:83
+msgid "Path Name"
+msgstr "اسم المجلد"
+
+#: .\templates\includes\_paths.html:98
+#| msgid "Documents"
+msgid "Upload Documents"
+msgstr "رفع الملفات"
 
 #: .\templates\index.html:11
 msgid "Welcome to ISC Legal App"
 msgstr "اهلا بك في النظام القانوني"
+
+#: .\templates\obj.html:31
+msgid "Basic Information"
+msgstr "المعلومات الرئيسية"
 
 #: .\templates\socialaccount\login.html:10
 msgid "To stay connected with us please login with your Qi email"
@@ -1658,6 +1700,21 @@ msgstr "للبقاء على اتصال معنا، يرجى تسجيل الدخو
 #: .\templates\socialaccount\snippets\login.html:8
 msgid "Or use a third-party"
 msgstr "أو استخدم جهة خارجية"
+
+#~ msgid "Legal App - New Notification"
+#~ msgstr "النظام القانوني - اشعار جديد"
+
+#~ msgid "Are you sure you want to read all notifications?"
+#~ msgstr "هل انت متاكد من جعل كل الاشعارات مقروءة؟"
+
+#~ msgid "An error occurred while read all notifications"
+#~ msgstr "حدث خطأ عند عملية جعل كل الاشعارات مقروءة."
+
+#~ msgid "Are you sure you want to delete all notifications?"
+#~ msgstr "هل انت متاكد من حذف كل الاشعارات؟"
+
+#~ msgid "An error occurred while delete all notifications"
+#~ msgstr "حدث خطأ عند عملية الحذف كل الاشعارات."
 
 #~ msgid "ISC © 2022 Company, Inc"
 #~ msgstr "كي كارد 2025"

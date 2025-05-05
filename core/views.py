@@ -21,6 +21,7 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import activate
 from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_POST
 from django_filters.rest_framework import DjangoFilterBackend
 from pghistory.models import Events
 from rest_framework import generics as rest_framework_generics
@@ -74,13 +75,11 @@ def setCache(key,query):
         cache.set(key, result, timeout=None)
     return result
 
-
 def prev_month(d):
     first = d.replace(day=1)
     prev_month = first - timedelta(days=1)
     month = 'month=' + str(prev_month.year) + '-' + str(prev_month.month)
     return month
-
 
 def next_month(d):
     days_in_month = calendar.monthrange(d.year, d.month)[1]
@@ -89,13 +88,11 @@ def next_month(d):
     month = 'month=' + str(next_month.year) + '-' + str(next_month.month)
     return month
 
-
 def get_date(req_day):
     if req_day:
         year, month = (int(x) for x in req_day.split('-'))
         return date(year, month, day=1)
     return datetime.today()
-
 
 @never_cache
 @login_required
@@ -113,7 +110,6 @@ def myhome(request):
         'next_month': nex_month
     }
     return render(request, 'index.html', context=context)
-
 
 @login_required
 def set_language(request):
@@ -204,10 +200,8 @@ def delete_notification(request, notification_id):
     notification.save()
     return JsonResponse({'success': True, 'message': 'Notification has been deleted successfully.'},status=200)
 
-
 def notifications(request):
     return render(request, 'notification.html')
-
 
 class LogsViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = StandardResultsSetPagination
@@ -238,13 +232,11 @@ class LogsViewSet(viewsets.ReadOnlyModelViewSet):
     def perform_update(self, serializer):
         serializer.save(modified_by=self.request.user)
 
-
 class GroupViewSet(viewsets.ModelViewSet):
     # pagination_class = None
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
-
 
 class commentsViewSet(viewsets.ModelViewSet):
     # pagination_class = None
@@ -383,13 +375,11 @@ class prioritiesViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "core.priorities"
 
-
 class StatusViewSet(viewsets.ModelViewSet):
     queryset = Status.objects.all().order_by('status')
     serializer_class = StatusSerializer
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "core.Status"
-
 
 class contractsViewSet(viewsets.ModelViewSet):
     queryset = contracts.objects.all().order_by(
@@ -451,7 +441,6 @@ class contractsViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         cache.delete("contracts_queryset")
         serializer.save(modified_by=self.request.user)
-
 
 class documentsViewSet(viewsets.ModelViewSet):
     queryset = documents.objects.all().order_by(
@@ -578,7 +567,6 @@ class eventsViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filterset_fields = ['pgh_obj_model', 'pgh_obj_id', ]
 
-
 class caseseventsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Events.objects.all().exclude(pgh_diff='').filter(
         pgh_obj_model='cases.LitigationCases')
@@ -597,7 +585,6 @@ class caseseventsViewSet(viewsets.ReadOnlyModelViewSet):
     def perform_update(self, serializer):
         serializer.save(modified_by=self.request.user)
 
-
 class APIDocumentPathListView(
     ExternalObjectAPIViewMixin, generics.ListAPIView
 ):
@@ -614,7 +601,6 @@ class APIDocumentPathListView(
     # @method_decorator(cache_page(60 * 60))
     # def dispatch(self, *args, **kwargs):
     #     return super(APIDocumentPathListView, self).dispatch(*args, **kwargs)
-
 
 
 class APIPathListView(generics.ListCreateAPIView):
@@ -760,7 +746,6 @@ class APIPathListView(generics.ListCreateAPIView):
 
 ## APIPathView OLD END
 
-
 class APIPathView_old(rest_framework_generics.RetrieveUpdateDestroyAPIView):
     lookup_url_kwarg = 'path_id'
     permission_classes = [permissions.IsAuthenticated]
@@ -851,7 +836,6 @@ class APIPathView_old(rest_framework_generics.RetrieveUpdateDestroyAPIView):
         # Include both the parent object and its children in the response
         return parent_node
 
-
 class APIPathView(rest_framework_generics.RetrieveUpdateDestroyAPIView):
     lookup_url_kwarg = 'path_id'
     permission_classes = [permissions.IsAuthenticated]
@@ -940,7 +924,6 @@ class APIPathDocumentAddView(generics.ObjectActionAPIView):
         document = serializer.validated_data['document']
         obj.document_add(document=document, user=self.request.user)
 
-
 class APIPathDocumentRemoveView(generics.ObjectActionAPIView):
     """
     post: Remove a document from a Path.
@@ -953,7 +936,6 @@ class APIPathDocumentRemoveView(generics.ObjectActionAPIView):
     def object_action(self, obj, request, serializer):
         document = serializer.validated_data['document']
         obj.document_remove(document=document, user=self.request.user)
-
 
 class APIPathDocumentListView(
     ExternalObjectAPIViewMixin, generics.ListAPIView
@@ -1088,7 +1070,6 @@ class NotificationViewSet(viewsets.ModelViewSet):
 
         return http_response
 
-
 # def get_nested_children(path):
 #     children = Path.objects.filter(parent=path)
 #     serialized_children = []
@@ -1187,3 +1168,34 @@ class SelectedPathChildren(generics.RetrieveAPIView):
         serialized_tree['subPaths'] = get_nested_children(selected_path)
 
         return Response(serialized_tree)
+
+@require_POST
+def new_path_docs(request, path_id=None):
+    instance = get_object_or_404(Path, pk=path_id)
+    print(f'{request.FILES.items()=}')
+    print(f'{request.POST=}')
+    files = request.FILES.getlist('attachments')
+    url = request.POST.get('url')
+    for uploaded_file in files:
+        print(f'{uploaded_file=}')
+        doc = documents.objects.create(
+            name=uploaded_file.name,
+            attachment=uploaded_file,
+            created_by=request.user,
+            created_at=timezone.now(),
+        )
+        instance.documents.add(doc)
+    return redirect(url)
+
+@require_POST
+def new_case_comment_reply(request, case_id=None, comment_id=None):
+    instance = get_object_or_404(comments, pk=comment_id)
+    instance.replies.create(reply=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
+    return redirect('case_view',case_id=case_id)
+
+@require_POST
+def new_comment_reply(request, comment_id=None):
+    url = request.POST.get('url')
+    instance = get_object_or_404(comments, pk=comment_id)
+    instance.replies.create(reply=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
+    return redirect(url)

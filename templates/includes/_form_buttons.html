@@ -2,19 +2,19 @@
 
     {% if mode == "edit" or mode == "create" %}
         <!-- Submit & Cancel Buttons -->
-        <button type="submit" class="btn btn-success pulse-success right">
+        <button type="submit" class="btn btn-success pulse-success right mb-3" data-aos="fade-left">
             <i class="bi bi-floppy"></i> {% trans 'Submit' %}
         </button>
-        <a href="{% url objs_list %}" class="btn btn-danger pulse-danger mr-3">
+        <a href="{% url objs_list %}" class="btn btn-danger pulse-danger mr-3 mb-3" data-aos-delay="200" data-aos="fade-left">
             <i class="bi bi-x-circle"></i> {% trans 'Cancel' %}
         </a>
     {% else %}
         <!-- Edit Button -->
-        <a href="{% url obj_edit obj_id %}" class="btn btn-primary pulse">
+
+        <a href="{% url obj_edit obj_id %}" class="btn btn-primary pulse mb-3" data-aos="fade-left">
             <i class="bi bi-pencil-square"></i> {% trans 'Edit' %}
         </a>
-          <button type="button" class="btn btn-primary pulse-primary mx-3" data-bs-toggle="modal" data-bs-target="#ObjHistory"><i class="bi bi-clock-history"></i> {% trans 'Case History' %}</button>
-        <div class="px-5 pb-2">
-</div>
+          <button type="button" class="btn btn-primary pulse-primary mx-3 mb-3" data-bs-toggle="modal" data-aos-delay="200" data-bs-target="#ObjHistory" data-aos="fade-left"><i class="bi bi-clock-history"></i> {% trans 'History' %}</button>
+
     {% endif %}
 

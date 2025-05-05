@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from urllib.parse import urlencode
-
+from auditlog.models import LogEntry
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
@@ -16,6 +16,7 @@ from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST, require_GET
 from django_celery_beat.models import PeriodicTask, ClockedSchedule
 from django_filters.rest_framework import DjangoFilterBackend
+from pyasn1_modules.rfc2985 import contentType
 from rest_framework import permissions
 from rest_framework import viewsets, status
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
@@ -33,7 +34,7 @@ from .models import hearing as hearing_model
 from .models import task, hearing
 from .models import task as task_model
 from .serializers import taskSerializer, hearingSerializer, CombinedStatisticsSerializer, TaskStatisticsSerializer
-
+from django.utils.translation import gettext_lazy as _
 
 def filter_tasks(queryset, created_at_after=None, created_at_before=None, assignee_id=None):
     """Filter cases based on date range and assignee."""
@@ -44,7 +45,6 @@ def filter_tasks(queryset, created_at_after=None, created_at_before=None, assign
     if assignee_id:
         queryset = queryset.filter(assignee=assignee_id)
     return queryset
-
 
 def calculate_statistics(tasks):
     """Calculate various statistics from a queryset of cases."""
@@ -60,7 +60,6 @@ def calculate_statistics(tasks):
         'status': status_dict,
         'category': task_category_dict,
     }
-
 
 def all_tasks_query():
     cache_key = "tasks_queryset"
@@ -420,7 +419,6 @@ class taskViewSet(viewsets.ModelViewSet):
         serializer = CombinedStatisticsSerializer(combined_statistics)
         return Response(serializer.data)
 
-
 class hearingViewSet(viewsets.ModelViewSet):
     queryset = hearing.objects.all().order_by('-id').filter(is_deleted=False)
     serializer_class = hearingSerializer
@@ -717,7 +715,6 @@ class hearingViewSet(viewsets.ModelViewSet):
         return rest_response(status=status.HTTP_200_OK,
                              data=data)
 
-
 @login_required
 def tasks_list(request):
     number_of_records = 10
@@ -857,18 +854,63 @@ def tasks_list(request):
     return render(request, 'activities/tasks_list.html', context)
 
 @require_GET
-def task_view(request, task_id=None):
+def task_view(request, task_id=None,mode='view'):
+    log = {}
+    field_translations = {}
+    OPERATION_TRANSLATIONS = {}
     instance = task()
     if task_id:
         instance = get_object_or_404(task, pk=task_id)
+        if request.method == 'POST':
+            if mode == 'edit':  # Allow editing only if mode is 'edit'
+                form = TaskForm(request.POST, instance=instance, mode=mode)
+                if form.is_valid():
+                    instance = form.save(commit=False)  # Don't save yet, update fields first
+                    instance.modified_by = request.user  # ✅ Correctly update modified_by
+                    instance.modified_at = timezone.now()  # ✅ Correctly update modified_at
+                    instance.save()  # Now save the instance with updated fields
+                    return redirect('tasks_list')
+            else:
+                form = TaskForm(instance=instance, mode=mode)  # Read-only form
+        else:
+            form = TaskForm(instance=instance, mode=mode)
+            if mode == 'view':
+                OPERATION_TRANSLATIONS = {
+                    'add': _('Add'),
+                    'delete': _('Delete'),
+                }
+                field_translations = {
+                    field.name: _(field.verbose_name)
+                    for field in task._meta.fields
+                }
+                field_translations.update({
+                    field.name: _(field.verbose_name)
+                    for field in task._meta.many_to_many
+                })
+                log = LogEntry.objects.filter(content_type__model='task', object_id=instance.pk)
+                for field in form.fields:
+                    form.fields[field].widget.attrs['disabled'] = True  # Disable all fields
     else:
+        mode = 'create'  # If no `case_id`, it's a new case
         instance = task()
-
-    form = TaskForm(request.POST or None, instance=instance)
-    if request.POST and form.is_valid():
-        form.save()
-        return HttpResponseRedirect(reverse('cal:calendar'))
-    return render(request, 'activities/task_view.html', {'form': form})
+        form = TaskForm(request.POST or None, instance=instance, mode=mode)
+        if request.method == 'POST' and form.is_valid():
+            instance = form.save(commit=False)
+            instance.created_by = request.user
+            instance.created_at = timezone.now()
+            instance.save()
+            return redirect('tasks_list')
+    context = {
+        'form': form,
+        'obj': instance,
+        'mode': mode,
+        'logs': log,
+        'obj_edit': 'task_edit',
+        'objs_list': 'tasks_list',
+        'field_translations': field_translations,
+        'operation_translations': OPERATION_TRANSLATIONS,
+    }
+    return render(request, 'activities/task_view.html', context=context)
 
 @require_POST
 def delete_task(request, pk=None):
@@ -1016,20 +1058,64 @@ def hearings_list(request):
 
 
 
-
-def hearing_view(request, hearing_id=None):
+def hearing_view(request, hearing_id=None,mode='view'):
+    log = {}
+    field_translations = {}
+    OPERATION_TRANSLATIONS = {}
     instance = hearing()
     if hearing_id:
         instance = get_object_or_404(hearing, pk=hearing_id)
+        if request.method == 'POST':
+            if mode == 'edit':  # Allow editing only if mode is 'edit'
+                form = HearingForm(request.POST, instance=instance, mode=mode)
+                if form.is_valid():
+                    instance = form.save(commit=False)  # Don't save yet, update fields first
+                    instance.modified_by = request.user  # ✅ Correctly update modified_by
+                    instance.modified_at = timezone.now()  # ✅ Correctly update modified_at
+                    instance.save()  # Now save the instance with updated fields
+                    return redirect('hearings_list')
+            else:
+                form = HearingForm(instance=instance, mode=mode)  # Read-only form
+        else:
+            form = HearingForm(instance=instance, mode=mode)
+            if mode == 'view':
+                OPERATION_TRANSLATIONS = {
+                    'add': _('Add'),
+                    'delete': _('Delete'),
+                }
+                field_translations = {
+                    field.name: _(field.verbose_name)
+                    for field in hearing._meta.fields
+                }
+                field_translations.update({
+                    field.name: _(field.verbose_name)
+                    for field in hearing._meta.many_to_many
+                })
+                log = LogEntry.objects.filter(content_type__model='hearing', object_id=instance.pk)
+                for field in form.fields:
+                    form.fields[field].widget.attrs['disabled'] = True  # Disable all fields
     else:
+        mode = 'create'  # If no `case_id`, it's a new case
         instance = hearing()
-
-    form = HearingForm(request.POST or None, instance=instance)
-    if request.POST and form.is_valid():
-        form.save()
-        return redirect('hearings_list')
-    return render(request, 'activities/obj_view.html', {'form': form})
-
+        form = HearingForm(request.POST or None, instance=instance, mode=mode)
+        if request.method == 'POST' and form.is_valid():
+            instance = form.save(commit=False)
+            instance.created_by = request.user
+            instance.created_at = timezone.now()
+            instance.save()
+            return redirect('hearings_list')
+    context = {
+        'form': form,
+        'obj': instance,
+        'mode': mode,
+        'logs': log,
+        'obj_edit': 'hearing_edit',
+        'objs_list': 'hearings_list',
+        'obj_new_comment':'new_hearing_comment',
+        'field_translations': field_translations,
+        'operation_translations': OPERATION_TRANSLATIONS,
+    }
+    return render(request, 'obj.html', context)
 
 @require_POST
 def delete_hearing(request, pk=None):
@@ -1044,3 +1130,9 @@ def delete_hearing(request, pk=None):
     instance.modified_by = request.user
     instance.save()
     return JsonResponse({'success': True, 'message': 'Hearing has been deleted successfully.'},status=200)
+
+@require_POST
+def new_hearing_comment(request, hearing_id=None):
+    instance = get_object_or_404(hearing, pk=hearing_id)
+    instance.comments.create(comment=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
+    return redirect('hearing_view',hearing_id=hearing_id)
