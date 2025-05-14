@@ -1136,3 +1136,20 @@ def new_hearing_comment(request, hearing_id=None):
     instance = get_object_or_404(hearing, pk=hearing_id)
     instance.comments.create(comment=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
     return redirect('hearing_view',hearing_id=hearing_id)
+
+
+from django.http import HttpResponseRedirect
+from formtools.wizard.views import SessionWizardView
+
+def show_message_form_condition(wizard):
+    # try to get the cleaned data of step 1
+    cleaned_data = wizard.get_cleaned_data_for_step('0') or {}
+    # check if the field ``leave_message`` was checked.
+    return cleaned_data.get('leave_message', True)
+
+class ContactWizard(SessionWizardView):
+
+    def done(self, form_list, **kwargs):
+        return render(self.request, 'base.html', {
+            'form_data': [form.cleaned_data for form in form_list],
+        })

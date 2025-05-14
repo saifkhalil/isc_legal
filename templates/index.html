@@ -7,37 +7,70 @@
 {% load static %}
 <link href="{% static 'css/cal.css' %}" rel="stylesheet">
 <div class="main">
-    <h1 class="text-center">
-      {% trans 'Welcome to ISC Legal App' %}
-    </h1>
-  <div class="row">
-{#    <div class="col-lg-6 col-md-6 col-sm-12">#}
-{#      <table style="width:100%" class="table table-responsive table-striped table-hover table-bordered qi-border">#}
-{#        <thead>#}
-{#          <tr>#}
-{#          <td>id</td>#}
-{#          <td>name</td>#}
-{#          <td>subject</td>#}
-{#          <tr>#}
-{#          </thead>#}
-{#          <tbody>#}
-{#        <tr>#}
-{#          {% for case in cases %}#}
-{#              <td>{{ case.id }}</td>#}
-{#          <td>{{ case.name }}</td>#}
-{#          <td>{{ case.description }}</td>#}
-{#          {% endfor %}#}
-{#        </tr>#}
-{#      </tbody>#}
-{#      </table>#}
-{#    </div>#}
-    <div class="col-lg-6 col-md-6 col-sm-12">
-        <div class="clearfix m-3">
-          <a class="btn qi-primary left" href="{% url 'home' %}?{{ prev_month }}"> Previous Month </a>
-          <a class="btn qi-primary right" href="{% url 'home' %}?{{ next_month }}"> Next Month </a>
+    <h5 class="fs-3 text-center qi-text-primary">
+      {% trans 'Calendar' %}
+    </h5>
+    <div class="card shadow-sm p-3 m-3">
+        <form method="GET">
+        <div class="row m-3">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+        <div class="row mb-3">
+          <div class="w-18">
+              <a class="btn qi-primary" href="{% url 'home' %}?{{ prev_month }}"><i class="bi bi-arrow-left-circle-fill"></i></a>
+          </div>
+          <div class="w-36 m-0 px-1">
+            <select name="month" class="form-select" id="month" aria-label="Default select" onchange="this.form.submit()">
+          {% for month in months %}
+              <option {% if month.number == selected_month %} selected {% endif %} value="{{ month.number }}">{{ month.name }}</option>
+          {% endfor %}
+          </select>
+          </div>
+          <div class="w-36 m-0 px-1">
+            <select name="year" class="form-select" id="year" aria-label="Default select" onchange="this.form.submit()">
+          {% for year in years %}
+              <option {% if year == selected_year %} selected {% endif %} value="{{ year }}">{{ year }}</option>
+          {% endfor %}
+          </select>
+          </div>
+          <div class="w-18">
+            <a class="btn qi-primary" href="{% url 'home' %}?{{ next_month }}"><i class="bi bi-arrow-right-circle-fill"></i></a>
+          </div>
         </div>
-        {{ calendar }}
-      </div>
+        </div>
+          <div class="col-12 col-sm-12 col-md-3 col-lg-3 ms-auto">
+            <div class="row ">
+              <div class="col model-type">
+              <div data-bs-html="true" class="day-data day-data-warning" >
+                  <i class="fa fa-gavel" aria-hidden="true"></i>
+                  <span>{% trans 'Cases' %}</span>
+                </div>
+            </div>
+            <div class="col model-type">
+              <div data-bs-html="true" class="day-data day-data-primary" >
+                  <i class="bi bi-briefcase"></i>
+                  <span>{% trans 'Hearings' %}</span>
+                </div>
+            </div>
+              <div class="col model-type">
+                <div data-bs-html="true" class="day-data day-data-dark" >
+                  <i class="bi bi-list-task"></i>
+                  <span>{% trans 'Tasks' %}</span>
+                </div>
+              </div>
+            </div>
+            </div>
+            </div>
+        </form>
+        <div class="table-responsivse">
+          {{ calendar }}
+        </div>
     </div>
-  </div>
+</div>
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script>
+  const elements = document.querySelectorAll('.day-data');
+Array.from(elements).forEach((element, index) => {
+  bootstrap.Popover.getOrCreateInstance(element);
+});
+  </script>
 {% endblock %}

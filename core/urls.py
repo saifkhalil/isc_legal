@@ -28,6 +28,7 @@ from rest_framework_simplejwt.views import (
 )
 
 from accounts.views import SearchEmployeeAPIView
+from activities.forms import TaskForm, HearingForm, ContactForm1, ContactForm2
 from activities.views import tasks_list, delete_task, hearings_list, delete_hearing, task_view, hearing_view, \
     new_hearing_comment
 from cases.views import cases_list, delete_case, notations_list, delete_notation, AdministrativeInvestigations_list, \
@@ -43,6 +44,7 @@ from .views import (
     delete_all_notifications, delete_notification, new_path_docs, new_case_comment_reply,
     new_comment_reply
 )
+from activities.views import ContactWizard,show_message_form_condition
 
 
 def handler404(request, *args, **argv):
@@ -57,7 +59,7 @@ def handler500(request, *args, **argv):
     return response
 
 def trigger_error(request):
-    division_by_zero = 1 / 0
+        division_by_zero = 1 / 0
 
 
 from patches import routers
@@ -102,6 +104,7 @@ urlpatterns = [
 urlpatterns += i18n_patterns(
     path('i18n/', include('django.conf.urls.i18n')),
     path('set-language/',views.set_language, name='set_language'),
+    path('set-theme-color/',views.set_theme_color, name='set_theme_color'),
     path("select2/", include("django_select2.urls")),
     path('',myhome,name='home'),
     path('cases/',login_required(cases_list),name='cases_list'),
@@ -153,9 +156,10 @@ urlpatterns += i18n_patterns(
     path('notifications/', views.notifications),
     path('admin/', admin.site.urls),
     path('sentry-debug/', trigger_error),
+    path('wizard/', ContactWizard.as_view([ContactForm1, ContactForm2],condition_dict={'1': show_message_form_condition}),),
     # path('account/', include('django.contrib.auth.urls')),
     path('accounts/', include('allauth.urls')),
-    path('service-worker.js', views.service_worker_view)
+    path('service-worker.js', views.service_worker_view ,)
 )+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 websocket_urlpatterns = [

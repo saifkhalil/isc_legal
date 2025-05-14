@@ -28,18 +28,44 @@
       {% elif field == 'created_at' %}
         {{ value|date:"Y-m-d" }}
       {% elif field == 'case_category' %}
-        {% trans value %}
+        {% if value == "Public" %}
+          <div class="alert alert-light p-1 fs-8 mb-0 fw-normal rounded-pill border-success text-success">
+          <i class="bi bi-globe"></i><span> {% trans value %}</span>
+          </div>
+        {% elif value == "Private" %}
+          <div class="alert alert-light p-1 fs-8 mb-0 fw-normal rounded-pill border-danger text-danger">
+          <i class="bi bi-lock"></i><span> {% trans value %}</span>
+          </div>
+        {% endif %}
       {% elif field == 'assignee' %}
-        {{ value.username }}
+        <div class="alert alert-light p-1 fs-8 mb-0 fw-normal rounded-pill position-relative">
+            <img src="{{ value.photo.url }}" class="img-avatar rounded-circle" alt="avatar">
+          <span {% if not value.is_active %}class="text-decoration-line-through fst-italic"{% endif %}>{{ value.username }}</span>
+{#          {% if value.is_manager or value.is_superuser %}#}
+{#            <span class="position-absolute top-0 start-0 translate-middle ">#}
+{#              <i class="bi bi-fire text-danger"></i>#}
+{#            </span>#}
+{#            {% endif %}#}
+        </div>
       {% elif field == 'case_status' or field == 'hearing_status' or field == 'task_status' %}
         {% if value %}
-          <button
-            class="cursor-default btn btn-sm btn-{{ value.color }}">
-            <span style="width:24px"
+          <div
+            class="alert alert-light p-1 fs-8 mb-0 fw-normal rounded-pill border-{{ value.color }}  bg-light-blue text-{{ value.color }}">
+            <span
                   class="{{ value.icon }}"
                   role="status" aria-hidden="true"></span>
-            {{ value }}
-          </button>
+            <span>{{ value }}</span>
+          </div>
+        {% endif %}
+      {% elif field == 'priority' %}
+        {% if value %}
+          <div
+            class="alert alert-light p-1 fs-8 mb-0 fw-normal rounded-pill border-{{ value.color }}  text-{{ value.color }}">
+            <span
+                  class="{{ value.icon }}"
+                  role="status" aria-hidden="true"></span>
+            <span>{{ value }}</span>
+          </div>
         {% endif %}
       {% else %}
         {{ value|default:"" }}

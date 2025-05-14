@@ -21,9 +21,24 @@ from .model_mixins import ExtraDataModelMixin, HooksModelMixin
 
 
 class priorities(models.Model):
+    theme_colors= (
+        ("primary","primary"),
+        ("secondary","secondary"),
+        ("success","success"),
+        ("info","info"),
+        ("warning","warning"),
+        ("danger","danger"),
+        ("light","light"),
+        ("dark","dark")
+    )
+
     id = models.AutoField(primary_key=True, )
     priority = models.CharField(
         max_length=250, blank=False, null=False, verbose_name=_('Priority'))
+    icon = models.CharField(default='bi bi-bootstrap',
+        max_length=250, blank=False, null=False, verbose_name=_('Icon'))
+    color = models.CharField(choices=theme_colors, default='primary',
+        max_length=250, blank=False, null=False, verbose_name=_('Color'))
 
     def __str__(self):
         return self.priority

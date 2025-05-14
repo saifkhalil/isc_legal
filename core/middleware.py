@@ -25,7 +25,7 @@ class LanguageMiddleware(MiddlewareMixin):
             cur_language = get_language()
             path = request.get_full_path()
             fist_segment = parse.urlparse(path).path.split('/')[1]
-            if cur_language != user_language and fist_segment not in ['media','static','lang','load-more-notifications']:
+            if cur_language != user_language and fist_segment not in ['', 'media','static','lang','load-more-notifications']:
                 url = translate_url(path,user_language)
                 return redirect(url)
 

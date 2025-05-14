@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 {% load i18n %}
+{% load django_bootstrap5 %}
 {% with CURRENT_LANGUAGE=user.language %}
 {% get_available_languages as AVAILABLE_LANGUAGES %}
 {% get_language_info_list for AVAILABLE_LANGUAGES as languages %}
 {% load static %}
 <html lang="{{CURRENT_LANGUAGE}}" dir="{% if CURRENT_LANGUAGE == 'en' %}ltr{% else %}rtl{% endif %}">
 {% include 'includes/_base_header.html' %}
-<body class="d-flex flex-column h-100">
+<body class="d-flex flex-column h-100" data-bs-theme="{% if user.is_authenticated %}{{ user.theme_color }}{% else %}light{% endif %}">
 {% include 'includes/_base_nav.html' %}
   <div class="my-50">
+  {% bootstrap_messages %}
+
   {% block content %}{% endblock %}
   </div>
 {% include 'includes/_base_footer.html' %}
@@ -42,6 +45,17 @@
     <script src="{% static 'js/aos.js' %}"></script>
 <script>
   {% include 'js/base.js' %}
+</script>
+<script>
+  function setTheme(theme) {
+    if (['light', 'dark', 'auto'].includes(theme)) {
+      document.body.setAttribute('data-bs-theme', theme);
+      localStorage.setItem('theme', theme);
+    }
+  }
+
+  // Load saved theme on page load
+
 </script>
 </body>
 </html>

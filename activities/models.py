@@ -1,6 +1,7 @@
 from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 
 from accounts.models import User
 from core.models import comments, court, Status, documents, priorities
@@ -44,6 +45,11 @@ class hearing(models.Model):
         verbose_name = _('Hearing')
         verbose_name_plural = _('Hearings')
 
+    @property
+    def get_html_url(self):
+        url = reverse('hearing_view', args=(self.id,))
+        return url
+
 task_categories = (
     ("Public", _("Public")),
     ("Private", _("Private")),
@@ -84,6 +90,10 @@ class task(models.Model):
         verbose_name = _('Task')
         verbose_name_plural = _('Tasks')
 
+    @property
+    def get_html_url(self):
+        url = reverse('task_view', args=(self.id,))
+        return url
 
 auditlog.register(
     task,

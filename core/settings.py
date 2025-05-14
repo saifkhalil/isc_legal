@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     'django_filters',
     'corsheaders',
     'haystack',
+    'formtools',
     # 'django-environ',
     'accounts',
     'core',
@@ -299,12 +300,12 @@ REST_FRAMEWORK = {
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',  # Replace with your Redis server address
+        'LOCATION': 'redis://:mayanredispassword@127.0.0.1:6379/1',  # Replace with your Redis server address
 
     },
     "select2": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/2",
+        "LOCATION": "redis://:mayanredispassword@127.0.0.1:6379/2",
     }
 }
 
@@ -391,8 +392,8 @@ DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 # result_backend = "redis://localhost:6379"
 # CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
-CELERY_BROKER_URL = "redis://localhost:6379"
-CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERY_BROKER_URL = "redis://:mayanredispassword@localhost:6379"
+CELERY_RESULT_BACKEND = "redis://:mayanredispassword@localhost:6379"
 accept_content = ['application/json']
 result_serializer = 'json'
 task_serializer = 'json'
@@ -489,7 +490,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("localhost", 6379)],
+            "hosts": ["redis://:mayanredispassword@127.0.0.1:6379/3"],
         },
     },
 }

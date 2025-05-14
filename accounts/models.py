@@ -87,6 +87,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('ar', _('Arabic')),
     ]
 
+    THEME_COLOR = [
+        ('light', _('light')),
+        ('dark', _('dark')),
+    ]
+
     id = models.AutoField(primary_key=True,)
     phone = PhoneNumberField()
     first_name = models.CharField(verbose_name=_("first name"), max_length=30)
@@ -100,6 +105,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     Manager = models.ForeignKey('User', on_delete=models.CASCADE, blank=True, null=True,verbose_name=_('Manager'))
     language = models.CharField(
         max_length=5, choices=LANGUAGE_CHOICES, default='ar', verbose_name=_('Language')
+    )
+    theme_color = models.CharField(
+        max_length=5, choices=THEME_COLOR, default='light', verbose_name=_('Theme Color')
     )
     date_joined = models.DateTimeField(verbose_name=_('last login'), default=timezone.now)
     last_login = models.DateTimeField(verbose_name=_('last login'), default=timezone.now)

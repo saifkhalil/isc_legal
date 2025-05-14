@@ -1,0 +1,8 @@
+{% load i18n %}
+<form action="{% url 'set_theme_color' %}" method="post" class="d-flex">
+  {% csrf_token %}
+  <select name="theme_color" class="form-select me-2" aria-label="Default select" onchange="this.form.submit()">
+    <option value="light" {% if user.theme_color == 'light' %}selected{% endif %}>🌞</option>
+    <option value="dark" {% if user.theme_color == 'dark' %}selected{% endif %}>🌙</option>
+  </select>
+</form>

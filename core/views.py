@@ -53,7 +53,7 @@ from .serializers import (
     PathDocumentAddSerializer, PathDocumentRemoveSerializer,
     PathSerializer
 )
-
+from django.utils.translation import gettext_lazy as _
 
 def service_worker_view(request):
     sw_path = settings.STATIC_ROOT.joinpath("css/service-worker.js") # This should be your path to service-worker.js
@@ -78,38 +78,74 @@ def setCache(key,query):
 def prev_month(d):
     first = d.replace(day=1)
     prev_month = first - timedelta(days=1)
-    month = 'month=' + str(prev_month.year) + '-' + str(prev_month.month)
+    month = 'month=' + str(prev_month.month) + '&year=' + str(prev_month.year)
     return month
 
 def next_month(d):
     days_in_month = calendar.monthrange(d.year, d.month)[1]
     last = d.replace(day=days_in_month)
     next_month = last + timedelta(days=1)
-    month = 'month=' + str(next_month.year) + '-' + str(next_month.month)
+    month = 'month=' + str(next_month.month) + '&year=' + str(next_month.year)
     return month
 
-def get_date(req_day):
-    if req_day:
-        year, month = (int(x) for x in req_day.split('-'))
-        return date(year, month, day=1)
+def years_list() -> list:
+    current_year = timezone.now().year +1
+    years: list[int] = [year for year in range(2020, current_year)]
+    return years
+
+def month_list():
+    months = [
+        {'number':1,'name': _("January")},
+        {'number':2,'name': _("February")},
+        {'number':3,'name': _("March")},
+        {'number':4,'name': _("April")},
+        {'number':5,'name': _("May")},
+        {'number':6,'name': _("June")},
+        {'number':7,'name': _("July")},
+        {'number':8,'name': _("August")},
+        {'number':9,'name': _("September")},
+        {'number':10,'name': _("October")},
+        {'number':11,'name': _("November")},
+        {'number':12,'name': _("December")},
+    ]
+    return months
+
+def get_date(month,year):
+    if month and year:
+        return date(int(year), int(month), day=1)
     return datetime.today()
 
 @never_cache
 @login_required
 def myhome(request):
-    d = get_date(request.GET.get('month', None))
+    month = request.GET.get('month', None)
+    year = request.GET.get('year', None)
+    d = get_date(month,year)
     pre_month = prev_month(d)
     nex_month = next_month(d)
     cal = Calendar(d.year, d.month)
     html_cal = cal.formatmonth(withyear=True)
-    cases = LitigationCases.objects.all().order_by('-created_at')
     context = {
-        'cases': cases,
         'calendar': mark_safe(html_cal),
         'prev_month': pre_month,
-        'next_month': nex_month
+        'next_month': nex_month,
+        'selected_year':d.year,
+        'selected_month':d.month,
+        'years':years_list(),
+        'months':month_list(),
     }
     return render(request, 'index.html', context=context)
+
+
+@login_required
+def set_theme_color(request):
+    if request.method == "POST":
+        theme_color = request.POST.get("theme_color")
+        if request.user.is_authenticated:
+            request.user.theme_color = theme_color
+            request.user.save()
+
+    return redirect(request.META.get("HTTP_REFERER", "/"))
 
 @login_required
 def set_language(request):
@@ -139,9 +175,6 @@ def set_language(request):
                     new_url = f'/{language}{match.group(2) or "/"}'  # Replace prefix & keep path
                 else:
                     new_url = f'/{language}/'  # Default to root with language
-
-            print(f'language: {language}')
-            print(f'new_url: {new_url}')
             return redirect(new_url)
 
     return redirect(request.META.get("HTTP_REFERER", "/"))  # Fallback redirect

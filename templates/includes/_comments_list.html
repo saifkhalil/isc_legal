@@ -13,8 +13,8 @@
                 <div class="breif">
                 <div class="flex items-start justify-between">
                   <div class="items-center gap-1 flex-wrap" style="flex: 5 1 0%;">
-                    <h4 class="font-bold fw-bold">{{ comment.comment }}</h4>
-                    <h6 class="text-muted" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ comment.created_at|date:"Y-m-d h:i:s a" }}">{{ comment.created_by.username }} - {{ comment.created_at|naturaltime }}</h6>
+                    <h4 class="mb-3">{{ comment.comment }}</h4>
+                    <h6 class="text-muted fs-8" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ comment.created_at|date:"Y-m-d h:i:s a" }}">{{ comment.created_by.username }} - {{ comment.created_at|naturaltime }}</h6>
                   </div>
                 </div>
               </div>
@@ -24,8 +24,8 @@
                   <div data-show="true" class="alert alert-light " role="alert">
                   <div class="alert-content">
               <div class="alert-message">
-              <h4 class="font-bold fw-bold">{{ reply.reply }}</h4>
-                    <h6 class="text-muted" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ reply.created_at|date:"Y-m-d h:i:s a" }}">{{ reply.created_by.username }} - {{ reply.created_at|naturaltime }}</h6>
+              <h4 class="mb-3">{{ reply.reply }}</h4>
+                    <h6 class="text-muted fs-8" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ reply.created_at|date:"Y-m-d h:i:s a" }}">{{ reply.created_by.username }} - {{ reply.created_at|naturaltime }}</h6>
                   </div>
                   </div>
                   </div>
@@ -35,17 +35,12 @@
                  <form method="post" action="{% url 'new_comment_reply' comment_id=comment.id %}">
                    <input type="hidden" id="url" name="url" value="">
                           {% csrf_token %}
-                      <div class="row mb-1">
-                        <div class="col-sm-10">
-                          <input class="form-control" id="content" name="content" placeholder="{% trans 'Reply' %}" required>
-                        </div>
-                        <div class="col-sm-2">
-                          <button class="btn qi-primary" type="submit">{% trans 'Submit' %}</button>
-                        </div>
-                      </div>
+                   <div class="input-group">
+                      <input class="form-control" id="content" name="content" placeholder="{% trans 'Reply' %}" required>
+                      <button class="input-group-text btn qi-primary" type="submit">{% trans 'Submit' %}</button>
+                   </div>
                     </form>
               </div>
-
             </div>
             </div>
           </div>
@@ -55,14 +50,10 @@
   </div>
     <form method="post" action="{% url obj_new_comment obj_id %}">
       {% csrf_token %}
-  <div class="row mb-1">
-    <div class="col-sm-10">
-      <textarea rows="3" class="form-control" id="content" name="content" placeholder="{% trans 'Comment' %}" required></textarea>
-    </div>
-    <div class="col-sm-2">
-      <button class="btn qi-primary" type="submit">{% trans 'Submit' %}</button>
-    </div>
-  </div>
+      <div class="input-group">
+        <textarea rows="3" class="form-control" id="content" name="content" placeholder="{% trans 'Comment' %}" required></textarea>
+        <button class="input-group-text btn qi-primary" type="submit">{% trans 'Submit' %}</button>
+      </div>
 </form>
 </div>
 <script>

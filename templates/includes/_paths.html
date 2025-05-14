@@ -4,7 +4,7 @@
 <div class="row mx-0">
   <div class="card shadow-sm p-3 mb-3" {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
     <p class="pb-3">{% trans 'Files and documents related to the case' %}
-      <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#NewPath"><i class="bi bi-folder-plus"></i>
+      <button class="btn btn-sm qi-primary" data-bs-toggle="modal" data-bs-target="#NewPath"><i class="bi bi-folder-plus"></i>
       </button>
     </p>
     <table class="table {% if paths|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transision %}
@@ -23,14 +23,14 @@
         <tr {% if user.enable_transision %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
           <td class="pt-2 pb-2">
             <button data-bs-toggle="collapse" data-bs-target="#parent_case_{{ path.id }}" aria-expanded="false"
-                    aria-controls="parent_path_{{ path.id }}" style="cursor: pointer;"><i
-              class="bi bi-folder-fill text-warning"></i></button>
+                    aria-controls="parent_path_{{ path.id }}" style="cursor: pointer" class="fs-6"><i class="fa {% if path.documents.all|length == 0 %}fa-folder text-secondary{% else %}fa-folder text-warning{% endif %}"
+      id="folder-icon-{{ path.id }}" aria-hidden="true"></i></button>
           </td>
           <td class="pt-2 pb-2">{{ forloop.counter }}</td>
           <td class="pt-2 pb-2 text-bold">{{ path.name|truncatechars:20 }}</td>
           <td class="pt-2 pb-2">{{ path.documents.all|length }}</td>
           <td class="pt-2 pb-2">
-                <button class="btn btn-sm btn-warning" data-path-id="{{ path.id }}" id="upload-files"><i class="bi bi-file-earmark-arrow-up"></i></i>
+                <button class="btn btn-sm qi-primary" data-path-id="{{ path.id }}" id="upload-files"><i class="bi bi-file-earmark-arrow-up"></i></i>
       </button>
             {% if user.is_manager or user.is_superuser %}
               <button class="btn btn-sm btn-danger delete-task" data-task-id="{{ path.id }}"><i
@@ -114,19 +114,34 @@
 </div>
 <script>
   $(document).ready(function () {
-document.querySelectorAll("#upload-files").forEach(function(button) {
-        button.addEventListener("click", function() {
-          let pathId = this.getAttribute("data-path-id");
-          let form = document.getElementById("upload-form");
-          let url = document.getElementById("url");
-          url.value = document.URL;
-          form.action = form.action.replaceAll("9999", pathId);
-          let upload_file_model = new bootstrap.Modal(document.getElementById('NewDocs'),{
-            keyboard: false
-          })
-          upload_file_model.show();
+    document.querySelectorAll("#upload-files").forEach(function(button) {
+            button.addEventListener("click", function() {
+              let pathId = this.getAttribute("data-path-id");
+              let form = document.getElementById("upload-form");
+              let url = document.getElementById("url");
+              url.value = document.URL;
+              form.action = form.action.replaceAll("9999", pathId);
+              let upload_file_model = new bootstrap.Modal(document.getElementById('NewDocs'),{
+                keyboard: false
+              })
+              upload_file_model.show();
+            });
+          });
+    document.querySelectorAll(".collapse").forEach(function (collapseEl) {
+          let pathId = collapseEl.id.split("_").pop();
+          let icon = document.getElementById("folder-icon-" + pathId);
+          collapseEl.addEventListener("show.bs.collapse", function () {
+            if (icon) {
+              icon.classList.remove("fa-folder");
+              icon.classList.add("fa-folder-open");
+            }
+          });
+          collapseEl.addEventListener("hide.bs.collapse", function () {
+            if (icon) {
+              icon.classList.remove("fa-folder-open");
+              icon.classList.add("fa-folder");
+            }
+          });
         });
-      });
-
   });
 </script>

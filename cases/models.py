@@ -229,9 +229,9 @@ class LitigationCases(BaseModel):
 
     @property
     def get_html_url(self):
-        url = reverse('cases:case_edit', args=(self.id,))
-        return f'<a class="btn qi-primary-outline btn-sm" href="{url}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true" title="<em>Tooltip</em> <u>with</u> <b>HTML</b>"> {self.name} </a>'
 
+        url = reverse('case_view', args=(self.id,))
+        return url
 
 
 @receiver(post_save, sender=LitigationCases)

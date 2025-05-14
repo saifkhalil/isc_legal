@@ -19,7 +19,7 @@ class repliesAdmin(admin.ModelAdmin):
 
 
 class prioritiesAdmin(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('id', 'priority')
+    list_display = ('id', 'priority', 'color', 'icon',)
 
 
 class contractsAdmin(admin.ModelAdmin):
