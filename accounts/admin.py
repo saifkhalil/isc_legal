@@ -201,7 +201,7 @@ class UserAdmin(admin.ModelAdmin):
         adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 
         context = {
-            "title": _("Change password: %s") % escape(user.get_username()),
+            "title": _("Change password:") + user.username,
             "adminForm": adminForm,
             "form_url": form_url,
             "form": form,

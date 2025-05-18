@@ -19,13 +19,6 @@
             {% include "includes/_form_buttons.html" with obj_status=obj_status obj_create_url=obj_create.url obj_edit=obj_edit obj_id=obj.id objs_list=objs_list %}
         {% csrf_token %}
         <table class="form form-table">
-          {% if obj_status %}
-            <span class="col-auto cursor-default btn btn-{{ obj_status.color }} mb-3">
-            <span style="width:24px" class="{{ obj_status.icon }}" role="status" aria-hidden="true"></span>
-            {{ obj_status }}
-          </span>
-            <br>
-        {% endif %}
           <div class="card shadow-sm p-3" {% if user.enable_transision %} data-aos="zoom-in-left" {% endif %}>
           <p class="pb-3">{% trans 'Basic Information' %}</p>
           {% bootstrap_form form %}

@@ -1,4 +1,5 @@
 {% load i18n %}
+
 $(document).ready(function() {
      AOS.init();
      var tab_url = window.location.pathname.replace(/^((?:[^\/]*\/){3}).*$/, "$1");
@@ -32,6 +33,9 @@ $(document).ready(function() {
           };
     socket.onmessage = function (event) {
         var notification = JSON.parse(event.data);
+            if (notification.type === 'user.status') {
+      console.log('User ID:', notification.user_id, 'is now', notification.status);
+    }
         console.log(notification);
         var modelTranslated = translatedModels[notification.content_type] || notification.content_type; // Default to action if not found
         var notificationDropdown = document.getElementById("notificationItems");
@@ -59,8 +63,17 @@ $(document).ready(function() {
         notificationDropdown.insertBefore(newItem, notificationDropdown.firstChild.nextSibling);
         document.getElementById("notificationCount").innerText++;
                 if ("Notification" in window && Notification.permission === "granted") {
+                  let notificationContent = '';
+                  if (notification.type === 'user.status')
+                  {
+                    notificationContent = `${notification.username} is now ${notification.status}`
+                  }
+                  else {
+                    notificationContent = `${notification.action_by} ${actionTranslated} ${notification.object_name}`
+                  }
             new Notification("{% trans 'Legal App - New Notification' %}", {
-                body: `${notification.action_by} ${actionTranslated} ${notification.object_name}`,
+
+                body: notificationContent,
                 icon: "/static/images/qilogo.svg",  // Optional: Add your own notification icon
                 requireInteraction: true,  // Keeps the notification on screen until user dismisses
             });
@@ -142,7 +155,7 @@ $(document).ready(function() {
     });
   {% if request.not_read_notifications_count > 0 %}
     document.getElementById("read_all_notifications").addEventListener('click', function() {
-        if (confirm('{% trans 'Are you sure you want to read all notifications?' %}')) {
+        if (confirm('{% trans "Are you sure you want to read all notifications?" %}')) {
           fetch("{% url 'read_all_notifications'  %}", {
             method: 'POST',
             headers: {
@@ -165,14 +178,14 @@ $(document).ready(function() {
           })
           .catch(error => {
             console.error('Error:', error);
-            alert('{% trans 'An error occurred while read all notifications' %}');
+            alert('{% trans "An error occurred while read all notifications" %}');
           });
         }
       });
   {% endif %}
 {% if request.not_deleted_notifications_count > 0 %}
     document.getElementById("delete_all_notifications").addEventListener('click', function() {
-        if (confirm('{% trans 'Are you sure you want to delete all notifications?' %}')) {
+        if (confirm('{% trans "Are you sure you want to delete all notifications?" %}')) {
           fetch("{% url 'delete_all_notifications'  %}", {
             method: 'POST',
             headers: {
@@ -195,7 +208,8 @@ $(document).ready(function() {
           })
           .catch(error => {
             console.error('Error:', error);
-            alert('{% trans 'An error occurred while delete all notifications' %}');
+            alert('{% trans "An error occurred while delete all notifications" %}');
+
           });
         }
       });

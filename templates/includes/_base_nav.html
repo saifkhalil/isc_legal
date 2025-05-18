@@ -41,9 +41,7 @@
               {% include 'includes/_select_theme.html' %}
 
               <button class="btn btn-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                 <img style="width:20px;display: inline-block;margin-left: 0.5rem;" role="image" src="{{ user.photo.url }}" class="bi rounded-circle">
-          <span>{{ user.username }}</span>
-
+                {% include 'includes/_user_with_photo.html' with value=user %}
               </button>
 
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">

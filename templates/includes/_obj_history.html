@@ -15,7 +15,7 @@
             <div class="created-info flex justify-center flex-col gap-3">
               <div>
                 <span>{% trans 'Created by' %}: </span>
-                <span class="mx-2 fw-bold">{{ obj.created_by.username }}</span>
+                <span class="mx-2 fw-bold">{% include 'includes/_user_with_photo.html' with value=obj.created_by %}</span>
               </div>
               <div>
                 <span>{% trans 'Created at' %}: </span>
@@ -25,7 +25,7 @@
             <div class="created-info flex justify-center flex-col gap-3">
               <div>
                 <span>{% trans 'Modified by' %}: </span>
-                <span class="mx-2 fw-bold">{{ obj.modified_by.username }}</span>
+                <span class="mx-2 fw-bold">{% include 'includes/_user_with_photo.html' with value=obj.modified_by %}</span>
               </div>
               <div>
                 <span>{% trans 'Modified at' %}: </span>
@@ -47,7 +47,7 @@
                 <div class="flex items-start justify-between">
                   <div class="flex items-center gap-1 flex-wrap" style="flex: 5 1 0%;">
                     <span>{{ log.get_action_display }}</span>
-                    <span class="font-bold fw-bold">{{ log.actor.username }}</span>
+                    <span class="font-bold fw-bold">{% include 'includes/_user_with_photo.html' with value=log.actor %}</span>
                   {% if log.action != 0 %}
                       <span>{% if log.changes|length > 1 %}{% trans 'fields' %}{% else %}{% trans 'field' %}{% endif %}</span>
                       <span>

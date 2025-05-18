@@ -2,6 +2,7 @@ import os
 
 from django import template
 from django.urls import NoReverseMatch, reverse
+from django.core.cache import cache
 
 register = template.Library()
 
@@ -54,3 +55,8 @@ def url_from_name(name, *args, **kwargs):
 @register.filter
 def model_name(value):
     return value.__class__.__name__
+
+
+@register.filter
+def is_user_online(user_id):
+    return cache.get(f"user_online_{user_id}",False)

@@ -1,0 +1,14 @@
+{% load file_filters %}
+<div class="alert alert-light p-1 fs-8 mb-0 fw-normal rounded-pill position-relative {% if not value.is_active %}opacity-50{% else %}border border-secondary{% endif %}">
+{% include 'includes/_user_with_photo.html' with value=value %}
+  {% if value.is_manager or value.is_superuser %}
+    <span class="position-absolute top-50 end-0 translate-middle opacity-70">
+      <i class="fa fa-briefcase text-secondary"></i>
+    </span>
+    {% endif %}
+  {% if value.id|is_user_online %}
+    <div class="position-absolute m-1 top-0 start-0 translate-middle opacity-70">
+<i class="bi bi-circle-fill text-success"></i>
+    </div>
+    {% endif %}
+</div>

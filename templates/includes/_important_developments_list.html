@@ -15,7 +15,7 @@
                   <div class="items-center gap-1 flex-wrap" style="flex: 5 1 0%;">
                     <h4 class="mb-3">{{ impdev.title }}</h4>
                     <h6 class="text-muted fs-8" data-bs-toggle="tooltip" data-bs-placement="top"
-                        title="{{ impdev.created_at|date:"Y-m-d h:i:s a" }}">{{ impdev.created_by.username|default:"system" }} - {{ impdev.created_at|naturaltime }}</h6>
+                        title="{{ impdev.created_at|date:"Y-m-d h:i:s a" }}"> {% include 'includes/_user_with_photo.html' with value=impdev.created_by %} - {{ impdev.created_at|naturaltime }}</h6>
                   </div>
                 </div>
               </div>

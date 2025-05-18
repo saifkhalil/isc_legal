@@ -14,7 +14,7 @@
                 <div class="flex items-start justify-between">
                   <div class="items-center gap-1 flex-wrap" style="flex: 5 1 0%;">
                     <h4 class="mb-3">{{ comment.comment }}</h4>
-                    <h6 class="text-muted fs-8" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ comment.created_at|date:"Y-m-d h:i:s a" }}">{{ comment.created_by.username }} - {{ comment.created_at|naturaltime }}</h6>
+                    <h6 class="text-muted fs-8" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ comment.created_at|date:"Y-m-d h:i:s a" }}">{% include 'includes/_user_with_photo.html' with value=comment.created_by %} - {{ comment.created_at|naturaltime }}</h6>
                   </div>
                 </div>
               </div>
@@ -25,7 +25,7 @@
                   <div class="alert-content">
               <div class="alert-message">
               <h4 class="mb-3">{{ reply.reply }}</h4>
-                    <h6 class="text-muted fs-8" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ reply.created_at|date:"Y-m-d h:i:s a" }}">{{ reply.created_by.username }} - {{ reply.created_at|naturaltime }}</h6>
+                    <h6 class="text-muted fs-8" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ reply.created_at|date:"Y-m-d h:i:s a" }}">{% include 'includes/_user_with_photo.html' with value=reply.created_by %} - {{ reply.created_at|naturaltime }}</h6>
                   </div>
                   </div>
                   </div>

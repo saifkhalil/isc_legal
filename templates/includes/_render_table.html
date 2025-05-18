@@ -38,34 +38,10 @@
           </div>
         {% endif %}
       {% elif field == 'assignee' %}
-        <div class="alert alert-light p-1 fs-8 mb-0 fw-normal rounded-pill position-relative">
-            <img src="{{ value.photo.url }}" class="img-avatar rounded-circle" alt="avatar">
-          <span {% if not value.is_active %}class="text-decoration-line-through fst-italic"{% endif %}>{{ value.username }}</span>
-{#          {% if value.is_manager or value.is_superuser %}#}
-{#            <span class="position-absolute top-0 start-0 translate-middle ">#}
-{#              <i class="bi bi-fire text-danger"></i>#}
-{#            </span>#}
-{#            {% endif %}#}
-        </div>
-      {% elif field == 'case_status' or field == 'hearing_status' or field == 'task_status' %}
+        {% include 'includes/_alert_user.html' with value=value %}
+      {% elif field == 'case_status' or field == 'hearing_status' or field == 'task_status' or field == 'priority' %}
         {% if value %}
-          <div
-            class="alert alert-light p-1 fs-8 mb-0 fw-normal rounded-pill border-{{ value.color }}  bg-light-blue text-{{ value.color }}">
-            <span
-                  class="{{ value.icon }}"
-                  role="status" aria-hidden="true"></span>
-            <span>{{ value }}</span>
-          </div>
-        {% endif %}
-      {% elif field == 'priority' %}
-        {% if value %}
-          <div
-            class="alert alert-light p-1 fs-8 mb-0 fw-normal rounded-pill border-{{ value.color }}  text-{{ value.color }}">
-            <span
-                  class="{{ value.icon }}"
-                  role="status" aria-hidden="true"></span>
-            <span>{{ value }}</span>
-          </div>
+          {% include 'includes/_alert_with_icon.html' with value=value %}
         {% endif %}
       {% else %}
         {{ value|default:"" }}
