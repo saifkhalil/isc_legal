@@ -3,7 +3,7 @@
 {% block content %}
 {% load static %}
 {% load humanize %}
-<div class="card shadow-sm m-5 mb-3 mt-3 " {% if user.enable_transision %}  data-aos="zoom-in" {% endif %}>
+<div class="card shadow-sm m-5 mb-3 mt-3 " {% if user.enable_transition %}  data-aos="zoom-in" {% endif %}>
   <div class="card-body">
     <form method="GET">
       <div class="row g-3">
@@ -48,12 +48,12 @@
 </div>
 <div class="row px-5 pb-3">
   <div class="col">
-    <a role="button" class="btn btn-primary pulse-primary" href="{% url 'administrative_investigation_create' %}" {% if user.enable_transision %}  data-aos="zoom-in" {% endif %}><i class="bi bi-file-earmark-plus"></i> {% trans 'New Administrative Investigation' %}</a>
+    <a role="button" class="btn btn-primary pulse-primary" href="{% url 'administrative_investigation_create' %}" {% if user.enable_transition %}  data-aos="zoom-in" {% endif %}><i class="bi bi-file-earmark-plus"></i> {% trans 'New Administrative Investigation' %}</a>
   </div>
 </div>
   <section class="px-5 pb-5" >
-    <table class="table {% if AdministrativeInvestigations|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
-    <thead {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
+    <table class="table {% if AdministrativeInvestigations|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transition %} data-aos="zoom-in" {% endif %}>
+    <thead {% if user.enable_transition %} data-aos="zoom-in" {% endif %}>
         <tr class="bg-gray-100">
           <td class="pt-3 pb-3 text-bold qi-light">{% trans 'Number' %}</td>
           <td class="pt-3 pb-3 text-bold qi-light">{% trans 'Subject' %}</td>
@@ -73,7 +73,7 @@
         </tr>
       {% else %}
       {% for AdministrativeInvestigation in AdministrativeInvestigations %}
-        <tr class="bg-white"  {% if user.enable_transision %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
+        <tr class="bg-white"  {% if user.enable_transition %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
           <td class="pt-2 pb-2">{{ AdministrativeInvestigation.id }}</td>
           <td class="pt-2 pb-2"><a href="{% url 'administrative_investigation_view' AdministrativeInvestigation.id %}">{{ AdministrativeInvestigation.subject }}</a></td>
           <td class="pt-2 pb-2">{{ AdministrativeInvestigation.priority|default:'' }}</td>

@@ -1,22 +1,25 @@
 {% load i18n %}
 {% load static %}
+<link href="{% static 'css/select2.min.css' %}" rel="stylesheet">
+<link href="{% static 'css/select2-bootstrap-5-theme.min.css' %}" rel="stylesheet">
 <form method="GET">
-  <div class="card shadow-sm m-5 mb-3 mt-3" {% if user.enable_transision %}data-aos="zoom-in"{% endif %}>
+  <div class="card shadow-sm m-5 mb-3 mt-3" {% if user.enable_transition %}data-aos="zoom-in"{% endif %}>
     <div class="card-body">
       <div class="row g-3">
         {% for field in filters %}
           <div class="col-md">
-            <div class="form-floating">
               {% if field.type == "text" %}
+                <label for="{{ field.name }}">{{ field.label }}</label>
                 <input type="text"
                        class="form-control"
                        id="{{ field.name }}"
                        name="{{ field.name }}"
                        placeholder="{{ field.label }}"
                        value="{{ field.value|default:'' }}">
-                <label for="{{ field.name }}">{{ field.label }}</label>
+
               {% elif field.type == "select" %}
-                <select class="form-select"
+                 <label for="{{ field.name }}">{{ field.label }}</label>
+                <select class="form-select select2"
                         id="{{ field.name }}"
                         name="{{ field.name }}"
                         onchange="this.form.submit()">
@@ -28,15 +31,14 @@
                     </option>
                   {% endfor %}
                 </select>
-                <label for="{{ field.name }}">{{ field.label }}</label>
+
               {% endif %}
-            </div>
           </div>
         {% endfor %}
 
         <!-- Record Count Field -->
         <div class="col-md">
-          <div class="form-floating">
+        <label for="number_of_records">{% trans 'Number of records' %}</label>
             <select class="form-control"
                     id="number_of_records"
                     onchange="this.form.submit()"
@@ -46,8 +48,7 @@
               <option value="25" {% if session.number_of_records == 25 %}selected{% endif %}>{% trans '25 records' %}</option>
               <option value="50" {% if session.number_of_records == 50 %}selected{% endif %}>{% trans '50 records' %}</option>
             </select>
-            <label for="number_of_records">{% trans 'Number of records' %}</label>
-          </div>
+
         </div>
 
         <!-- Buttons -->
@@ -65,3 +66,5 @@
     </div>
   </div>
 </form>
+  <script src="{% static 'js/jquery.min.js' %}"></script>
+  <script src="{% static 'js/select2.min.js' %}"></script>

@@ -19,7 +19,7 @@
             {% include "includes/_form_buttons.html" with obj_status=obj_status obj_create_url=obj_create.url obj_edit=obj_edit obj_id=obj.id objs_list=objs_list %}
         {% csrf_token %}
         <table class="form form-table">
-          <div class="card shadow-sm p-3" {% if user.enable_transision %} data-aos="zoom-in-left" {% endif %}>
+          <div class="card shadow-sm p-3" {% if user.enable_transition %} data-aos="zoom-in-left" {% endif %}>
           <p class="pb-3">{% trans 'Basic Information' %}</p>
           {% bootstrap_form form %}
           </div>

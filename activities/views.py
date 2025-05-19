@@ -719,7 +719,7 @@ class hearingViewSet(viewsets.ModelViewSet):
 def tasks_list(request):
     number_of_records = 10
     keywords = task_category = assignee = task_status = task_case = None
-    task_category_set = assignee_set = task_status_set = cases_set = None
+    task_category_set = assignee_set = task_status_set = cases_set = task_cases_set =  None
 
     if request.method == 'GET':
         # Clear filters and redirect if needed.
@@ -841,17 +841,52 @@ def tasks_list(request):
         if value:
             filter_params[key] = value
     filter_query = urlencode(filter_params)
+    objs_count = tasks_qs.count()
+    fields_to_show = [
+        'id', 'title', 'task_status', 'assignee','cases', 'created_at', 'task_category', 'assign_date', 'due_date'
+    ]
 
+    headers = [
+        _("Number"), _("Title"), _("Status"), _('Assignee'), _('Related Case'), _("Created At"), _('Category'), _("Start Date"), _('End Time'), _("Actions")
+    ]
+    filter_fields = [
+        {
+            "name": "keywords",
+            "label": _("Search keywords"),
+            "type": "text",
+            "value": keywords,
+        },
+        {
+            "name": "task_case",
+            "label": _("Cases"),
+            "type": "select",
+            "value": task_case,
+            "options": task_cases_set,
+        },
+        {
+            "name": "task_status",
+            "label": _("Status"),
+            "type": "select",
+            "value": task_status,
+            "options": task_status_set,
+        },
+    ]
+    obj_create = {'name': _('New Task'), 'url': 'task_create'}
     context = {
-        'tasks': page_obj,
-        'assignees': assignees_set,
-        'task_statuses': task_status_set,
-        'task_cases': task_cases_set,
+        'fields_to_show': fields_to_show,
+        'headers': headers,
+        'objs': page_obj,
+        'objs_count': objs_count,
+        'obj_view': 'task_view',
+        'obj_edit': 'task_edit',
+        'obj_delete': 'delete_task',
+        'obj_create': obj_create,
         'page_range': page_range,
         'session': json.dumps(session_info),
+        'filter_fields': filter_fields,
         'filter_query': filter_query,  # New variable for pagination links.
     }
-    return render(request, 'activities/tasks_list.html', context)
+    return render(request, 'objs_list.html', context)
 
 @require_GET
 def task_view(request, task_id=None,mode='view'):
@@ -924,7 +959,7 @@ def delete_task(request, pk=None):
     # Assuming you have a field to record the modifying user:
     instance.modified_by = request.user
     instance.save()
-    return JsonResponse({'success': True, 'message': 'Task has been deleted successfully.'},status=200)
+    return JsonResponse({'success': True, 'message': _('Task has been deleted successfully.')},status=200)
 
 @login_required
 def hearings_list(request):
@@ -1044,19 +1079,45 @@ def hearings_list(request):
         if value:
             filter_params[key] = value
     filter_query = urlencode(filter_params)
+    objs_count = hearings_qs.count()
+    fields_to_show = [
+        'id', 'name', 'hearing_status', 'assignee', 'created_at', 'court','cases'
+    ]
 
+    headers = [
+        _("Number"), _("Name"), _("Status"), _('Assignee'), _("Created At"), _("Court"), _('Related Case'), _("Actions")
+    ]
+    filter_fields = [
+        {
+            "name": "keywords",
+            "label": _("Search keywords"),
+            "type": "text",
+            "value": keywords,
+        },
+        {
+            "name": "cases",
+            "label": _("Cases"),
+            "type": "select",
+            "value": hearing_case,
+            "options": cases_set,
+        },
+    ]
+    obj_create = {'name': _('New Hearing'), 'url': 'hearing_create'}
     context = {
-        'hearings': page_obj,
-        'assignees': assignees_set,
-        'hearing_statuses': hearing_statuses_set,
-        'hearing_cases': courts_set,
+        'fields_to_show': fields_to_show,
+        'headers': headers,
+        'objs': page_obj,
+        'objs_count': objs_count,
+        'obj_view': 'hearing_view',
+        'obj_edit': 'hearing_edit',
+        'obj_delete': 'delete_hearing',
+        'obj_create': obj_create,
         'page_range': page_range,
         'session': json.dumps(session_info),
+        'filter_fields': filter_fields,
         'filter_query': filter_query,  # New variable for pagination links.
     }
-    return render(request, 'activities/hearings_list.html', context)
-
-
+    return render(request, 'objs_list.html', context)
 
 def hearing_view(request, hearing_id=None,mode='view'):
     log = {}
@@ -1119,7 +1180,6 @@ def hearing_view(request, hearing_id=None,mode='view'):
 
 @require_POST
 def delete_hearing(request, pk=None):
-    print('delete_hearing',pk)
     instance = hearing.objects.get(pk=pk)
     if not (request.user.is_manager or request.user.is_superuser):
         return JsonResponse({'success': False, 'message':"You do not have permission to perform this action."},status=401)
@@ -1129,7 +1189,7 @@ def delete_hearing(request, pk=None):
     # Assuming you have a field to record the modifying user:
     instance.modified_by = request.user
     instance.save()
-    return JsonResponse({'success': True, 'message': 'Hearing has been deleted successfully.'},status=200)
+    return JsonResponse({'success': True, 'message': _('Hearing has been deleted successfully.')},status=200)
 
 @require_POST
 def new_hearing_comment(request, hearing_id=None):

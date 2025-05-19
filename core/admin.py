@@ -65,7 +65,7 @@ class NotificationsAdmin(admin.ModelAdmin):
 class PathModelAdmin(ImportExportModelAdmin, MPTTModelAdmin):
     # specify pixel amount for this ModelAdmin only:
     fields = (
-        'name', 'parent', 'documents', 'case_id', 'folder_id', 'admin_id', 'notation_id', 'created_by'
+        'name', 'parent', 'documents', 'is_deleted', 'case_id', 'folder_id', 'admin_id', 'notation_id', 'created_by'
               )
     list_display = (
         'id',

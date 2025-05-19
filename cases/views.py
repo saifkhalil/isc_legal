@@ -48,11 +48,13 @@ from .serializers import LitigationCasesSerializer, stagesSerializer, case_typeS
 
 logger = logging.getLogger(__name__)
 
+
 def manager_superuser_check(request):
     return Response(data={"detail": "انت غير مصرح بالمسح"}, status=status.HTTP_401_UNAUTHORIZED)
     current_user = User.objects.get(id=request.user.id)
     if not (current_user.is_manager or current_user.is_superuser):
         return Response(data={"detail": "انت غير مصرح بالمسح"}, status=status.HTTP_401_UNAUTHORIZED)
+
 
 def get_stages_for_case_type(request):
     case_type_id = request.GET.get('case_type_id')
@@ -65,12 +67,13 @@ def get_stages_for_case_type(request):
 
     return JsonResponse({"stages": []})
 
+
 @login_required
 def cases_list(request):
     number_of_records = 10
     keywords = stage = assignee = case_type = status = None
     assignees_set = court_set = case_type_set = stage_set = case_status_set = None
-    cases_count: int = 0
+    objs_count: int = 0
     if request.method == 'GET':
         # Clear filters and redirect if needed.
         if request.GET.get('clear'):
@@ -84,10 +87,10 @@ def cases_list(request):
             request.session['keywords'] = keywords  # Update session even if empty
         else:
             keywords = request.session.get('keywords', '')
-        stage = request.GET.get('stage') or request.session.get('stage',0)
-        assignee = request.GET.get('assignee') or request.session.get('assignee',0)
-        case_type = request.GET.get('type') or request.session.get('type',0)
-        status = request.GET.get('status') or request.session.get('status',0)
+        stage = request.GET.get('stage') or request.session.get('stage', 0)
+        assignee = request.GET.get('assignee') or request.session.get('assignee', 0)
+        case_type = request.GET.get('type') or request.session.get('type', 0)
+        status = request.GET.get('status') or request.session.get('status', 0)
 
         # Save parameters to session if provided.
         for key, value in (('keywords', keywords), ('stage', stage),
@@ -173,7 +176,7 @@ def cases_list(request):
         cases_qs = cases_qs.filter(query)
     else:
         cases_qs = LitigationCases.objects.filter(is_deleted=False).order_by('-created_by')
-    cases_count = cases_qs.count()
+    objs_count = cases_qs.count()
     # Set up pagination.
     paginator = Paginator(cases_qs, number_of_records)
     page_number = request.GET.get('page', 1)
@@ -245,22 +248,23 @@ def cases_list(request):
             "options": assignees_set,
         },
     ]
-    cases_create = {'name':_('New Case'),'url':'case_create'}
+    obj_create = {'name': _('New Case'), 'url': 'case_create'}
     context = {
         'fields_to_show': fields_to_show,
         'headers': headers,
         'objs': page_obj,
-        'objs_count': cases_count,
+        'objs_count': objs_count,
         'obj_view': 'case_view',
         'obj_edit': 'case_edit',
         'obj_delete': 'delete_case',
-        'obj_create': cases_create,
+        'obj_create': obj_create,
         'page_range': page_range,
         'session': json.dumps(session_info),
         'filter_fields': filter_fields,
         'filter_query': filter_query,  # New variable for pagination links.
     }
     return render(request, 'objs_list.html', context)
+
 
 def case_view(request, case_id=None, mode='view'):
     log = {}
@@ -295,7 +299,7 @@ def case_view(request, case_id=None, mode='view'):
                     field.name: _(field.verbose_name)
                     for field in LitigationCases._meta.many_to_many
                 })
-                log = LogEntry.objects.filter(content_type__model='litigationcases',object_id=instance.pk)
+                log = LogEntry.objects.filter(content_type__model='litigationcases', object_id=instance.pk)
                 for field in form.fields:
                     form.fields[field].widget.attrs['disabled'] = True  # Disable all fields
 
@@ -314,56 +318,63 @@ def case_view(request, case_id=None, mode='view'):
         'obj': instance,
         'mode': mode,
         'logs': log,
-        'obj_edit':'case_edit',
-        'objs_list':'cases_list',
-        'new_path':'new_case_path',
+        'obj_edit': 'case_edit',
+        'objs_list': 'cases_list',
+        'new_path': 'new_case_path',
 
-        'obj_new_comment':'new_case_comment',
+        'obj_new_comment': 'new_case_comment',
         'new_ImportantDevelopment': 'new_case_ImportantDevelopment',
-        'obj_status':instance.case_status,
+        'obj_status': instance.case_status,
         'field_translations': field_translations,
-        'operation_translations':OPERATION_TRANSLATIONS,
+        'operation_translations': OPERATION_TRANSLATIONS,
     }
     return render(request, 'obj.html', context)
 
+
 @require_POST
 def delete_case(request, pk=None):
-    print('delete_case',pk)
+    print('delete_case', pk)
     instance = LitigationCases.objects.get(pk=pk)
     if not (request.user.is_manager or request.user.is_superuser):
-        return JsonResponse({'success': False, 'message':"You do not have permission to perform this action."},status=401)
+        return JsonResponse({'success': False, 'message': "You do not have permission to perform this action."},
+                            status=401)
     instance = get_object_or_404(LitigationCases, pk=pk)
     instance.is_deleted = True
     instance.modified = timezone.now()
     # Assuming you have a field to record the modifying user:
     instance.modified_by = request.user
     instance.save()
-    return JsonResponse({'success': True, 'message': 'Case has been deleted successfully.'},status=200)
+    return JsonResponse({'success': True, 'message': _('Case has been deleted successfully.')}, status=200)
+
 
 @require_POST
 def new_case_path(request, case_id=None):
     instance = get_object_or_404(LitigationCases, pk=case_id)
     instance.paths.create(name=request.POST.get('name'))
-    return redirect('case_view',case_id=case_id)
+    return redirect('case_view', case_id=case_id)
+
 
 @require_POST
 def new_case_ImportantDevelopment(request, case_id=None):
     url = request.POST.get('url')
     instance = get_object_or_404(LitigationCases, pk=case_id)
-    instance.ImportantDevelopment.create(title=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
+    instance.ImportantDevelopment.create(title=request.POST.get('content'), created_by=request.user,
+                                         created_at=timezone.now())
     return redirect(url)
+
 
 @require_POST
 def new_case_comment(request, case_id=None):
     instance = get_object_or_404(LitigationCases, pk=case_id)
-    instance.comments.create(comment=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
-    return redirect('case_view',case_id=case_id)
+    instance.comments.create(comment=request.POST.get('content'), created_by=request.user, created_at=timezone.now())
+    return redirect('case_view', case_id=case_id)
+
 
 @login_required
 def notations_list(request):
     number_of_records = 10
     keywords = court = priority = assignee = None
-    assignees_set = court_set = priority_set = None
+    assignees_set = court_set = priorities_set = None
 
     if request.method == 'GET':
         # Clear filters and redirect if needed.
@@ -378,9 +389,9 @@ def notations_list(request):
             request.session['keywords'] = keywords  # Update session even if empty
         else:
             keywords = request.session.get('keywords', '')
-        court = request.GET.get('court') or request.session.get('court',0)
-        assignee = request.GET.get('assignee') or request.session.get('assignee',0)
-        priority = request.GET.get('priority') or request.session.get('priority',0)
+        court = request.GET.get('court') or request.session.get('court', 0)
+        assignee = request.GET.get('assignee') or request.session.get('assignee', 0)
+        priority = request.GET.get('priority') or request.session.get('priority', 0)
 
         # Save parameters to session if provided.
         for key, value in (('keywords', keywords), ('court', court),
@@ -449,7 +460,7 @@ def notations_list(request):
         notations_qs = notations_qs.filter(query)
     else:
         notations_qs = Notation.objects.filter(is_deleted=False).order_by('-created_by')
-
+    objs_count = notations_qs.count()
     # Set up pagination.
     paginator = Paginator(notations_qs, number_of_records)
     page_number = request.GET.get('page', 1)
@@ -473,35 +484,84 @@ def notations_list(request):
         if value:
             filter_params[key] = value
     filter_query = urlencode(filter_params)
+    fields_to_show = [
+        'id', 'subject', 'court', 'priority', 'assignee',
+        'created_at', 'end_time'
+    ]
+    headers = [
+        _("Number"), _("Subject"), _("Court"), _("Priority"), _('Assignee'), _("Created At"), _('Start Date'),
+        _("Actions")
+    ]
+
+    filter_fields = [
+        {
+            "name": "keywords",
+            "label": _("Search keywords"),
+            "type": "text",
+            "value": keywords,
+        },
+        {
+            "name": "court",
+            "label": _("Court"),
+            "type": "select",
+            "value": court,
+            "options": court_set,
+        },
+        {
+            "name": "priority",
+            "label": _("Priority"),
+            "type": "select",
+            "value": priority,
+            "options": priorities_set,
+        },
+        {
+            "name": "assignee",
+            "label": _("Assignee"),
+            "type": "select",
+            "value": assignee,
+            "options": assignees_set,
+        },
+    ]
+    obj_create = {'name': _('New Notation'), 'url': 'notation_create'}
     context = {
-        'notations': page_obj,
-        'courts': court_set,
-        'prorities': priorities_set ,
-        'assignees': assignees_set,
+        'fields_to_show': fields_to_show,
+        'headers': headers,
+        'objs': page_obj,
+        'objs_count': objs_count,
+        'obj_view': 'notation_view',
+        'obj_edit': 'notation_edit',
+        'obj_delete': 'delete_notation',
+        'obj_create': obj_create,
         'page_range': page_range,
         'session': json.dumps(session_info),
+        'filter_fields': filter_fields,
         'filter_query': filter_query,  # New variable for pagination links.
     }
-    return render(request, 'cases/notations_list.html', context)
+    return render(request, 'objs_list.html', context)
+
 
 @require_POST
 def new_notation_path(request, notation_id=None):
     instance = get_object_or_404(Notation, pk=notation_id)
     instance.paths.create(name=request.POST.get('name'))
-    return redirect('notation_view',notation_id=notation_id)
+    return redirect('notation_view', notation_id=notation_id)
+
 
 @require_POST
 def new_notation_ImportantDevelopment(request, notation_id=None):
     url = request.POST.get('url')
     instance = get_object_or_404(Notation, pk=notation_id)
-    instance.ImportantDevelopment.create(title=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
+    instance.ImportantDevelopment.create(title=request.POST.get('content'), created_by=request.user,
+                                         created_at=timezone.now())
     return redirect(url)
+
 
 @require_POST
 def new_notation_comment(request, notation_id=None):
     instance = get_object_or_404(Notation, pk=notation_id)
-    instance.comments.create(comment=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
-    return redirect('notation_view',notation_id=notation_id)
+    instance.comments.create(comment=request.POST.get('content'), created_by=request.user, created_at=timezone.now())
+    return redirect('notation_view', notation_id=notation_id)
+
 
 def notation_view(request, notation_id=None, mode='view'):
     log = {}
@@ -536,7 +596,7 @@ def notation_view(request, notation_id=None, mode='view'):
                     field.name: _(field.verbose_name)
                     for field in Notation._meta.many_to_many
                 })
-                log = LogEntry.objects.filter(content_type__model='notations',object_id=instance.pk)
+                log = LogEntry.objects.filter(content_type__model='notations', object_id=instance.pk)
                 for field in form.fields:
                     form.fields[field].widget.attrs['disabled'] = True  # Disable all fields
 
@@ -555,13 +615,13 @@ def notation_view(request, notation_id=None, mode='view'):
         'obj': instance,
         'mode': mode,
         'logs': log,
-        'obj_edit':'notation_edit',
-        'objs_list':'notations_list',
-        'new_path':'new_notation_path',
-        'new_ImportantDevelopment':'new_notation_ImportantDevelopment',
-        'obj_new_comment':'new_notation_comment',
+        'obj_edit': 'notation_edit',
+        'objs_list': 'notations_list',
+        'new_path': 'new_notation_path',
+        'new_ImportantDevelopment': 'new_notation_ImportantDevelopment',
+        'obj_new_comment': 'new_notation_comment',
         'field_translations': field_translations,
-        'operation_translations':OPERATION_TRANSLATIONS,
+        'operation_translations': OPERATION_TRANSLATIONS,
     }
     return render(request, 'obj.html', context)
 
@@ -570,21 +630,22 @@ def notation_view(request, notation_id=None, mode='view'):
 def delete_notation(request, pk=None):
     instance = Notation.objects.get(pk=pk)
     if not (request.user.is_manager or request.user.is_superuser):
-        return JsonResponse({'success': False, 'message':"You do not have permission to perform this action."},status=401)
+        return JsonResponse({'success': False, 'message': "You do not have permission to perform this action."},
+                            status=401)
     instance = get_object_or_404(Notation, pk=pk)
     instance.is_deleted = True
     instance.modified = timezone.now()
     # Assuming you have a field to record the modifying user:
     instance.modified_by = request.user
     instance.save()
-    return JsonResponse({'success': True, 'message': 'Notation has been deleted successfully.'},status=200)
+    return JsonResponse({'success': True, 'message': _('Notation has been deleted successfully.')}, status=200)
 
 
 @login_required
 def AdministrativeInvestigations_list(request):
     number_of_records = 10
     keywords = priority = None
-    priority_set = None
+    priorities_set = None
 
     if request.method == 'GET':
         # Clear filters and redirect if needed.
@@ -599,10 +660,10 @@ def AdministrativeInvestigations_list(request):
             request.session['keywords'] = keywords  # Update session even if empty
         else:
             keywords = request.session.get('keywords', '')
-        priority = request.GET.get('priority') or request.session.get('priority',0)
+        priority = request.GET.get('priority') or request.session.get('priority', 0)
 
         # Save parameters to session if provided.
-        for key, value in (('keywords', keywords), ('priority', priority)) :
+        for key, value in (('keywords', keywords), ('priority', priority)):
             if value is not None:
                 request.session[key] = value
 
@@ -627,7 +688,8 @@ def AdministrativeInvestigations_list(request):
             query &= Q(priority_id=priority)
 
         # Get base queryset.
-        AdministrativeInvestigations_qs = AdministrativeInvestigation.objects.filter(is_deleted=False).order_by('-created_by')
+        AdministrativeInvestigations_qs = AdministrativeInvestigation.objects.filter(is_deleted=False).order_by(
+            '-created_by')
 
         # Retrieve filter dropdown data from cache or compute if not cached.
         cache_key = "AdministrativeInvestigations_objects"
@@ -638,7 +700,8 @@ def AdministrativeInvestigations_list(request):
             priorities = []
             for Administrative_Investigation in AdministrativeInvestigations_qs:
                 if Administrative_Investigation.priority:
-                    priorities.append(dict_item(Administrative_Investigation.priority.id, Administrative_Investigation.priority.priority))
+                    priorities.append(dict_item(Administrative_Investigation.priority.id,
+                                                Administrative_Investigation.priority.priority))
             priorities_set = GetUniqueDictionaries(priorities)
             cached_data = {
                 'priorities': priorities_set,
@@ -648,7 +711,8 @@ def AdministrativeInvestigations_list(request):
         # Apply filters.
         AdministrativeInvestigations_qs = AdministrativeInvestigations_qs.filter(query)
     else:
-        AdministrativeInvestigations_qs = AdministrativeInvestigation.objects.filter(is_deleted=False).order_by('-created_by')
+        AdministrativeInvestigations_qs = AdministrativeInvestigation.objects.filter(is_deleted=False).order_by(
+            '-created_by')
 
     # Set up pagination.
     paginator = Paginator(AdministrativeInvestigations_qs, number_of_records)
@@ -671,14 +735,45 @@ def AdministrativeInvestigations_list(request):
         if value:
             filter_params[key] = value
     filter_query = urlencode(filter_params)
+    objs_count = AdministrativeInvestigations_qs.count()
+    fields_to_show = [
+        'id', 'subject', 'priority', 'created_at', 'end_time'
+    ]
+
+    headers = [
+        _("Number"), _("Subject"), _("Priority"), _("Created At"), _("End Time"), _("Actions")
+    ]
+    filter_fields = [
+        {
+            "name": "keywords",
+            "label": _("Search keywords"),
+            "type": "text",
+            "value": keywords,
+        },
+        {
+            "name": "priority",
+            "label": _("Priority"),
+            "type": "select",
+            "value": priority,
+            "options": priorities_set,
+        },
+    ]
+    obj_create = {'name': _('New Administrative Investigation'), 'url': 'administrative_investigation_create'}
     context = {
-        'AdministrativeInvestigations': page_obj,
-        'prorities': priorities_set ,
+        'fields_to_show': fields_to_show,
+        'headers': headers,
+        'objs': page_obj,
+        'objs_count': objs_count,
+        'obj_view': 'administrative_investigation_view',
+        'obj_edit': 'administrative_investigation_edit',
+        'obj_delete': 'delete_AdministrativeInvestigation',
+        'obj_create': obj_create,
         'page_range': page_range,
         'session': json.dumps(session_info),
+        'filter_fields': filter_fields,
         'filter_query': filter_query,  # New variable for pagination links.
     }
-    return render(request, 'cases/AdministrativeInvestigations_list.html', context)
+    return render(request, 'objs_list.html', context)
 
 
 def AdministrativeInvestigations_view(request, administrative_investigation_id=None, mode='view'):
@@ -713,7 +808,7 @@ def AdministrativeInvestigations_view(request, administrative_investigation_id=N
                     field.name: _(field.verbose_name)
                     for field in AdministrativeInvestigation._meta.many_to_many
                 })
-                log = LogEntry.objects.filter(content_type__model='AdministrativeInvestigation',object_id=instance.pk)
+                log = LogEntry.objects.filter(content_type__model='AdministrativeInvestigation', object_id=instance.pk)
                 for field in form.fields:
                     form.fields[field].widget.attrs['disabled'] = True  # Disable all fields
 
@@ -732,12 +827,12 @@ def AdministrativeInvestigations_view(request, administrative_investigation_id=N
         'obj': instance,
         'mode': mode,
         'logs': log,
-        'obj_edit':'administrative_investigation_edit',
-        'objs_list':'administrative_investigations_list',
-        'new_path':'new_administrative_investigation_path',
-        'new_ImportantDevelopment':'new_AdministrativeInvestigation_ImportantDevelopment',
+        'obj_edit': 'administrative_investigation_edit',
+        'objs_list': 'administrative_investigations_list',
+        'new_path': 'new_administrative_investigation_path',
+        'new_ImportantDevelopment': 'new_AdministrativeInvestigation_ImportantDevelopment',
         'field_translations': field_translations,
-        'operation_translations':OPERATION_TRANSLATIONS,
+        'operation_translations': OPERATION_TRANSLATIONS,
     }
     return render(request, 'obj.html', context)
 
@@ -746,27 +841,33 @@ def AdministrativeInvestigations_view(request, administrative_investigation_id=N
 def delete_AdministrativeInvestigation(request, pk=None):
     instance = AdministrativeInvestigation.objects.get(pk=pk)
     if not (request.user.is_manager or request.user.is_superuser):
-        return JsonResponse({'success': False, 'message':"You do not have permission to perform this action."},status=401)
+        return JsonResponse({'success': False, 'message': "You do not have permission to perform this action."},
+                            status=401)
     instance = get_object_or_404(AdministrativeInvestigation, pk=pk)
     instance.is_deleted = True
     instance.modified = timezone.now()
     # Assuming you have a field to record the modifying user:
     instance.modified_by = request.user
     instance.save()
-    return JsonResponse({'success': True, 'message': f'{_("Administrative Investigation")} {_("has been deleted successfully.")}'},status=200)
+    return JsonResponse({'success': True, 'message': _("Administrative Investigation has been deleted successfully.")},
+                        status=200)
+
 
 @require_POST
 def new_AdministrativeInvestigation_ImportantDevelopment(request, administrative_investigation_id=None):
     url = request.POST.get('url')
     instance = get_object_or_404(AdministrativeInvestigation, pk=administrative_investigation_id)
-    instance.ImportantDevelopment.create(title=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
+    instance.ImportantDevelopment.create(title=request.POST.get('content'), created_by=request.user,
+                                         created_at=timezone.now())
     return redirect(url)
+
 
 @require_POST
 def new_AdministrativeInvestigation_path(request, administrative_investigation_id=None):
     instance = get_object_or_404(AdministrativeInvestigation, pk=administrative_investigation_id)
     instance.paths.create(name=request.POST.get('name'))
-    return redirect('administrative_investigation_view',notation_id=administrative_investigation_id)
+    return redirect('administrative_investigation_view', notation_id=administrative_investigation_id)
+
 
 def filter_cases(queryset, created_at_after=None, created_at_before=None, assignee_id=None):
     """Filter cases based on date range and assignee."""
@@ -841,9 +942,9 @@ class LitigationCasesViewSet(CSVRendererMixin2, viewsets.ModelViewSet):
         elif current_user.is_cases_private_manager and obj.case_category == "Private":
             return obj
         elif (
-            current_user in obj.shared_with.all()
-            or obj.created_by == current_user
-            or obj.assignee == current_user
+                current_user in obj.shared_with.all()
+                or obj.created_by == current_user
+                or obj.assignee == current_user
         ):
             return obj
         else:
@@ -1043,20 +1144,24 @@ class LitigationCasesViewSet(CSVRendererMixin2, viewsets.ModelViewSet):
                                        start_time__day=req_date.day)
         if Stage not in ('', None):
             queryset = queryset.filter(Stage__id=Stage)
-        filter_query = Q(shared_with__id__exact=current_user_id) | Q(created_by__id__exact=current_user_id) | Q(assignee__id__exact=current_user_id)
+        filter_query = Q(shared_with__id__exact=current_user_id) | Q(created_by__id__exact=current_user_id) | Q(
+            assignee__id__exact=current_user_id)
         if is_manager or (is_cases_private_manager and is_cases_public_manager) or is_superuser:
             queryset = queryset
         elif is_cases_public_manager:
-            filter_query = Q(case_category='Public') | Q(shared_with__id__exact=current_user_id) | Q(created_by__id__exact=current_user_id) | Q(assignee__id__exact=current_user_id)
+            filter_query = Q(case_category='Public') | Q(shared_with__id__exact=current_user_id) | Q(
+                created_by__id__exact=current_user_id) | Q(assignee__id__exact=current_user_id)
             queryset = queryset.filter(filter_query).distinct()
 
         elif is_cases_private_manager:
-            filter_query = Q(case_category='Private') | Q(shared_with__id__exact=current_user_id) | Q(created_by__id__exact=current_user_id) | Q(assignee__id__exact=current_user_id)
+            filter_query = Q(case_category='Private') | Q(shared_with__id__exact=current_user_id) | Q(
+                created_by__id__exact=current_user_id) | Q(assignee__id__exact=current_user_id)
 
             queryset = queryset.filter(filter_query).distinct()
 
         else:
-            filter_query = Q(shared_with__id__exact=current_user_id) | Q(created_by__id__exact=current_user_id) | Q(assignee__id__exact=current_user_id)
+            filter_query = Q(shared_with__id__exact=current_user_id) | Q(created_by__id__exact=current_user_id) | Q(
+                assignee__id__exact=current_user_id)
             queryset = queryset.filter(filter_query).distinct()
         print('end LitigationCasesViewSet - get_queryset')
         return queryset
@@ -1073,9 +1178,9 @@ class LitigationCasesViewSet(CSVRendererMixin2, viewsets.ModelViewSet):
 
         queryset = LitigationCases.objects.all().order_by('-created_by')
         normal_user_filter = (
-            Q(shared_with=current_user)
-            | Q(created_by=current_user)
-            | Q(assignee=current_user)
+                Q(shared_with=current_user)
+                | Q(created_by=current_user)
+                | Q(assignee=current_user)
         )
 
         queryset = queryset.filter(filters)
@@ -1085,7 +1190,8 @@ class LitigationCasesViewSet(CSVRendererMixin2, viewsets.ModelViewSet):
         current_user_id = current_user.id
 
         # Access control logic
-        user_filter = Q(shared_with__id=current_user_id) | Q(created_by__id=current_user_id) | Q(assignee__id=current_user_id)
+        user_filter = Q(shared_with__id=current_user_id) | Q(created_by__id=current_user_id) | Q(
+            assignee__id=current_user_id)
 
         if internal_ref_number:
             queryset = queryset.filter(internal_ref_number=internal_ref_number)
@@ -1160,9 +1266,9 @@ class LitigationCasesViewSet(CSVRendererMixin2, viewsets.ModelViewSet):
             court_set = GetUniqueDictionaries(court)
             case_type_set = GetUniqueDictionaries(case_type)
             assignees_set = GetUniqueDictionaries(assignees)
-            data={'Stage': Stage_set, 'court': court_set, 'case_type': case_type_set,'assignees': assignees_set}
+            data = {'Stage': Stage_set, 'court': court_set, 'case_type': case_type_set, 'assignees': assignees_set}
             cache.set(cache_key, data, timeout=None)
-        return Response(status=status.HTTP_200_OK,data=data)
+        return Response(status=status.HTTP_200_OK, data=data)
 
     @action(methods=['get'], detail=False, serializer_class=CombinedStatisticsSerializer)
     def statistics(self, request):
@@ -1220,6 +1326,7 @@ class LitigationCasesViewSet(CSVRendererMixin2, viewsets.ModelViewSet):
 
         serializer = CombinedStatisticsSerializer(combined_statistics)
         return Response(serializer.data)
+
 
 class FoldersViewSet(viewsets.ModelViewSet):
     model = Folder

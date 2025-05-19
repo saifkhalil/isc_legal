@@ -3,7 +3,7 @@
 {% block content %}
 {% load static %}
 
-<div class="card shadow-sm m-5 mb-3 mt-3 " {% if user.enable_transision %}  data-aos="zoom-in" {% endif %}>
+<div class="card shadow-sm m-5 mb-3 mt-3 " {% if user.enable_transition %}  data-aos="zoom-in" {% endif %}>
   <div class="card-body">
     <form method="GET">
       <div class="row g-3">
@@ -70,12 +70,12 @@
 </div>
 <div class="row px-5 pb-3">
   <div class="col">
-    <a role="button" class="btn btn-primary pulse-primary" href="{% url 'hearings_list' %}" {% if user.enable_transision %}  data-aos="zoom-in" {% endif %}><i class="bi bi-file-earmark-plus"></i> {% trans 'New hearing' %}</a>
+    <a role="button" class="btn btn-primary pulse-primary" href="{% url 'hearings_list' %}" {% if user.enable_transition %}  data-aos="zoom-in" {% endif %}><i class="bi bi-file-earmark-plus"></i> {% trans 'New hearing' %}</a>
   </div>
 </div>
   <section class="px-5 pb-5" >
-    <table class="table {% if hearings|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
-    <thead {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
+    <table class="table {% if hearings|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transition %} data-aos="zoom-in" {% endif %}>
+    <thead {% if user.enable_transition %} data-aos="zoom-in" {% endif %}>
         <tr class="bg-gray-100">
           <td class="pt-3 pb-3 text-bold qi-light">{% trans 'Number' %}</td>
           <td class="pt-3 pb-3 text-bold qi-light">{% trans 'Name' %}</td>
@@ -89,7 +89,7 @@
     </thead>
     <tbody>
       {% for hearing in hearings %}
-        <tr class="bg-white"  {% if user.enable_transision %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
+        <tr class="bg-white"  {% if user.enable_transition %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
           <td class="pt-2 pb-2">{{ hearing.id }}</td>
           <td class="pt-2 pb-2" data-toggle="tooltip" data-placement="top" title="{{ hearing.name|default:''}}"><a href="{% url 'hearing_view' hearing.id %}">{{ hearing.name|truncatechars:40 }}</a> </td>
           <td class="pt-2 pb-2"><button class="cursor-default btn btn-sm btn-{% if hearing.hearing_status.id == 1 %}light{% elif hearing.hearing_status.id == 2 %}warning text-dark{% elif hearing.hearing_status.id == 3 or hearing.hearing_status.id == 5 or hearing.hearing_status.id == 6 %}danger{% elif hearing.hearing_status.id == 4 or hearing.hearing_status.id == 7 %}success{% else %}light text-dark{% endif %}">

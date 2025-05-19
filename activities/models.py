@@ -62,7 +62,7 @@ class task(models.Model):
     description = models.CharField(max_length=250, default='', blank=False, null=False,
                                    verbose_name=_('Task Description'))
     task_category = models.CharField(max_length=500, choices=task_categories, default='Public', blank=False, null=False,
-                                     verbose_name=_('Case Category'))
+                                     verbose_name=_('Task Category'))
     assignee = models.ManyToManyField(User, related_name='task_assignees', blank=False, verbose_name=_('Assigned to'))
     task_status = models.ForeignKey(Status, related_name='%(class)s_task_status', on_delete=models.CASCADE, null=True,
                                     blank=True, verbose_name=_('Task Status'))

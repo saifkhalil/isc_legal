@@ -2,7 +2,7 @@
 {% load static %}
 {% load file_filters %}
 {% load humanize %}
-<div class="card shadow-sm p-3 mb-3" {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
+<div class="card shadow-sm p-3 mb-3" {% if user.enable_transition %} data-aos="zoom-in" {% endif %}>
   <p class="pb-3">{% trans 'Important developments' %}</p>
      <div class="edits-list overflow-auto develop-scroll mb-3" style="height:25vh;">
     {% for impdev in ImportantDevelopments %}

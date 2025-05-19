@@ -1,10 +1,10 @@
 {% load i18n %}
 {% load static %}
-<div class="row mx-0" {% if user.enable_transision %} data-aos="zoom-in-right" data-aos-delay="300" {% endif %}>
+<div class="row mx-0" {% if user.enable_transition %} data-aos="zoom-in-right" data-aos-delay="300" {% endif %}>
 <div class="card shadow-sm p-3 mb-3">
           <p class="pb-3">{% trans 'Tasks' %}</p>
-    <table class="table {% if tasks|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
-    <thead {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
+    <table class="table {% if tasks|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transition %} data-aos="zoom-in" {% endif %}>
+    <thead {% if user.enable_transition %} data-aos="zoom-in" {% endif %}>
         <tr class="bg-gray-100">
           <td class="pt-3 pb-3 text-bold">{% trans 'Sequence' %}</td>
           <td class="pt-3 pb-3 text-bold">{% trans 'Subject' %}</td>
@@ -13,7 +13,7 @@
     </thead>
        <tbody>
     {% for task in tasks  %}
-              <tr {% if user.enable_transision %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
+              <tr {% if user.enable_transition %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
               <td class="pt-2 pb-2">{{ forloop.counter }}</td>
                 <td class="pt-2 pb-2"><a href="{% url 'task_view' task.id %}" target="_blank">{{ task.title }}</a></td>
               <td class="pt-2 pb-2">{{ task.created_at|date:"Y-m-d" }}</td>

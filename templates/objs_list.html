@@ -1,9 +1,12 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% load static i18n file_filters %}
 {% block content %}
 {% include "includes/_render_filter_form.html" with filters=filter_fields session=session %}
 {% include "includes/_create_count.html" with obj_create=obj_create objs_count=objs_count %}
 {% include "includes/_render_table.html" with objs=objs headers=headers fields_to_show=fields_to_show filter_query=filter_query page_range=page_range %}
+
   <script type="text/javascript">
   {% include 'js/objs_list.js' %}
   </script>

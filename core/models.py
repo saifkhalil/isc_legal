@@ -21,6 +21,12 @@ from .model_mixins import ExtraDataModelMixin, HooksModelMixin
 
 
 class priorities(models.Model):
+    PRIORITY_CHOICES = [
+        ("Normal", _("Normal")),
+        ("High", _("High")),
+        ("Critical", _("Critical")),
+        ("Low", _("Low")),
+    ]
     theme_colors= (
         ("primary","primary"),
         ("secondary","secondary"),
@@ -33,7 +39,7 @@ class priorities(models.Model):
     )
 
     id = models.AutoField(primary_key=True, )
-    priority = models.CharField(
+    priority = models.CharField(choices=PRIORITY_CHOICES,
         max_length=250, blank=False, null=False, verbose_name=_('Priority'))
     icon = models.CharField(default='bi bi-bootstrap',
         max_length=250, blank=False, null=False, verbose_name=_('Icon'))
@@ -194,7 +200,7 @@ class Path(MPTTModel):
         blank=True, null=True, verbose_name=_('Administrative Investigation'))
     notation_id = models.IntegerField(blank=True, null=True, verbose_name=_('Notation'))
     contract_id = models.IntegerField(blank=True, null=True, verbose_name=_('Contract'))
-    # is_deleted = models.BooleanField(default=False,verbose_name=_("Is Deleted"))
+    is_deleted = models.BooleanField(default=False,verbose_name=_("Is Deleted"))
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
     created_by = models.ForeignKey(
@@ -304,6 +310,17 @@ class Path(MPTTModel):
 
 
 class Status(models.Model):
+
+    STATUS_CHOICES = [
+        ("Resolved", _("Resolved")),
+        ("Dismissed", _("Dismissed")),
+        ("Suspended", _("Suspended")),
+        ("Closed", _("Closed")),
+        ("Nullified", _("Nullified")),
+        ("In Progress", _("In Progress")),
+        ("New", _("New")),
+    ]
+
     theme_colors= (
         ("primary","primary"),
         ("secondary","secondary"),
@@ -316,7 +333,7 @@ class Status(models.Model):
     )
     
     id = models.AutoField(primary_key=True, )
-    status = models.CharField(
+    status = models.CharField(choices=STATUS_CHOICES,
         max_length=250, blank=False, null=False, verbose_name=_('Status'))
     icon = models.CharField(default='bi bi-bootstrap',
         max_length=250, blank=False, null=False, verbose_name=_('Icon'))

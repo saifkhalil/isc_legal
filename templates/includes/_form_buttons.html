@@ -2,19 +2,19 @@
 
     {% if mode == "edit" or mode == "create" %}
         <!-- Submit & Cancel Buttons -->
-        <button type="submit" class="btn btn-success pulse-success right mb-3" {% if user.enable_transision %} data-aos="fade-left" {% endif %}>
+        <button type="submit" class="btn btn-success pulse-success right mb-3" {% if user.enable_transition %} data-aos="fade-left" {% endif %}>
             <i class="bi bi-floppy"></i> {% trans 'Submit' %}
         </button>
-        <a href="{% url objs_list %}" class="btn btn-danger pulse-danger mr-3 mb-3" {% if user.enable_transision %} data-aos-delay="200" data-aos="fade-left" {% endif %}>
+        <a href="{% url objs_list %}" class="btn btn-danger pulse-danger mr-3 mb-3" {% if user.enable_transition %} data-aos-delay="200" data-aos="fade-left" {% endif %}>
             <i class="bi bi-x-circle"></i> {% trans 'Cancel' %}
         </a>
     {% else %}
         <!-- Edit Button -->
 
-        <a href="{% url obj_edit obj_id %}" class="btn btn-primary pulse mb-3" {% if user.enable_transision %} data-aos="fade-left" {% endif %}>
+        <a href="{% url obj_edit obj_id %}" class="btn btn-primary pulse mb-3" {% if user.enable_transition %} data-aos="fade-left" {% endif %}>
             <i class="bi bi-pencil-square"></i> {% trans 'Edit' %}
         </a>
-          <button type="button" class="btn btn-primary pulse-primary mx-3 mb-3" data-bs-toggle="modal" {% if user.enable_transision %} data-aos-delay="200" data-aos="fade-left" {% endif %} data-bs-target="#ObjHistory" ><i class="bi bi-clock-history"></i> {% trans 'History' %}</button>
+          <button type="button" class="btn btn-primary pulse-primary mx-3 mb-3" data-bs-toggle="modal" {% if user.enable_transition %} data-aos-delay="200" data-aos="fade-left" {% endif %} data-bs-target="#ObjHistory" ><i class="bi bi-clock-history"></i> {% trans 'History' %}</button>
 
     {% endif %}
 

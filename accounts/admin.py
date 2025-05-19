@@ -64,7 +64,7 @@ class UserAdmin(admin.ModelAdmin):
                     "is_sub_manager",
                     "is_blocked",
                     "is_verified",
-                    "enable_transision",
+                    "enable_transition",
                     "groups",
                     "user_permissions",
                 ),

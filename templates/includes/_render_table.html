@@ -2,7 +2,7 @@
 {% load static %}
 <section class="px-5 pb-5">
 <div class="table-responsive">
-<table class="table table-hover shadow-sm" {% if user.enable_transision %}data-aos="zoom-in"{% endif %}>
+<table class="table table-hover shadow-sm" {% if user.enable_transition %}data-aos="zoom-in"{% endif %}>
   <thead>
     <tr class="bg-gray-100 fw-bold">
       {% for header in headers %}
@@ -19,13 +19,13 @@
       </tr>
     {% else %}
       {% for obj in objs %}
-        <tr class="table-row bg-white" {% if user.enable_transision %}data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00"{% endif %}>
+        <tr class="table-row bg-white" {% if user.enable_transition %}data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00"{% endif %}>
           {% for field in fields_to_show %}
   <td class="pt-2 pb-2">
     {% with value=obj|attr:field %}
-      {% if field == 'name' %}
+      {% if field == 'name' or field == 'subject' or field == 'title' %}
         <a href="{% url obj_view obj.id %}">{{ value|truncatechars:40 }}</a>
-      {% elif field == 'created_at' %}
+      {% elif field == 'created_at' or field == 'start_date' or field == 'end_date' or field == 'end_time' %}
         {{ value|date:"Y-m-d" }}
       {% elif field == 'case_category' %}
         {% if value == "Public" %}
@@ -37,15 +37,36 @@
           <i class="bi bi-lock"></i><span> {% trans value %}</span>
           </div>
         {% endif %}
+      {% elif field == 'cases' %}
+        {% if value.all %}
+          {% for case in value.all %}
+                <a href="{% url 'case_view' case.id %}">{{ case|truncatechars:40 }}</a>
+        {% endfor %}
+          {% endif %}
       {% elif field == 'assignee' %}
+        {% if value.all %}
+           <div class="flex">
+          {% for assignee in value.all %}
+            {% include 'includes/_alert_user.html' with value=assignee %}
+        {% endfor %}
+           </div>
+        {% else %}
         {% include 'includes/_alert_user.html' with value=value %}
-      {% elif field == 'case_status' or field == 'hearing_status' or field == 'task_status' or field == 'priority' %}
+          {% endif %}
+      {% elif field == 'case_status' or field == 'hearing_status' or field == 'task_status' %}
         {% if value %}
-          {% include 'includes/_alert_with_icon.html' with value=value %}
+          {% include 'includes/_status_with_icon.html' with value=value %}
         {% endif %}
+      {% elif field == 'priority' %}
+        {% if value %}
+          {% include 'includes/_priority_with_icon.html' with value=value %}
+        {% endif %}
+        {% elif field == 'auto_renewal' %}
+                  {% if value == False %}<i class="bi bi-x-circle-fill text-danger"></i>{% else %}<i class="bi bi-check-circle-fill text-success"></i>{% endif %}
       {% else %}
         {{ value|default:"" }}
       {% endif %}
+
     {% endwith %}
   </td>
 {% endfor %}

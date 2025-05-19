@@ -1,5 +1,10 @@
 {% load i18n %}
 window.addEventListener("load", function() {
+           $(".select2").each(function () {
+             $(this).select2({
+               theme: "bootstrap-5",
+             });
+           });
       const sessionData = JSON.parse('{{ session | escapejs }}');
       const objDeleteURL = "{% url obj_delete 0 %}";
       const popoverTriggerList = [].slice.call(document.querySelectorAll("[data-bs-toggle=\"popover\"]"));

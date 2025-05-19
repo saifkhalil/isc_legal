@@ -2,10 +2,10 @@
 <a href="{% url obj_edit obj.id %}" class="btn btn-sm border border-warning text-warning"><i class="bi bi-pencil-square"></i></a>
 {% if user.is_manager or user.is_superuser %}
   <button class="btn btn-sm border border-danger text-danger delete-obj" data-obj-id="{{ obj.id }}"><i class="bi bi-trash3-fill"></i></button>
-{% else %}
-  <button class="btn btn-sm border border-danger text-danger " disabled>{% trans 'Delete' %}</button>
 {% endif %}
+{% if obj.ImportantDevelopment %}
 <button class="btn btn-sm border border-success text-success " data-bs-toggle="popover" title="{% trans 'Latest important development' %}"
         data-bs-content="<strong>{{ obj.ImportantDevelopment.last|default:'لا يوجد' }}</strong>{% if obj.ImportantDevelopment.last %}<br> {% trans 'Created by' %}: {{ obj.ImportantDevelopment.last.created_by.username }}<br> {% trans 'Created At' %}: {{ obj.ImportantDevelopment.last.created_at|date:'Y:m:d' }}{% endif %}">
   <i class="bi bi-card-list"></i>
 </button>
+{% endif %}

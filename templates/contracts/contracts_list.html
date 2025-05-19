@@ -3,7 +3,7 @@
 {% block content %}
 {% load static %}
 
-<div class="card shadow-sm m-5 mb-3 mt-3 " {% if user.enable_transision %}  data-aos="zoom-in" {% endif %}>
+<div class="card shadow-sm m-5 mb-3 mt-3 " {% if user.enable_transition %}  data-aos="zoom-in" {% endif %}>
   <div class="card-body">
     <form method="GET">
       <div class="row g-3">
@@ -91,12 +91,12 @@
 </div>
 <div class="row px-5 pb-3">
   <div class="col">
-    <a role="button" class="btn btn-primary pulse-primary" href="{% url 'contracts_list' %}" {% if user.enable_transision %}  data-aos="zoom-in" {% endif %}><i class="bi bi-file-earmark-plus"></i> {% trans 'New contract' %}</a>
+    <a role="button" class="btn btn-primary pulse-primary" href="{% url 'contracts_list' %}" {% if user.enable_transition %}  data-aos="zoom-in" {% endif %}><i class="bi bi-file-earmark-plus"></i> {% trans 'New contract' %}</a>
   </div>
 </div>
   <section class="px-5 pb-5" >
-    <table class="table {% if contracts|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
-    <thead {% if user.enable_transision %} data-aos="zoom-in" {% endif %}>
+    <table class="table {% if contracts|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transition %} data-aos="zoom-in" {% endif %}>
+    <thead {% if user.enable_transition %} data-aos="zoom-in" {% endif %}>
         <tr class="bg-gray-100">
           <td class="pt-3 pb-3 text-bold qi-light">{% trans 'Number' %}</td>
           <td class="pt-3 pb-3 text-bold qi-light">{% trans 'Name' %}</td>
@@ -121,7 +121,7 @@
         </tr>
       {% else %}
       {% for contract in contracts %}
-        <tr class="bg-white"  {% if user.enable_transision %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
+        <tr class="bg-white"  {% if user.enable_transition %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
           <td class="pt-2 pb-2">{{ contract.id }}</td>
           <td class="pt-2 pb-2" data-toggle="tooltip" data-placement="top" title="{{ contract.name|default:''}}">{{ contract.name|truncatechars:40 }}</td>
           <td class="pt-2 pb-2">{{ contract.type|default:'' }}</td>

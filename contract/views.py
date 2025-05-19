@@ -26,7 +26,7 @@ from core.classes import dict_item, GetUniqueDictionaries
 from core.models import Notification
 from .models import Contract, Type, Payment, Duration
 from .serializers import ContractSerializer, PaymentSerializer, DurationSerializer, TypeSerializer
-
+from django.utils.translation import gettext_lazy as _
 
 class ContractViewSet(viewsets.ModelViewSet):
     model = Contract
@@ -216,7 +216,6 @@ class ContractViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK,
                         data={'Type': type_set, 'payments': payments_set, 'assignees': assignees_set})
 
-
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all().order_by('-id')
     serializer_class = PaymentSerializer
@@ -235,14 +234,12 @@ class DurationViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "contract.Duration"
 
-
 class TypeViewSet(viewsets.ModelViewSet):
     queryset = Type.objects.all().order_by('-id')
     serializer_class = TypeSerializer
     authentication_classes = [TokenAuthentication, ]
     permission_classes = [permissions.IsAuthenticated, MyPermission]
     perm_slug = "contract.Type"
-
 
 @login_required
 def contracts_list(request):
@@ -372,16 +369,140 @@ def contracts_list(request):
         if value:
             filter_params[key] = value
     filter_query = urlencode(filter_params)
+    objs_count = hearings_qs.count()
+    fields_to_show = [
+        'id', 'name', 'company', 'auto_renewal', 'first_party' ,'second_party', 'type', 'assignee', 'created_at'
+    ]
+
+    headers = [
+        _("Number"), _("Name"), _("Company"), _("Auto Renewal"), _("First Party"), _('Second Party'), _('Type'), _('Assignee'),_('Created At'), _("Actions")
+    ]
+    filter_fields = [
+        {
+            "name": "keywords",
+            "label": _("Search keywords"),
+            "type": "text",
+            "value": keywords,
+        },
+        {
+            "name": "type",
+            "label": _("Type"),
+            "type": "select",
+            "value": type,
+            "options": types_set,
+        },
+        {
+            "name": "assignee",
+            "label": _("Assignee"),
+            "type": "select",
+            "value": assignee,
+            "options": assignees_set,
+        },
+        {
+            "name": "company",
+            "label": _("Company"),
+            "type": "select",
+            "value": company,
+            "options": companies_set,
+        },
+        {
+            "name": "out_side_iraq",
+            "label": _("Company"),
+            "type": "select",
+            "value": out_side_iraq,
+            "options": [
+                {'id':'International','name':_('International')},
+                {'id':'Domestic','name':_('Domestic')}
+            ],
+        },
+        {
+            "name": "auto_renewal",
+            "label": _("Auto Renewal"),
+            "type": "select",
+            "value": auto_renewal,
+            "options": [
+                {'id':'True','name':_('Yes')},
+                {'id':'False','name':_('No')}
+            ],
+        },
+    ]
+    obj_create = {'name': _('New Contract'), 'url': 'administrative_investigation_create'}
     context = {
-        'contracts': page_obj,
-        'assignees': assignees_set,
-        'types': types_set,
-        'companies': companies_set,
+        'fields_to_show': fields_to_show,
+        'headers': headers,
+        'objs': page_obj,
+        'objs_count': objs_count,
+        'obj_view': 'administrative_investigation_view',
+        'obj_edit': 'administrative_investigation_edit',
+        'obj_delete': 'delete_AdministrativeInvestigation',
+        'obj_create': obj_create,
         'page_range': page_range,
         'session': json.dumps(session_info),
+        'filter_fields': filter_fields,
         'filter_query': filter_query,  # New variable for pagination links.
     }
-    return render(request, 'contracts/contracts_list.html', context)
+    return render(request, 'objs_list.html', context)
+
+
+def AdministrativeInvestigations_view(request, administrative_investigation_id=None, mode='view'):
+    log = {}
+    field_translations = {}
+    OPERATION_TRANSLATIONS = {}
+    if administrative_investigation_id:
+        instance = get_object_or_404(AdministrativeInvestigation, pk=administrative_investigation_id)
+        if request.method == 'POST':
+            if mode == 'edit':  # Allow editing only if mode is 'edit'
+                form = AdministrativeInvestigationForm(request.POST, instance=instance, mode=mode)
+                if form.is_valid():
+                    instance = form.save(commit=False)  # Don't save yet, update fields first
+                    instance.modified_by = request.user  # ✅ Correctly update modified_by
+                    instance.modified_at = timezone.now()  # ✅ Correctly update modified_at
+                    instance.save()  # Now save the instance with updated fields
+                    return redirect('administrative_investigations_list')
+            else:
+                form = AdministrativeInvestigationForm(instance=instance, mode=mode)  # Read-only form
+        else:
+            form = AdministrativeInvestigationForm(instance=instance, mode=mode)
+            if mode == 'view':
+                OPERATION_TRANSLATIONS = {
+                    'add': _('Add'),
+                    'delete': _('Delete'),
+                }
+                field_translations = {
+                    field.name: _(field.verbose_name)
+                    for field in AdministrativeInvestigation._meta.fields
+                }
+                field_translations.update({
+                    field.name: _(field.verbose_name)
+                    for field in AdministrativeInvestigation._meta.many_to_many
+                })
+                log = LogEntry.objects.filter(content_type__model='AdministrativeInvestigation', object_id=instance.pk)
+                for field in form.fields:
+                    form.fields[field].widget.attrs['disabled'] = True  # Disable all fields
+
+    else:
+        mode = 'create'  # If no `case_id`, it's a new case
+        instance = AdministrativeInvestigation()
+        form = AdministrativeInvestigationForm(request.POST or None, instance=instance, mode=mode)
+        if request.method == 'POST' and form.is_valid():
+            instance = form.save(commit=False)  # ✅ Correct way to update before saving
+            instance.created_by = request.user  # ✅ Correctly update created_by
+            instance.created_at = timezone.now()  # ✅ Correctly update created_at
+            instance.save()  # ✅ Now save the instance
+            return redirect('administrative_investigations_list')
+    context = {
+        'form': form,
+        'obj': instance,
+        'mode': mode,
+        'logs': log,
+        'obj_edit': 'administrative_investigation_edit',
+        'objs_list': 'administrative_investigations_list',
+        'new_path': 'new_administrative_investigation_path',
+        'new_ImportantDevelopment': 'new_AdministrativeInvestigation_ImportantDevelopment',
+        'field_translations': field_translations,
+        'operation_translations': OPERATION_TRANSLATIONS,
+    }
+    return render(request, 'obj.html', context)
 
 
 @require_POST
@@ -396,4 +517,4 @@ def delete_contract(request, pk=None):
     # Assuming you have a field to record the modifying user:
     instance.modified_by = request.user
     instance.save()
-    return JsonResponse({'success': True, 'message': 'Contract has been deleted successfully.'},status=200)
+    return JsonResponse({'success': True, 'message': _('Contract has been deleted successfully.')},status=200)

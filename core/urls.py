@@ -42,7 +42,7 @@ from .consumers import NotificationConsumer
 from .views import (
     APIPathListView, APIPathView, myhome, about, load_more_notifications, read_all_notifications, read_notification,
     delete_all_notifications, delete_notification, new_path_docs, new_case_comment_reply,
-    new_comment_reply
+    new_comment_reply, delete_path
 )
 from activities.views import ContactWizard,show_message_form_condition
 
@@ -127,6 +127,7 @@ urlpatterns += i18n_patterns(
     path('notations/<int:notation_id>/new_comment/', login_required(new_notation_comment), name='new_notation_comment'),
     # path('paths/<int:path_id>/', login_required(path), name='path_vew'),
     path('paths/<int:path_id>/new_docs', login_required(new_path_docs), name='new_path_docs'),
+    path('paths/<int:path_id>/', login_required(delete_path), name='delete_path'),
     path('AdministrativeInvestigations/', login_required(AdministrativeInvestigations_list), name='administrative_investigations_list'),
     path('AdministrativeInvestigations/create/', login_required(AdministrativeInvestigations_view), {'mode': 'create'}, name='administrative_investigation_create'),
     path('AdministrativeInvestigations/<int:administrative_investigation_id>/edit/', login_required(AdministrativeInvestigations_view), {'mode': 'edit'}, name='administrative_investigation_edit'),
@@ -135,12 +136,14 @@ urlpatterns += i18n_patterns(
     path('AdministrativeInvestigations/<int:administrative_investigation_id>/new_id/', login_required(new_AdministrativeInvestigation_ImportantDevelopment),  name='new_AdministrativeInvestigation_ImportantDevelopment'),
     path('AdministrativeInvestigations/<int:pk>/', login_required(delete_AdministrativeInvestigation), name='delete_AdministrativeInvestigation'),
     path('tasks/', login_required(tasks_list), name='tasks_list'),
+    path('tasks/create/', login_required(task_view), {'mode': 'create'},name='task_create'),
     path('tasks/<int:pk>/', login_required(delete_task), name='delete_task'),
     path('tasks/<int:task_id>/edit/', login_required(task_view),{'mode': 'edit'}, name='task_edit'),
     path('tasks/<int:task_id>/view/', login_required(task_view),{'mode': 'view'},name= 'task_view'),
     path('hearings/', login_required(hearings_list), name='hearings_list'),
     path('hearing/<int:pk>/', login_required(delete_hearing), name='delete_hearing'),
     path('comments/<int:comment_id>/new_reply', login_required(new_comment_reply), name='new_comment_reply'),
+    path('hearings/create/', login_required(hearing_view), {'mode': 'create'}, name='hearing_create'),
     path('hearings/<int:hearing_id>/edit', login_required(hearing_view),{'mode':'edit'}, name='hearing_edit'),
     path('hearings/<int:hearing_id>/view', login_required(hearing_view),{'mode':'view'}, name='hearing_view'),
     path('hearings/<int:hearing_id>/new_comment', login_required(new_hearing_comment), name='new_hearing_comment'),

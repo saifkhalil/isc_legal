@@ -184,7 +184,6 @@ def set_language(request):
 def about(request):
     return render(request, 'about.html')
 
-
 def load_more_notifications(request):
     """Load more notifications via AJAX for infinite scroll."""
     page = int(request.GET.get("page", 1))  # Get current page number
@@ -400,7 +399,6 @@ class repliesViewSet(viewsets.ModelViewSet):
             queryset = replies.objects.all().order_by('-created_at').filter(is_deleted=False)
             cache.set(cache_key, queryset, timeout=None)
         return queryset
-    
 
 class prioritiesViewSet(viewsets.ModelViewSet):
     queryset = priorities.objects.all().order_by('priority')
@@ -618,9 +616,7 @@ class caseseventsViewSet(viewsets.ReadOnlyModelViewSet):
     def perform_update(self, serializer):
         serializer.save(modified_by=self.request.user)
 
-class APIDocumentPathListView(
-    ExternalObjectAPIViewMixin, generics.ListAPIView
-):
+class APIDocumentPathListView(ExternalObjectAPIViewMixin, generics.ListAPIView):
     """
     Returns a list of all the Paths to which a document belongs.
     """
@@ -634,7 +630,6 @@ class APIDocumentPathListView(
     # @method_decorator(cache_page(60 * 60))
     # def dispatch(self, *args, **kwargs):
     #     return super(APIDocumentPathListView, self).dispatch(*args, **kwargs)
-
 
 class APIPathListView(generics.ListCreateAPIView):
     """
@@ -970,9 +965,7 @@ class APIPathDocumentRemoveView(generics.ObjectActionAPIView):
         document = serializer.validated_data['document']
         obj.document_remove(document=document, user=self.request.user)
 
-class APIPathDocumentListView(
-    ExternalObjectAPIViewMixin, generics.ListAPIView
-):
+class APIPathDocumentListView(ExternalObjectAPIViewMixin, generics.ListAPIView):
     """
     get: Returns a list of all the documents contained in a particular Path.
     """
@@ -986,7 +979,6 @@ class APIPathDocumentListView(
         return documents.objects.filter(
             pk__in=self.get_external_object().documents.only('pk')
         )
-
 
 class NotificationViewSet(viewsets.ModelViewSet):
     permission_classes = [
@@ -1165,7 +1157,6 @@ class HasRelatedModelPermission(permissions.BasePermission):
             )
         return False  # Return False for other objects
 
-
 class SelectedPathChildren(generics.RetrieveAPIView):
     serializer_class = YourMPTTModelSerializer
     authentication_classes = [TokenAuthentication, SessionAuthentication]
@@ -1219,6 +1210,24 @@ def new_path_docs(request, path_id=None):
         )
         instance.documents.add(doc)
     return redirect(url)
+
+@require_POST
+def delete_path(request, path_id=None):
+    instance = get_object_or_404(Path, pk=path_id)
+    instance.is_deleted = True
+    instance.modified_by = request.user
+    instance.modified_at = timezone.now()
+    instance.save()
+    return JsonResponse({'success': True, 'message': _('Path has been deleted successfully.')}, status=200)
+
+@require_POST
+def delete_document(request, doc_id=None):
+    instance = get_object_or_404(documents, pk=doc_id)
+    instance.is_deleted = True
+    instance.modified_by = request.user
+    instance.modified_at = timezone.now()
+    instance.save()
+    return JsonResponse({'success': True, 'message': _('Document has been deleted successfully.')}, status=200)
 
 @require_POST
 def new_case_comment_reply(request, case_id=None, comment_id=None):
