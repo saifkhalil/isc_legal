@@ -28,9 +28,12 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.forms import UserAuthenticationForm
+from accounts.forms import UserAuthenticationForm,UserUpdateForm
 from accounts.models import User, Employees
 from accounts.serializers import EmployeesSerializer, EmpSerializer
+from activities.models import task_categories, task, hearing
+from cases.models import LitigationCases
+from contract.models import Contract
 
 
 def get_user_queryset(user=None):
@@ -223,33 +226,40 @@ def registration_view(request):
     return render(request, 'account/register.html', context)
 
 
-def account_view(request):
-    context = {}
-    if request.POST:
-        form = UserUpdateForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.initial = {
-                "email": request.POST['email'],
-                "username": request.POST['username'],
-                "first_name": request.POST['first_name'],
-                "lastname": request.POST['lastname'],
-                "phone": request.POST['phone'],
-            }
-            form.save()
-            context['success_message'] = _("Profile Updated")
-    else:
-        form = UserUpdateForm(
+def calculate_status_counts(queryset, status_field):
+    total = queryset.count()
+    done = queryset.filter(**{f"{status_field}__is_done": True}).count()
+    new = queryset.filter(**{f"{status_field}__status": "New"}).count()
+    progress = total - (done + new)
 
-            initial={
-                "email": request.user.email,
-                "username": request.user.username,
-                "first_name": request.user.first_name,
-                "lastname": request.user.lastname,
-                "phone": request.user.phone,
-            }
-        )
-    context['account_form'] = form
-    return render(request, "account/account.html", context)
+    def percent(part):
+        return int((part / total) * 100) if total > 0 else 0
+
+    return {
+        "count_all": total,
+        "count_done": done,
+        "count_new": new,
+        "count_progress": progress,
+        "count_done_per": percent(done),
+        "count_new_per": percent(new),
+        "count_progress_per": percent(progress),
+    }
+
+
+def account_view(request):
+    user = request.user
+
+    cases_data = calculate_status_counts(LitigationCases.objects.filter(created_by=user), "case_status")
+    tasks_data = calculate_status_counts(task.objects.filter(created_by=user), "task_status")
+    hearings_data = calculate_status_counts(hearing.objects.filter(created_by=user), "hearing_status")
+
+    context = {
+        "cases": cases_data,
+        "tasks": tasks_data,
+        "hearings": hearings_data,
+    }
+
+    return render(request, "user_profile.html", context)
 
 
 def must_authenticate_view(request):

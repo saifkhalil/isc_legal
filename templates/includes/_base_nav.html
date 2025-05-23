@@ -37,15 +37,13 @@
 
               </ul>
               {% include 'includes/_notifications.html' %}
-              {% include 'includes/_languages_selection.html' %}
-              {% include 'includes/_select_theme.html' %}
-
               <button class="btn btn-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 {% include 'includes/_user_with_photo.html' with value=user %}
               </button>
 
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
               <li>
+                <a class="dropdown-item user-item" href="{% url 'my_profile' %}">{% trans 'My Profile' %}</a>
                 <a class="dropdown-item user-item" href="{% url 'account_logout' %}">{% trans 'Logout' %}</a>
               </li>
             </ul>

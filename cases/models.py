@@ -211,7 +211,7 @@ class LitigationCases(BaseModel):
     created_at = models.DateTimeField(editable=False,verbose_name=_('Created At'))
     modified_at = models.DateTimeField(auto_now=True, editable=False, verbose_name=_('Modified at'))
     created_by = models.ForeignKey(
-        User, related_name='%(class)s_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False,verbose_name=_('Created At'))
+        User, related_name='cases_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False,verbose_name=_('Created At'))
     modified_by = models.ForeignKey(
         User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False,verbose_name=_('Modified by'))
 
@@ -413,7 +413,7 @@ class AdministrativeInvestigation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
     created_by = models.ForeignKey(
-        User, related_name='%(class)s_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
+        User, related_name='admininvs_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
     modified_by = models.ForeignKey(
         User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False)
 
@@ -460,7 +460,7 @@ class Notation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
     created_by = models.ForeignKey(
-        User, related_name='%(class)s_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
+        User, related_name='notations_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
     modified_by = models.ForeignKey(
         User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False)
 

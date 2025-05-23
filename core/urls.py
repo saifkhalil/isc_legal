@@ -27,7 +27,7 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView
 )
 
-from accounts.views import SearchEmployeeAPIView
+from accounts.views import SearchEmployeeAPIView, account_view
 from activities.forms import TaskForm, HearingForm, ContactForm1, ContactForm2
 from activities.views import tasks_list, delete_task, hearings_list, delete_hearing, task_view, hearing_view, \
     new_hearing_comment
@@ -36,7 +36,7 @@ from cases.views import cases_list, delete_case, notations_list, delete_notation
     new_case_ImportantDevelopment, new_case_comment, notation_view, new_notation_comment, new_notation_path, \
     new_notation_ImportantDevelopment, AdministrativeInvestigations_view, new_AdministrativeInvestigation_path, \
     new_AdministrativeInvestigation_ImportantDevelopment
-from contract.views import contracts_list, delete_contract
+from contract.views import contracts_list, delete_contract, create_contract_with_payments
 from . import views
 from .consumers import NotificationConsumer
 from .views import (
@@ -107,6 +107,7 @@ urlpatterns += i18n_patterns(
     path('set-theme-color/',views.set_theme_color, name='set_theme_color'),
     path("select2/", include("django_select2.urls")),
     path('',myhome,name='home'),
+    path('myprofile/',login_required(account_view),name='my_profile'),
     path('cases/',login_required(cases_list),name='cases_list'),
     path('cases/create/', login_required(case_view), {'mode': 'create'}, name='case_create'),
     path("get-stages/", get_stages_for_case_type, name="get_stages"),
@@ -148,6 +149,7 @@ urlpatterns += i18n_patterns(
     path('hearings/<int:hearing_id>/view', login_required(hearing_view),{'mode':'view'}, name='hearing_view'),
     path('hearings/<int:hearing_id>/new_comment', login_required(new_hearing_comment), name='new_hearing_comment'),
     path('contracts/', login_required(contracts_list), name='contracts_list'),
+    path('contracts/create', login_required(create_contract_with_payments), name='contracts_create'),
     path('contracts/<int:pk>/', login_required(delete_contract), name='delete_contract'),
     path("load-more-notifications/", load_more_notifications, name="load_more_notifications"),
     path("notifications/read_all", read_all_notifications, name="read_all_notifications"),

@@ -52,7 +52,9 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def set_user_online(self, user_id):
-        cache.set(f"user_online_{user_id}", True, timeout=300)
+        check_cache = cache.get(f"user_online_{user_id}")
+        if not check_cache:
+            cache.set(f"user_online_{user_id}", True,timeout=None)
 
     @database_sync_to_async
     def set_user_offline(self, user_id):

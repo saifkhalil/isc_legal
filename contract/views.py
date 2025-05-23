@@ -24,6 +24,7 @@ from cases.permissions import Manager_SuperUser, MyPermission
 from core.classes import StandardResultsSetPagination
 from core.classes import dict_item, GetUniqueDictionaries
 from core.models import Notification
+from .forms import ContractForm, PaymentFormSet
 from .models import Contract, Type, Payment, Duration
 from .serializers import ContractSerializer, PaymentSerializer, DurationSerializer, TypeSerializer
 from django.utils.translation import gettext_lazy as _
@@ -518,3 +519,27 @@ def delete_contract(request, pk=None):
     instance.modified_by = request.user
     instance.save()
     return JsonResponse({'success': True, 'message': _('Contract has been deleted successfully.')},status=200)
+
+
+def create_contract_with_payments(request):
+    if request.method == 'POST':
+        form = ContractForm(request.POST)
+        formset = PaymentFormSet(request.POST)
+
+        if form.is_valid() and formset.is_valid():
+            contract = form.save()
+            payments = formset.save(commit=False)
+            for payment in payments:
+                payment.contract = contract
+                payment.save()
+            formset.save_m2m()
+            return redirect('contract_list')  # or wherever you want
+
+    else:
+        form = ContractForm()
+        formset = PaymentFormSet(request.POST or None, prefix='payments')
+
+    return render(request, 'contracts/new_contract_form.html', {
+        'form': form,
+        'formset': formset,
+    })

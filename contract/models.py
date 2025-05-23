@@ -39,7 +39,7 @@ class Contract(models.Model):
     is_deleted = models.BooleanField(default=False, verbose_name=_("Is Deleted"))
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
-    created_by = models.ForeignKey(User, related_name='%(class)s_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
+    created_by = models.ForeignKey(User, related_name='contracts_createdby', on_delete=models.CASCADE, blank=True, null=True, editable=False)
     modified_by = models.ForeignKey(User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False)
 
     def __str__(self):

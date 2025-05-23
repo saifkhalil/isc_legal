@@ -5,7 +5,8 @@ from .models import *
 
 
 class taskAdmin(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('id', 'title', 'description',  'due_date', 'assign_date', 'task_status', 'is_deleted','modified_by')
+    list_display = ('id', 'title', 'description',  'due_date', 'assign_date', 'task_status', 'is_deleted' ,'created_by','modified_by')
+    fields = ('title', 'description',  'due_date', 'assign_date', 'task_status', 'is_deleted' ,'created_by','modified_by')
 
 
 class hearingAdmin(ImportExportModelAdmin, admin.ModelAdmin):

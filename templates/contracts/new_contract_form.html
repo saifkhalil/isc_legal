@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+{% load static %}
+{% load django_bootstrap5 %}
+<link href="{% static 'css/select2.min.css' %}" rel="stylesheet">
+<link href="{% static 'css/select2-bootstrap-5-theme.min.css' %}" rel="stylesheet">
+<div class="content m-5">
+
+  <form method="post" novalidate>
+  <div class="row mb-50">
+    <div class="col-sm-12 col-md-6 col-lg-6 mb-3">
+    {% csrf_token %}
+      <input type="hidden" name="payments-TOTAL_FORMS" id="id_payments-TOTAL_FORMS">
+      <div class="card shadow-sm p-3" {% if user.enable_transition %} data-aos="zoom-in-left" {% endif %}>
+      <p class="pb-3">{% trans 'Basic Information' %}</p>
+      {% bootstrap_form form  %}
+      </div>
+</div>
+<div class="col-sm-12 col-md-6 col-lg-6 mb-3">
+<div class="card shadow-sm p-3" {% if user.enable_transition %} data-aos="zoom-in-left" {% endif %}>
+ <p class="pb-3">{% trans 'Payment information' %}</p>
+{{ formset.management_form }}
+
+<div id="payment-forms">
+    {% for form in formset %}
+      <div class="row payment-form">
+      <div class="col-3">
+            {{ form.duration.errors }}
+    <label for="{{ form.duration.id_for_label }}">Duration</label>
+    {{ form.duration }}
+      </div>
+            <div class="col-3">
+            {{ form.amount.errors }}
+    <label for="{{ form.amount.id_for_label }}">Amount</label>
+    {{ form.amount }}
+      </div>
+            <div class="col-3">
+            {{ form.date.errors }}
+    <label for="{{ form.date.id_for_label }}">date</label>
+    {{ form.date }}
+      </div>
+{#      {% for field in form %}#}
+{#            <div class="mb-3">#}
+{#        {{ field.errors }}#}
+{#        {{ field.label_tag }} {{ field }}#}
+{#    </div>#}
+{#        {% endfor %}#}
+{#      {% bootstrap_form form layout='inline' %}#}
+            {% if form.DELETE %}
+                <div class="form-check" style="display: none">
+                    {{ form.DELETE }} <label class="form-check-label">Delete</label>
+                </div>
+            {% endif %}
+       <div class="col-3 ">
+            <button type="button" class="btn btn-danger remove-payment align-bottom mt-2"><i class="bi bi-x-circle"></i></button>
+       </div>
+       <hr class="my-2">
+      </div>
+
+    {% endfor %}
+</div>
+</div>
+<button type="button" class="btn btn-secondary" id="add-payment">{% trans 'Add Payment' %}</button>
+
+</div>
+    <button type="submit" class="btn btn-primary">{% trans 'Save' %}</button>
+  </div>
+  </form>
+    </div>
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/select2.min.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const paymentFormsContainer = document.getElementById('payment-forms');
+    const addButton = document.getElementById('add-payment');
+    const totalForms = document.querySelector('#id_payments-TOTAL_FORMS');
+
+    if (!totalForms) {
+        console.error('TOTAL_FORMS input not found. Did you include {{ formset.management_form }} inside the form?');
+        return;
+    }
+
+    addButton.addEventListener('click', function () {
+        const currentFormCount = parseInt(totalForms.value);
+        const firstForm = document.querySelector('.payment-form');
+        const newForm = firstForm.cloneNode(true);
+        newForm.style.display = 'flex';
+        // Reset values and update indexes
+        Array.from(newForm.querySelectorAll('input, select')).forEach(input => {
+            if (input.type === 'checkbox' || input.type === 'radio') {
+                input.checked = false;
+            } else {
+                input.value = '';
+            }
+
+            if (input.name) {
+                input.name = input.name.replace(/-\d+-/, `-${currentFormCount}-`);
+            }
+            if (input.id) {
+                input.id = input.id.replace(/-\d+-/, `-${currentFormCount}-`);
+            }
+        });
+
+        newForm.innerHTML = newForm.innerHTML.replace(/-0-/g, `-${currentFormCount}-`);
+        totalForms.value = currentFormCount + 1;
+
+        paymentFormsContainer.appendChild(newForm);
+    });
+
+    paymentFormsContainer.addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-payment')) {
+            const form = e.target.closest('.payment-form');
+            const deleteCheckbox = form.querySelector('input[type=checkbox][name$="-DELETE"]');
+            if (deleteCheckbox) {
+                deleteCheckbox.checked = true;
+                form.style.display = 'none';
+            } else {
+                form.remove();
+                totalForms.value = parseInt(totalForms.value) - 1;
+            }
+        }
+    });
+});
+$(".select2").each(function () {
+          $(this).select2({
+              theme: "bootstrap-5",
+              width: "100%",
+          });
+      });
+</script>
+
+{% endblock %}
