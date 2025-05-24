@@ -42,7 +42,7 @@ from .consumers import NotificationConsumer
 from .views import (
     APIPathListView, APIPathView, myhome, about, load_more_notifications, read_all_notifications, read_notification,
     delete_all_notifications, delete_notification, new_path_docs, new_case_comment_reply,
-    new_comment_reply, delete_path
+    new_comment_reply, delete_path,Paths_list
 )
 from activities.views import ContactWizard,show_message_form_condition
 
@@ -150,6 +150,7 @@ urlpatterns += i18n_patterns(
     path('hearings/<int:hearing_id>/new_comment', login_required(new_hearing_comment), name='new_hearing_comment'),
     path('contracts/', login_required(contracts_list), name='contracts_list'),
     path('contracts/create', login_required(create_contract_with_payments), name='contracts_create'),
+    path('paths/', login_required(Paths_list), name='paths_list'),
     path('contracts/<int:pk>/', login_required(delete_contract), name='delete_contract'),
     path("load-more-notifications/", load_more_notifications, name="load_more_notifications"),
     path("notifications/read_all", read_all_notifications, name="read_all_notifications"),

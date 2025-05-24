@@ -31,7 +31,7 @@ class Contract(models.Model):
     third_party = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Third Party'))
     auto_renewal = models.BooleanField(default=False, verbose_name=_("Auto Renewal"))
     penal_clause = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Penal clause'))
-    paths = models.ManyToManyField(Path, blank=True, verbose_name=_('Paths'))
+    paths = models.ManyToManyField(Path, blank=True, verbose_name=_('Paths'),related_name='contracts')
     assignee = models.ForeignKey(User, related_name='%(class)s_assignee', on_delete=models.CASCADE, null=True, blank=True, verbose_name=_('Assignee'))
     shared_with = models.ManyToManyField(User, related_name='%(class)s_shared_with', blank=True, verbose_name=_('Shared With'))
     ImportantDevelopment = models.ManyToManyField(ImportantDevelopment, related_name='%(class)s_ImportantDevelopment', blank=True, verbose_name=_('Important Development'))

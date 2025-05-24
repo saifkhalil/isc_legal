@@ -1,6 +1,6 @@
 {% load file_filters i18n %}
 {% load static %}
-<section class="px-5 pb-5">
+<section class="px-5">
 <div class="table-responsive">
 <table class="table table-hover shadow-sm" {% if user.enable_transition %}data-aos="zoom-in"{% endif %}>
   <thead>
@@ -79,45 +79,4 @@
   </tbody>
 </table>
 </div>
-    <!-- Start of Pagination -->
-    <nav aria-label="Page navigation shadow-sm">
-      <ul class="pagination justify-content-center flex-wrap">
-        {% if objs.has_previous %}
-          <li class="page-item">
-            <a class="btn btn-light"
-               href="?{{ filter_query }}&page={{ objs.previous_page_number }}">{% trans 'Previous' %}</a>
-          </li>
-        {% else %}
-          <li class="page-item disabled">
-            <button class="btn btn-light " disabled aria-disabled="true">{% trans 'Previous' %}</button>
-          </li>
-        {% endif %}
-        {% for i in page_range %}
-          {% if objs.number == i %}
-            <li class="page-item active">
-              <span class="btn btn-secondary">{{ i }} <span class="visually-hidden">{% trans 'current' %}</span></span>
-            </li>
-          {% else %}
-            {% if i == objs.paginator.ELLIPSIS %}
-              <button class="page-item disabled" aria-disabled="true"><span class="btn btn-light">{{ i }}</span>
-              </button>
-            {% else %}
-              <li class="page-item">
-                <a class="btn btn-light" href="?{{ filter_query }}&page={{ i }}">{{ i }}</a>
-              </li>
-            {% endif %}
-          {% endif %}
-        {% endfor %}
-        {% if objs.has_next %}
-          <li class="page-item">
-            <a class="btn btn-light" href="?{{ filter_query }}&page={{ objs.next_page_number }}">{% trans 'Next' %}</a>
-          </li>
-        {% else %}
-          <li class="page-item disabled">
-            <button class="btn btn-light " disabled aria-disabled="true">{% trans 'Next' %}</button>
-          </li>
-        {% endif %}
-      </ul>
-    </nav>
-<!-- End of Pagination -->
 </section>

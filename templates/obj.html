@@ -38,7 +38,7 @@
       </div>
       <div class="col-sm-12 col-md-12 col-lg-4">
         {% if obj.paths %}
-        {% include "includes/_paths.html" with new_path=new_path obj_id=obj.id paths=obj.paths.all user=user %}
+        {% include "includes/_paths_obj_list.html" with new_path=new_path obj_id=obj.id paths=obj.paths.all user=user %}
         {% endif %}
       {% if obj.hearing %}
             {% include "includes/_hearings.html" with hearings=obj.hearing.all user=user %}

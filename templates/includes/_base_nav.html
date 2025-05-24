@@ -34,10 +34,12 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'administrative_investigations_list' %}"><i class="fa fa-eercast" aria-hidden="true"></i> {% trans 'Administrative investigations' %}</a>
                 </li>
-
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'paths_list' %}"><i class="fa fa-folder" aria-hidden="true"></i> {% trans 'Paths' %}</a>
+                </li>
               </ul>
               {% include 'includes/_notifications.html' %}
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <button class="nav-item nav-link dropdown-toggle bg-transparent" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 {% include 'includes/_user_with_photo.html' with value=user %}
               </button>
 

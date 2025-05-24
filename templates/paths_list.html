@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static i18n file_filters %}
+{% block content %}
+{% include "includes/_render_filter_form.html" with filters=filter_fields session=session %}
+{% include "includes/_create_count.html" with objs_count=objs_count %}
+  <div class="mx-5">
+{% include "includes/_paths_table.html" with new_path=new_path paths=objs user=user %}
+{% include 'includes/_pagination.html' with objs=objs filter_query=filter_query %}
+  </div>
+<div class="modal fade modal-lg" id="NewDocs" tabindex="-1" aria-labelledby="New Docs" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="NewPath">{% trans 'Upload Documents' %}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{% url 'new_path_docs' 9999 %}" id="upload-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="url" id="url" value="">
+        <div class="modal-body">
+          <input type="file" class="form-control" name="attachments" id="attachments" placeholder="{% trans 'Documents' %}"
+                 aria-label="Path Name" required multiple>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">{% trans 'Submit' %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+  </script>
+{% endblock %}

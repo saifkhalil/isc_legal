@@ -1,8 +1,9 @@
 import calendar
+import json
 import re
 from datetime import date
 from datetime import datetime, timedelta
-
+from urllib.parse import urlencode
 import django_filters.rest_framework
 from auditlog.models import LogEntry
 from django.conf import settings
@@ -1192,6 +1193,130 @@ class SelectedPathChildren(generics.RetrieveAPIView):
         serialized_tree['subPaths'] = get_nested_children(selected_path)
 
         return Response(serialized_tree)
+
+
+@login_required
+def Paths_list(request):
+    number_of_records = 10
+    keywords = priority = None
+    user = request.user
+    if request.method == 'GET':
+        # Clear filters and redirect if needed.
+        if request.GET.get('clear'):
+            for key in ['keywords', 'number_of_records']:
+                request.session.pop(key, None)
+            return redirect(request.path)
+
+        # Retrieve filter parameters from GET or session.
+        if 'keywords' in request.GET:
+            keywords = request.GET.get('keywords')
+            request.session['keywords'] = keywords  # Update session even if empty
+        else:
+            keywords = request.session.get('keywords', '')
+
+        # Save parameters to session if provided.
+        for key, value in (('keywords', keywords),):
+            if value is not None:
+                request.session[key] = value
+
+        # Handle number_of_records.
+        if request.GET.get('number_of_records'):
+            try:
+                number_of_records = int(request.GET.get('number_of_records'))
+            except ValueError:
+                number_of_records = 10
+            request.session['number_of_records'] = number_of_records
+        else:
+            number_of_records = request.session.get('number_of_records', 10)
+
+        # Build search query using Q objects.
+        query = Q()
+        if keywords:
+            query |= Q(name__icontains=keywords)
+
+        # Get base queryset.
+        cache_key = "Paths_objects"
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            Paths_qs = cached_data
+        else:
+            Paths_qs = Path.objects.filter(is_deleted=False).exclude(id=24).exclude(parent=24).order_by(
+                '-created_by')
+            cache.set(cache_key, Paths_qs, timeout=None)
+        Paths_qs = Paths_qs.filter(query)
+        # Retrieve filter dropdown data from cache or compute if not cached.
+        if user.is_manager or user.is_superuser:
+            Paths_qs = Paths_qs
+        elif user.is_cases_public_manager:
+            # Apply filters.
+            Paths_qs = Paths_qs
+
+        else:
+            cases_filter = Q(cases__shared_with=user) | Q(cases__created_by=user) | Q(cases__assignee=user)
+            admins_filter = Q(AdministrativeInvestigations__shared_with=user) | Q(AdministrativeInvestigations__created_by=user) | Q(AdministrativeInvestigations__assignee=user)
+            notations_filter = Q(notations__shared_with=user) | Q(notations__created_by=user) | Q(notations__assignee=user)
+            folders_filter = Q(folders__shared_with=user) | Q(folders__created_by=user) | Q(folders__assignee=user)
+            contracts_filter = Q(contracts__shared_with=user) | Q(contracts__created_by=user) | Q(contracts__assignee=user)
+            filter_query= Q()
+            filter_query.add(cases_filter,Q.OR)
+            filter_query.add(notations_filter,Q.OR)
+            filter_query.add(admins_filter,Q.OR)
+            filter_query.add(folders_filter,Q.OR)
+            filter_query.add(contracts_filter,Q.OR)
+            Paths_qs = Paths_qs.filter(filter_query)
+    else:
+        Paths_qs = Path.objects.filter(is_deleted=False).order_by(
+            '-created_by')
+
+    # Set up pagination.
+    paginator = Paginator(Paths_qs, number_of_records)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    page_range = paginator.get_elided_page_range(number=page_number, on_each_side=2, on_ends=2)
+
+    # Prepare session info for the template.
+    session_info = {
+        'number_of_records': number_of_records or 10,
+        'keywords': keywords or '',
+    }
+
+    # Build a filter query string to be used in pagination links.
+    # Only include filter keys (exclude 'page').
+    filter_params = {}
+    for key in ['keywords', 'number_of_records']:
+        value = request.session.get(key)
+        if value:
+            filter_params[key] = value
+    filter_query = urlencode(filter_params)
+    objs_count = Paths_qs.count()
+    fields_to_show = [
+        'id', 'name', 'created_at',
+    ]
+
+    headers = [
+        _("Number"), _("Name"), _("Created At"), _("Actions")
+    ]
+    filter_fields = [
+        {
+            "name": "keywords",
+            "label": _("Search keywords"),
+            "type": "text",
+            "value": keywords,
+        },
+    ]
+    context = {
+        'fields_to_show': fields_to_show,
+        'headers': headers,
+        'new_path':'hearing_create',
+        'objs': page_obj,
+        'objs_count': objs_count,
+        'page_range': page_range,
+        'session': json.dumps(session_info),
+        'filter_fields': filter_fields,
+        'filter_query': filter_query,  # New variable for pagination links.
+    }
+    return render(request, 'paths_list.html', context)
+
 
 @require_POST
 def new_path_docs(request, path_id=None):

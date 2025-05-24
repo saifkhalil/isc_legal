@@ -1,0 +1,52 @@
+{% load i18n %}
+{% load file_filters %}
+{% load static %}
+<div class="row mx-0">
+  <div class="card shadow-sm p-3 mb-3" {% if user.enable_transition %} data-aos="zoom-in" {% endif %}>
+{% include 'includes/_paths_upload_title.html' %}
+{% include 'includes/_paths_table.html' with paths=paths %}
+  </div>
+</div>
+
+<div class="modal fade modal-lg" id="NewPath" tabindex="-1" aria-labelledby="New Path" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="NewPath">{% trans 'New Path' %}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{% if obj_id %}{% url new_path obj_id %}{% else %}{% url new_path %}{% endif %}" method="post">
+        {% csrf_token %}
+        <div class="modal-body">
+          <input type="text" class="form-control" name="name" id="name" placeholder="{% trans 'Path Name' %}"
+                 aria-label="Path Name" required>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">{% trans 'Submit' %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade modal-lg" id="NewDocs" tabindex="-1" aria-labelledby="New Docs" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="NewPath">{% trans 'Upload Documents' %}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{% url 'new_path_docs' 9999 %}" id="upload-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="url" id="url" value="">
+        <div class="modal-body">
+          <input type="file" class="form-control" name="attachments" id="attachments" placeholder="{% trans 'Documents' %}"
+                 aria-label="Path Name" required multiple>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">{% trans 'Submit' %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -179,7 +179,7 @@ class LitigationCases(BaseModel):
     court = models.ForeignKey(court, on_delete=models.CASCADE, blank=True, null=True, verbose_name=_('Court name'))
     documents = models.ManyToManyField(documents, blank=True, verbose_name=_('Documents'))
 
-    paths = models.ManyToManyField(Path, blank=True, verbose_name=_('Paths'))
+    paths = models.ManyToManyField(Path, blank=True, verbose_name=_('Paths'),related_name='cases')
     client_position = models.ForeignKey('client_position', on_delete=models.CASCADE, blank=True, null=True,
                                         verbose_name=_('Client Position'))
     opponent_position = models.ForeignKey('opponent_position', on_delete=models.CASCADE, blank=True, null=True,
@@ -298,7 +298,7 @@ class Folder(models.Model):
                                     verbose_name=_('Folder type'))
     court = models.ForeignKey(court, on_delete=models.CASCADE, blank=True, null=True, verbose_name=_('Court name'))
     documents = models.ManyToManyField(documents, blank=True, verbose_name=_('Documents'))
-    paths = models.ManyToManyField(Path, blank=True, verbose_name=_('Paths'))
+    paths = models.ManyToManyField(Path, blank=True, verbose_name=_('Paths'),related_name='folders')
     assignee = models.ForeignKey(User, related_name='%(class)s_assignee', on_delete=models.CASCADE, null=True,
                                  blank=True, verbose_name=_('Assignee'))
     shared_with = models.ManyToManyField(User, related_name='%(class)s_shared_with', blank=True,
@@ -394,7 +394,7 @@ class AdministrativeInvestigation(models.Model):
     subject = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Subject'))
     admin_order_number = models.CharField(max_length=500, blank=True, null=True,
                                           verbose_name=_('Administrative order number'))
-    paths = models.ManyToManyField(Path, blank=True, verbose_name=_('Paths'))
+    paths = models.ManyToManyField(Path, blank=True, verbose_name=_('Paths'),related_name='AdministrativeInvestigations')
     chairman = models.ForeignKey(Employees, related_name='%(class)s_chairman', on_delete=models.CASCADE, null=True,
                                  blank=True, verbose_name=_('Chairman of the Committee'))
     members = models.ManyToManyField(Employees, related_name='%(class)s_members', blank=True,
@@ -439,7 +439,7 @@ class Notation(models.Model):
                                         verbose_name=_('Reference Number'))
     reference_date = models.DateField(null=True, blank=True)
     notation_date = models.DateField(null=True, blank=True)
-    paths = models.ManyToManyField(Path, blank=True, verbose_name=_('Paths'))
+    paths = models.ManyToManyField(Path, blank=True, verbose_name=_('Paths'),related_name='notations')
     requester = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Requester'))
     court = models.ForeignKey(court, on_delete=models.CASCADE, blank=True, null=True, verbose_name=_('Court name'))
     judge = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('Judge Name'))

@@ -1,11 +1,13 @@
 {% load static i18n file_filters %}
 <div class="px-5 pb-2">
+{% if obj_create %}
   <a role="button"
      class="btn btn-primary pulse-primary"
      href="{% url obj_create.url %}"
      {% if user.enable_transition %}data-aos="zoom-in"{% endif %}>
     <i class="bi bi-file-earmark-plus"></i> {% trans obj_create.name %}
   </a>
+{% endif %}
 </div>
   <div class="px-5 pb-2 text-dark">
     <p>{% trans 'Count' %}: {{ objs_count|default:0 }}</p>
