@@ -105,6 +105,7 @@ urlpatterns += i18n_patterns(
     path('i18n/', include('django.conf.urls.i18n')),
     path('set-language/',views.set_language, name='set_language'),
     path('set-theme-color/',views.set_theme_color, name='set_theme_color'),
+    path('set-animation/',views.set_animation, name='set_animation'),
     path("select2/", include("django_select2.urls")),
     path('',myhome,name='home'),
     path('myprofile/',login_required(account_view),name='my_profile'),

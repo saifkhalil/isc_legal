@@ -1,0 +1,8 @@
+{% load i18n %}
+<form action="{% url 'set_animation' %}" method="post" class="d-flex">
+  {% csrf_token %}
+  <div class="form-check form-switch">
+  <input class="form-check-input" type="checkbox" role="switch" id="animation" name="animation" onchange="this.form.submit()" {% if user.enable_transition %}checked{% endif %}>
+  <label class="form-check-label" for="animation"></label>
+</div>
+</form>

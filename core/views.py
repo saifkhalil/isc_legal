@@ -148,6 +148,18 @@ def set_theme_color(request):
 
     return redirect(request.META.get("HTTP_REFERER", "/"))
 
+
+@login_required
+def set_animation(request):
+    if request.method == "POST":
+        animation = True if request.POST.get("animation") == 'on' else False
+        print(f'{request.POST}')
+        if request.user.is_authenticated:
+            request.user.enable_transition = animation
+            request.user.save()
+
+    return redirect(request.META.get("HTTP_REFERER", "/"))
+
 @login_required
 def set_language(request):
     if request.method == "POST":

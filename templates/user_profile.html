@@ -20,47 +20,56 @@
         <div class="card mb-4 mb-lg-0 shadow-sm">
           <div class="card-body">
             <div class="row mb-1">
-              <div class="col-sm-4">
+              <div class="col-sm-5">
                 <p class="mb-0">{% trans 'Full Name' %}</p>
               </div>
-              <div class="col-sm-8">
+              <div class="col-sm-7">
                 <p class="text-muted mb-0">{{ user.username }}</p>
               </div>
             </div>
             <hr>
             <div class="row mb-1">
-              <div class="col-sm-4">
+              <div class="col-sm-5">
                 <p class="mb-0">{% trans 'Email' %}</p>
               </div>
-              <div class="col-sm-8">
+              <div class="col-sm-7">
                 <p class="text-muted mb-0">{{ user.email }}</p>
               </div>
             </div>
             <hr>
             <div class="row mb-1">
-              <div class="col-sm-4">
+              <div class="col-sm-5">
                 <p class="mb-0">{% trans 'Last Login' %}</p>
               </div>
-              <div class="col-sm-8">
+              <div class="col-sm-7">
                 <p class="text-muted mb-0">{{ user.last_login }}</p>
               </div>
             </div>
             <hr>
             <div class="row mb-1">
-              <div class="col-sm-4 mt-2">
+              <div class="col-sm-5 mt-2">
                 <p class="mb-0">{% trans 'Language' %}</p>
               </div>
-              <div class="col-sm-8 mt-1">
+              <div class="col-sm-7 mt-1">
                 {% include 'includes/_languages_selection.html' %}
               </div>
             </div>
             <hr>
             <div class="row mb-1">
-              <div class="col-sm-4 mt-2">
+              <div class="col-sm-5 mt-2">
                 <p class="mb-0">{% trans 'Theme' %}</p>
               </div>
-              <div class="col-sm-8 mt-1">
+              <div class="col-sm-7 mt-1">
                 {% include 'includes/_select_theme.html' %}
+              </div>
+            </div>
+            <hr>
+            <div class="row mb-1">
+              <div class="col-sm-5 mt-2">
+                <p class="mb-0">{% trans 'Enable Animations' %}</p>
+              </div>
+              <div class="col-sm-7 mt-1">
+                {% include 'includes/_select_animation.html' %}
               </div>
             </div>
           </div>
