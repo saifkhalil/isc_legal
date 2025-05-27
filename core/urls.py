@@ -30,13 +30,14 @@ from rest_framework_simplejwt.views import (
 from accounts.views import SearchEmployeeAPIView, account_view
 from activities.forms import TaskForm, HearingForm, ContactForm1, ContactForm2
 from activities.views import tasks_list, delete_task, hearings_list, delete_hearing, task_view, hearing_view, \
-    new_hearing_comment
+    new_hearing_comment, new_task_comment, new_task_path
 from cases.views import cases_list, delete_case, notations_list, delete_notation, AdministrativeInvestigations_list, \
     delete_AdministrativeInvestigation, case_view, get_stages_for_case_type, new_case_path, \
     new_case_ImportantDevelopment, new_case_comment, notation_view, new_notation_comment, new_notation_path, \
     new_notation_ImportantDevelopment, AdministrativeInvestigations_view, new_AdministrativeInvestigation_path, \
     new_AdministrativeInvestigation_ImportantDevelopment
-from contract.views import contracts_list, delete_contract, create_contract_with_payments
+from contract.views import contracts_list, delete_contract, create_contract_with_payments, contract_view, \
+    new_contract_ImportantDevelopment, new_contract_comment
 from . import views
 from .consumers import NotificationConsumer
 from .views import (
@@ -142,6 +143,8 @@ urlpatterns += i18n_patterns(
     path('tasks/<int:pk>/', login_required(delete_task), name='delete_task'),
     path('tasks/<int:task_id>/edit/', login_required(task_view),{'mode': 'edit'}, name='task_edit'),
     path('tasks/<int:task_id>/view/', login_required(task_view),{'mode': 'view'},name= 'task_view'),
+    path('tasks/<int:task_id>/new_comment/', login_required(new_task_comment),name= 'new_task_comment'),
+    path('tasks/<int:task_id>/new_path/', login_required(new_task_path),name= 'new_task_path'),
     path('hearings/', login_required(hearings_list), name='hearings_list'),
     path('hearing/<int:pk>/', login_required(delete_hearing), name='delete_hearing'),
     path('comments/<int:comment_id>/new_reply', login_required(new_comment_reply), name='new_comment_reply'),
@@ -150,7 +153,12 @@ urlpatterns += i18n_patterns(
     path('hearings/<int:hearing_id>/view', login_required(hearing_view),{'mode':'view'}, name='hearing_view'),
     path('hearings/<int:hearing_id>/new_comment', login_required(new_hearing_comment), name='new_hearing_comment'),
     path('contracts/', login_required(contracts_list), name='contracts_list'),
-    path('contracts/create', login_required(create_contract_with_payments), name='contracts_create'),
+    path('contracts/create', login_required(create_contract_with_payments), name='contract_create'),
+    path('contracts/<int:contract_id>/edit', login_required(contract_view),{'mode':'edit'}, name='contract_edit'),
+    path('contracts/<int:contract_id>/view', login_required(contract_view),{'mode':'view'}, name='contract_view'),
+    path('contracts/<int:contract_id>/new_id/', login_required(new_contract_ImportantDevelopment),
+         name='new_contract_ImportantDevelopment'),
+    path('contracts/<int:contract_id>/new_comment', login_required(new_contract_comment), name='new_contract_comment'),
     path('paths/', login_required(Paths_list), name='paths_list'),
     path('contracts/<int:pk>/', login_required(delete_contract), name='delete_contract'),
     path("load-more-notifications/", load_more_notifications, name="load_more_notifications"),

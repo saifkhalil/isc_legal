@@ -942,10 +942,25 @@ def task_view(request, task_id=None,mode='view'):
         'logs': log,
         'obj_edit': 'task_edit',
         'objs_list': 'tasks_list',
+        'new_path': 'new_task_path',
+        'obj_new_comment':'new_task_comment',
         'field_translations': field_translations,
         'operation_translations': OPERATION_TRANSLATIONS,
     }
-    return render(request, 'activities/task_view.html', context=context)
+    return render(request, 'obj.html', context=context)
+
+@require_POST
+def new_task_comment(request, task_id=None):
+    instance = get_object_or_404(task, pk=task_id)
+    instance.comments.create(comment=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
+    return redirect('hearing_view',hearing_id=task_id)
+
+
+@require_POST
+def new_task_path(request, task_id=None):
+    instance = get_object_or_404(task, pk=task_id)
+    instance.paths.create(name=request.POST.get('name'))
+    return redirect('case_view', case_id=task_id)
 
 @require_POST
 def delete_task(request, pk=None):

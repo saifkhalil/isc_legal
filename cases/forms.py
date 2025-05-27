@@ -57,10 +57,7 @@ class CaseForm(ModelForm):
         self.fields['end_time'].input_formats = ('%Y-%m-%dT%H:%M',)
         self.fields["Stage"].widget.attrs["disabled"] = True
         restricted_fields = [
-            "case_close_status",
-            "case_close_comment",
-            "ImportantDevelopment",
-            "comments",
+            "payments",
         ]
 
         if mode not in ["edit", "view"]:

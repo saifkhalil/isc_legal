@@ -94,3 +94,4 @@ class AutoUpdateFieldsMiddleware:
                         obj.save()
 
         return response
+

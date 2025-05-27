@@ -56,10 +56,10 @@
                         {{ translated_name|default:change }}
                         {% endwith %}
                       {% endfor %}
-                    <button data-bs-toggle="collapse" class="underline cursor-pointer text-xs text-green-600" data-bs-target="#log_{{ log.id }}" aria-expanded="false" aria-controls="log_{{ log.id }}" style="cursor: pointer;">{% trans 'See more' %}</button>
+                    <button data-bs-toggle="collapse" class="underline cursor-pointer text-xs text-green-600 bg-transparent" data-bs-target="#log_{{ log.id }}" aria-expanded="false" aria-controls="log_{{ log.id }}" style="cursor: pointer;">{% trans 'See more' %}</button>
                   {% else %}
                     <span>{% trans 'Litigation Case' %}</span>
-                    <button data-bs-toggle="collapse" class="underline cursor-pointer text-xs text-green-600" data-bs-target="#log_{{ log.id }}" aria-expanded="false" aria-controls="log_{{ log.id }}" style="cursor: pointer;">{% trans 'See more' %}</button>
+                    <button data-bs-toggle="collapse" class="underline cursor-pointer text-xs text-green-600 bg-transparent" data-bs-target="#log_{{ log.id }}" aria-expanded="false" aria-controls="log_{{ log.id }}" style="cursor: pointer;">{% trans 'See more' %}</button>
                   {% endif %}
                   </div>
                   <div class="text-qibackground text-xs text-right" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ log.timestamp|date:"Y-m-d h:i:s a" }}">{{ log.timestamp|naturaltime }}</div>

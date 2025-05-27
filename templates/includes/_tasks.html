@@ -2,7 +2,7 @@
 {% load static %}
 <div class="row mx-0" {% if user.enable_transition %} data-aos="zoom-in-right" data-aos-delay="300" {% endif %}>
 <div class="card shadow-sm p-3 mb-3">
-          <p class="pb-3">{% trans 'Tasks' %}</p>
+          <p class="pb-3"><i class="bi bi-card-checklist"></i> {% trans 'Tasks' %}</p>
     <table class="table {% if tasks|length > 0 %} table-hover {% endif %} shadow-sm" {% if user.enable_transition %} data-aos="zoom-in" {% endif %}>
     <thead {% if user.enable_transition %} data-aos="zoom-in" {% endif %}>
         <tr class="bg-gray-100">

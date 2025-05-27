@@ -24,7 +24,7 @@
   <td class="pt-2 pb-2">
     {% with value=obj|attr:field %}
       {% if field == 'name' or field == 'subject' or field == 'title' %}
-        <a href="{% url obj_view obj.id %}">{{ value|truncatechars:40 }}</a>
+        <a {% if value|length > 30 %} data-bs-toggle="tooltip" data-bs-placement="left" title="{{ value }}" {% endif %} href="{% url obj_view obj.id %}">{{ value|truncatechars:30 }}</a>
       {% elif field == 'created_at' or field == 'start_date' or field == 'end_date' or field == 'end_time' %}
         {{ value|date:"Y-m-d" }}
       {% elif field == 'case_category' %}
@@ -51,7 +51,9 @@
         {% endfor %}
            </div>
         {% else %}
+          {% if value %}
         {% include 'includes/_alert_user.html' with value=value %}
+            {% endif %}
           {% endif %}
       {% elif field == 'case_status' or field == 'hearing_status' or field == 'task_status' %}
         {% if value %}

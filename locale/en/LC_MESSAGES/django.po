@@ -2,13 +2,13 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-25 08:58+0300\n"
+"POT-Creation-Date: 2025-05-26 13:24+0300\n"
 "PO-Revision-Date: 2025-05-14 10:20+0300\n"
 "Last-Translator: Saif AlKhateeb <saif.ibrahim@qi.iq>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -86,13 +86,13 @@ msgstr "New Account"
 msgid "تم انشاء الحساب الخاص بك على النظام القانوني"
 msgstr "Account has been created"
 
-#: accounts/models.py:71 activities/models.py:12 activities/views.py:1088
+#: accounts/models.py:71 activities/models.py:12 activities/views.py:1103
 #: cases/models.py:32 cases/models.py:52 cases/models.py:68 cases/models.py:87
-#: contract/models.py:125 contract/views.py:379 core/models.py:125
-#: core/models.py:142 core/models.py:159 core/views.py:1309
+#: contract/models.py:125 contract/views.py:381 core/models.py:125
+#: core/models.py:142 core/models.py:159 core/views.py:1308
 #: rest_api/serializers.py:45 templates/activities/hearings_list.html:81
 #: templates/contracts/contracts_list.html:102 templates/includes/_docs.html:12
-#: templates/includes/_paths_table.html:8
+#: templates/includes/_paths_table.html:7
 msgid "Name"
 msgstr ""
 
@@ -241,6 +241,14 @@ msgstr ""
 
 #: accounts/models.py:134 templates/includes/_action_buttons.html:8
 #: templates/includes/_obj_history.html:17
+#: templates/includes/_paths_loop.html:18
+#: templates/includes/_paths_loop.html:23
+#: templates/includes/_paths_loop.html:28
+#: templates/includes/_paths_loop.html:33
+#: templates/includes/_paths_subloop.html:18
+#: templates/includes/_paths_subloop.html:23
+#: templates/includes/_paths_subloop.html:28
+#: templates/includes/_paths_subloop.html:33
 msgid "Created by"
 msgstr ""
 
@@ -341,11 +349,11 @@ msgstr ""
 msgid "Hearing Date"
 msgstr ""
 
-#: activities/models.py:16 activities/views.py:850 activities/views.py:1088
+#: activities/models.py:16 activities/views.py:850 activities/views.py:1103
 #: cases/models.py:188 cases/models.py:303 cases/models.py:403
 #: cases/models.py:452 cases/views.py:212 cases/views.py:245 cases/views.py:492
-#: cases/views.py:519 contract/models.py:35 contract/views.py:379
-#: contract/views.py:397 templates/activities/hearings_list.html:46
+#: cases/views.py:519 contract/models.py:35 contract/views.py:381
+#: contract/views.py:399 templates/activities/hearings_list.html:46
 #: templates/activities/hearings_list.html:83
 #: templates/activities/tasks_list.html:46
 #: templates/activities/tasks_list.html:83
@@ -457,9 +465,9 @@ msgstr ""
 msgid "You have been assigned with you below case details"
 msgstr "لقد تم تعيينك كمحامي للدعوى ادناه"
 
-#: activities/views.py:850 activities/views.py:1088 cases/views.py:211
-#: cases/views.py:492 cases/views.py:744 contract/views.py:379
-#: core/views.py:1309 templates/activities/hearings_list.html:80
+#: activities/views.py:850 activities/views.py:1103 cases/views.py:211
+#: cases/views.py:492 cases/views.py:744 contract/views.py:381
+#: core/views.py:1308 templates/activities/hearings_list.html:80
 #: templates/activities/tasks_list.html:80
 #: templates/cases/AdministrativeInvestigations_list.html:58
 #: templates/cases/notations_list.html:80
@@ -474,31 +482,40 @@ msgstr "رقم الدعوى:"
 msgid "Title"
 msgstr ""
 
-#: activities/views.py:850 activities/views.py:868 activities/views.py:1088
+#: activities/views.py:850 activities/views.py:868 activities/views.py:1103
 #: cases/views.py:212 cases/views.py:238 core/models.py:338 core/models.py:359
 #: templates/activities/hearings_list.html:35
 #: templates/activities/hearings_list.html:82
 #: templates/activities/tasks_list.html:35
 #: templates/activities/tasks_list.html:82
+#: templates/includes/_paths_loop.html:18
+#: templates/includes/_paths_subloop.html:18
 msgid "Status"
 msgstr ""
 
-#: activities/views.py:850 activities/views.py:1088
+#: activities/views.py:850 activities/views.py:1103
 #: templates/activities/hearings_list.html:86
 #: templates/activities/tasks_list.html:84
 msgid "Related Case"
 msgstr ""
 
-#: activities/views.py:850 activities/views.py:1088 cases/models.py:211
+#: activities/views.py:850 activities/views.py:1103 cases/models.py:211
 #: cases/models.py:214 cases/views.py:212 cases/views.py:492 cases/views.py:744
-#: contract/views.py:379 core/views.py:1309
+#: contract/views.py:381 core/views.py:1308
 #: templates/activities/hearings_list.html:84
 #: templates/activities/tasks_list.html:85
 #: templates/cases/AdministrativeInvestigations_list.html:61
 #: templates/cases/notations_list.html:85
 #: templates/contracts/contracts_list.html:110
 #: templates/includes/_action_buttons.html:8 templates/includes/_docs.html:13
-#: templates/includes/_hearings.html:11 templates/includes/_tasks.html:11
+#: templates/includes/_hearings.html:11 templates/includes/_paths_loop.html:18
+#: templates/includes/_paths_loop.html:23
+#: templates/includes/_paths_loop.html:28
+#: templates/includes/_paths_loop.html:33
+#: templates/includes/_paths_subloop.html:18
+#: templates/includes/_paths_subloop.html:23
+#: templates/includes/_paths_subloop.html:28
+#: templates/includes/_paths_subloop.html:33 templates/includes/_tasks.html:11
 msgid "Created At"
 msgstr ""
 
@@ -518,20 +535,20 @@ msgstr ""
 msgid "End Time"
 msgstr ""
 
-#: activities/views.py:850 activities/views.py:1088 cases/views.py:213
-#: cases/views.py:493 cases/views.py:744 contract/views.py:379
-#: core/views.py:1309 templates/activities/hearings_list.html:87
+#: activities/views.py:850 activities/views.py:1103 cases/views.py:213
+#: cases/views.py:493 cases/views.py:744 contract/views.py:381
+#: core/views.py:1308 templates/activities/hearings_list.html:87
 #: templates/activities/tasks_list.html:89
 #: templates/cases/AdministrativeInvestigations_list.html:63
 #: templates/cases/notations_list.html:87
 #: templates/contracts/contracts_list.html:111 templates/includes/_docs.html:14
-#: templates/includes/_paths_table.html:10
+#: templates/includes/_paths_table.html:12
 msgid "Actions"
 msgstr ""
 
-#: activities/views.py:855 activities/views.py:1093 cases/views.py:218
-#: cases/views.py:499 cases/views.py:749 contract/views.py:384
-#: core/views.py:1314 templates/activities/hearings_list.html:13
+#: activities/views.py:855 activities/views.py:1108 cases/views.py:218
+#: cases/views.py:499 cases/views.py:749 contract/views.py:386
+#: core/views.py:1313 templates/activities/hearings_list.html:13
 #: templates/activities/tasks_list.html:13
 #: templates/cases/AdministrativeInvestigations_list.html:13
 #: templates/cases/notations_list.html:13
@@ -539,7 +556,7 @@ msgstr ""
 msgid "Search keywords"
 msgstr ""
 
-#: activities/views.py:861 activities/views.py:1099 cases/apps.py:10
+#: activities/views.py:861 activities/views.py:1114 cases/apps.py:10
 #: templates/activities/hearings_list.html:24
 #: templates/activities/tasks_list.html:24 templates/includes/_base_nav.html:20
 #: templates/index.html:45 templates/user_profile.html:83
@@ -550,13 +567,13 @@ msgstr ""
 msgid "New Task"
 msgstr ""
 
-#: activities/views.py:914 activities/views.py:1144 cases/views.py:291
-#: cases/views.py:588 cases/views.py:800 contract/views.py:469
+#: activities/views.py:914 activities/views.py:1159 cases/views.py:291
+#: cases/views.py:588 cases/views.py:800 contract/views.py:473
 msgid "Add"
 msgstr ""
 
-#: activities/views.py:915 activities/views.py:1145 cases/views.py:292
-#: cases/views.py:589 cases/views.py:801 contract/views.py:470
+#: activities/views.py:915 activities/views.py:1160 cases/views.py:292
+#: cases/views.py:589 cases/views.py:801 contract/views.py:474
 #: templates/activities/hearings_list.html:106
 #: templates/activities/tasks_list.html:111
 #: templates/cases/AdministrativeInvestigations_list.html:86
@@ -566,11 +583,11 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: activities/views.py:962
+#: activities/views.py:977
 msgid "Task has been deleted successfully."
 msgstr ""
 
-#: activities/views.py:1088 cases/views.py:211 cases/views.py:492
+#: activities/views.py:1103 cases/views.py:211 cases/views.py:492
 #: cases/views.py:505 core/models.py:134
 #: templates/activities/hearings_list.html:85
 #: templates/cases/notations_list.html:24
@@ -578,11 +595,11 @@ msgstr ""
 msgid "Court"
 msgstr ""
 
-#: activities/views.py:1105
+#: activities/views.py:1120
 msgid "New Hearing"
 msgstr ""
 
-#: activities/views.py:1192
+#: activities/views.py:1207
 msgid "Hearing has been deleted successfully."
 msgstr ""
 
@@ -650,7 +667,14 @@ msgstr "Lost"
 #: contract/models.py:22
 #: templates/cases/AdministrativeInvestigations_list.html:59
 #: templates/cases/notations_list.html:81 templates/includes/_hearings.html:10
-#: templates/includes/_tasks.html:10
+#: templates/includes/_paths_loop.html:18
+#: templates/includes/_paths_loop.html:23
+#: templates/includes/_paths_loop.html:28
+#: templates/includes/_paths_loop.html:33
+#: templates/includes/_paths_subloop.html:18
+#: templates/includes/_paths_subloop.html:23
+#: templates/includes/_paths_subloop.html:28
+#: templates/includes/_paths_subloop.html:33 templates/includes/_tasks.html:10
 msgid "Subject"
 msgstr ""
 
@@ -817,7 +841,7 @@ msgid "توجد دعوى متأخرة لمدة شهر من تاريخ الإنش
 msgstr ""
 
 #: cases/views.py:211 cases/views.py:224 contract/models.py:100
-#: contract/models.py:141 contract/views.py:379 contract/views.py:390
+#: contract/models.py:141 contract/views.py:381 contract/views.py:392
 #: templates/contracts/contracts_list.html:24
 #: templates/contracts/contracts_list.html:103
 msgid "Type"
@@ -873,12 +897,12 @@ msgstr ""
 msgid "Total amount"
 msgstr ""
 
-#: contract/models.py:29 contract/views.py:379
+#: contract/models.py:29 contract/views.py:381
 #: templates/contracts/contracts_list.html:106
 msgid "First Party"
 msgstr ""
 
-#: contract/models.py:30 contract/views.py:379
+#: contract/models.py:30 contract/views.py:381
 #: templates/contracts/contracts_list.html:107
 msgid "Second Party"
 msgstr ""
@@ -887,7 +911,7 @@ msgstr ""
 msgid "Third Party"
 msgstr ""
 
-#: contract/models.py:32 contract/views.py:379 contract/views.py:421
+#: contract/models.py:32 contract/views.py:381 contract/views.py:423
 #: templates/contracts/contracts_list.html:66
 #: templates/contracts/contracts_list.html:105
 msgid "Auto Renewal"
@@ -905,7 +929,7 @@ msgstr ""
 msgid "Contracts"
 msgstr ""
 
-#: contract/models.py:70
+#: contract/models.py:70 templates/includes/_payments.html:11
 msgid "Amount"
 msgstr ""
 
@@ -913,7 +937,7 @@ msgstr ""
 msgid "Payment"
 msgstr ""
 
-#: contract/models.py:87
+#: contract/models.py:87 templates/includes/_payments.html:5
 msgid "Payments"
 msgstr ""
 
@@ -929,7 +953,7 @@ msgstr ""
 msgid "Is recurring"
 msgstr ""
 
-#: contract/models.py:119
+#: contract/models.py:119 templates/includes/_payments.html:10
 msgid "Duration"
 msgstr ""
 
@@ -957,36 +981,36 @@ msgstr ""
 msgid "Reminders"
 msgstr ""
 
-#: contract/views.py:379 contract/views.py:404 contract/views.py:411
+#: contract/views.py:381 contract/views.py:406 contract/views.py:413
 #: templates/contracts/contracts_list.html:46
 #: templates/contracts/contracts_list.html:104
 msgid "Company"
 msgstr ""
 
-#: contract/views.py:415 templates/contracts/contracts_list.html:53
+#: contract/views.py:417 templates/contracts/contracts_list.html:53
 #: templates/contracts/contracts_list.html:134
 msgid "International"
 msgstr ""
 
-#: contract/views.py:416 templates/contracts/contracts_list.html:54
+#: contract/views.py:418 templates/contracts/contracts_list.html:54
 #: templates/contracts/contracts_list.html:136
 msgid "Domestic"
 msgstr ""
 
-#: contract/views.py:425 templates/contracts/contracts_list.html:63
+#: contract/views.py:427 templates/contracts/contracts_list.html:63
 msgid "Yes"
 msgstr ""
 
-#: contract/views.py:426 templates/contracts/contracts_list.html:64
+#: contract/views.py:428 templates/contracts/contracts_list.html:64
 msgid "No"
 msgstr ""
 
-#: contract/views.py:430
+#: contract/views.py:432
 #, fuzzy
 msgid "New Contract"
 msgstr "رقم الدعوى الجديدة"
 
-#: contract/views.py:521
+#: contract/views.py:540
 msgid "Contract has been deleted successfully."
 msgstr ""
 
@@ -1087,7 +1111,7 @@ msgstr ""
 msgid "%(model_name)s with this %(field_names)s already exists."
 msgstr ""
 
-#: core/models.py:316
+#: core/models.py:316 templates/user_profile.html:132
 msgid "Resolved"
 msgstr ""
 
@@ -1107,11 +1131,11 @@ msgstr ""
 msgid "Nullified"
 msgstr ""
 
-#: core/models.py:321
+#: core/models.py:321 templates/user_profile.html:127
 msgid "In Progress"
 msgstr ""
 
-#: core/models.py:322
+#: core/models.py:322 templates/user_profile.html:122
 msgid "New"
 msgstr ""
 
@@ -1265,11 +1289,11 @@ msgstr "رقم الدعوى:"
 msgid "December"
 msgstr ""
 
-#: core/views.py:1358
+#: core/views.py:1357
 msgid "Path has been deleted successfully."
 msgstr ""
 
-#: core/views.py:1367
+#: core/views.py:1366
 msgid "Document has been deleted successfully."
 msgstr ""
 
@@ -1592,7 +1616,9 @@ msgstr ""
 #: templates/cases/notations_list.html:96
 #: templates/contracts/contracts_list.html:120
 #: templates/includes/_docs_list.html:24 templates/includes/_hearings.html:23
-#: templates/includes/_paths_table.html:57
+#: templates/includes/_paths_loop.html:83
+#: templates/includes/_paths_subloop.html:80
+#: templates/includes/_payments.html:25
 #: templates/includes/_render_table.html:17 templates/includes/_tasks.html:23
 msgid "No data available in table"
 msgstr ""
@@ -1640,7 +1666,7 @@ msgstr ""
 #: templates/cases/AdministrativeInvestigations_list.html:170
 #: templates/cases/cases_list.html:66 templates/cases/notations_list.html:211
 #: templates/contracts/contracts_list.html:255
-#: templates/includes/_paths_table.html:88
+#: templates/includes/_paths_table.html:44
 msgid "Are you sure you want to delete?"
 msgstr ""
 
@@ -1649,7 +1675,7 @@ msgstr ""
 #: templates/cases/AdministrativeInvestigations_list.html:193
 #: templates/cases/cases_list.html:89 templates/cases/notations_list.html:234
 #: templates/contracts/contracts_list.html:278
-#: templates/includes/_paths_table.html:107
+#: templates/includes/_paths_table.html:63
 msgid "An error occurred while deleting."
 msgstr ""
 
@@ -1804,11 +1830,11 @@ msgid "Count"
 msgstr ""
 
 #: templates/includes/_docs.html:6
-msgid "Files and documents related to the case"
+msgid "Documents related"
 msgstr ""
 
 #: templates/includes/_docs.html:11 templates/includes/_hearings.html:9
-#: templates/includes/_paths_table.html:7 templates/includes/_tasks.html:9
+#: templates/includes/_payments.html:9 templates/includes/_tasks.html:9
 msgid "Sequence"
 msgstr ""
 
@@ -1868,6 +1894,28 @@ msgstr ""
 msgid "to"
 msgstr ""
 
+#: templates/includes/_paths_loop.html:17
+#: templates/includes/_paths_subloop.html:17
+msgid "Case Details"
+msgstr ""
+
+#: templates/includes/_paths_loop.html:22
+#: templates/includes/_paths_subloop.html:22
+msgid "Administrative Investigation Details"
+msgstr ""
+
+#: templates/includes/_paths_loop.html:27
+#: templates/includes/_paths_subloop.html:27
+msgid "Notation Details"
+msgstr ""
+
+#: templates/includes/_paths_loop.html:32
+#: templates/includes/_paths_subloop.html:32
+#, fuzzy
+#| msgid "Case Type:"
+msgid "Contract Details"
+msgstr "نوع الدعوى:"
+
 #: templates/includes/_paths_obj_list.html:15
 msgid "New Path"
 msgstr ""
@@ -1881,11 +1929,19 @@ msgid "Upload Documents"
 msgstr ""
 
 #: templates/includes/_paths_table.html:9
+msgid "Related"
+msgstr ""
+
+#: templates/includes/_paths_table.html:11
 msgid "Document Count"
 msgstr ""
 
 #: templates/includes/_paths_upload_title.html:2
 msgid "Files and documents"
+msgstr ""
+
+#: templates/includes/_payments.html:12
+msgid "Date"
 msgstr ""
 
 #: templates/index.html:11

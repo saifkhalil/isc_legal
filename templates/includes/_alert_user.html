@@ -1,4 +1,5 @@
 {% load file_filters %}
+{% if value.username %}
 <div class="alert alert-light p-1 fs-8 mb-0 fw-normal rounded-pill position-relative mx-1 w-fit {% if not value.is_active %}opacity-50{% else %}border border-secondary{% endif %}">
 {% include 'includes/_user_with_photo.html' with value=value %}
   {% if value.id|is_user_online and value.is_active %}
@@ -11,3 +12,4 @@
     </div>
     {% endif %}
 </div>
+{% endif %}

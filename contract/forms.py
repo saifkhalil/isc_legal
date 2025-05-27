@@ -53,6 +53,22 @@ class ContractForm(forms.ModelForm):
         }
         fields = ['name','description','type','out_side_iraq','total_amount','company','first_party','second_party','third_party','penal_clause','auto_renewal','start_time','end_time','assignee','shared_with']
 
+    def __init__(self, *args, **kwargs):
+        mode = kwargs.pop("mode")
+        super(ContractForm, self).__init__(*args, **kwargs)
+        self.fields['start_time'].input_formats = ('%Y-%m-%dT%H:%M',)
+        self.fields['end_time'].input_formats = ('%Y-%m-%dT%H:%M',)
+        restricted_fields = [
+            "case_close_status",
+            "case_close_comment",
+            "ImportantDevelopment",
+            "comments",
+        ]
+
+        if mode not in ["edit", "view"]:
+            for field in restricted_fields:
+                self.fields.pop(field, None)  # Remove these fields in "create" mode
+
 class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment

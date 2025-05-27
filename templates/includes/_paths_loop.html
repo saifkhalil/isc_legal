@@ -1,0 +1,86 @@
+{% load i18n file_filters %}
+
+{% for path in paths %}
+  {% if not path.is_deleted %}
+    <tr {% if user.enable_transition %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
+      <td class="pt-2 pb-2">
+        <button data-bs-toggle="collapse" data-bs-target="#parent_case_{{ path.id }}" aria-expanded="false"
+                aria-controls="parent_path_{{ path.id }}" style="cursor: pointer" class="fs-6 bg-transparent"><i class="fa {% if path.documents.all|length == 0 %}fa-folder text-secondary{% else %}fa-folder text-warning{% endif %}"
+  id="folder-icon-{{ path.id }}" aria-hidden="true"></i></button>
+      </td>
+      <td class="pt-2 pb-2 text-bold"><p {% if path.name|length > 20 %} data-bs-toggle="tooltip" data-bs-placement="left" title="{{ path.name }}" {% endif %}>{{ path.name|truncatechars:20 }}</p></td>
+    {% if not obj_id %}
+      <td class="pt-2 pb-2 text-bold">
+      {% if path.cases.all|length or path.AdministrativeInvestigations.all|length or path.notations.all|length or path.contracts.all|length %}
+    <div class="alert alert-light p-1 fs-8 mb-0 fw-normal rounded-pill position-relative mx-1 w-fit border border-secondary" type="alert">
+      {% if path.cases.all|length %}
+        <button class="bg-transparent" data-bs-html="true" data-bs-toggle="popover" title="{% trans 'Case Details' %}"
+        data-bs-content="<strong>{% trans 'Subject' %}: </strong><a href='{% url 'case_view' path.cases.all.0.id %}'>{{ path.cases.all.0.name }}</a><br>{% trans 'Status' %}: {{ path.cases.all.0.case_status.get_status_display }}<br> {% trans 'Created by' %}: {{ path.cases.all.0.created_by.username }}<br> {% trans 'Created At' %}: {{ path.cases.all.0.created_at|date:'Y/m/d' }}">
+        <i class="bi bi-briefcase"></i> {{ path.cases.all.0.name }}
+      </button>
+      {% elif path.AdministrativeInvestigations.all|length %}
+        <button class="bg-transparent" data-bs-html="true" data-bs-toggle="popover" title="{% trans 'Administrative Investigation Details' %}"
+        data-bs-content="<strong>{% trans 'Subject' %}: </strong><a href='{% url 'administrative_investigation_view' path.AdministrativeInvestigations.all.0.id %}'>{{ path.AdministrativeInvestigations.all.0.subject }}</a><br> {% trans 'Created by' %}: {{ path.AdministrativeInvestigations.all.0.created_by.username }}<br> {% trans 'Created At' %}: {{ path.AdministrativeInvestigations.all.0.created_at|date:'Y/m/d' }}">
+        <i class="fa fa-eercast" aria-hidden="true"></i> {{ path.AdministrativeInvestigations.all.0.subject }}
+      </button>
+      {% elif path.notations.all|length %}
+      <button class="bg-transparent" data-bs-html="true" data-bs-toggle="popover" title="{% trans 'Notation Details' %}"
+        data-bs-content="<strong>{% trans 'Subject' %}: </strong><a href='{% url 'notation_view' path.notations.all.0.id %}'>{{ path.notations.all.0.subject }}</a><br> {% trans 'Created by' %}: {{ path.notations.all.0.created_by.username }}<br> {% trans 'Created At' %}: {{ path.notations.all.0.created_at|date:'Y/m/d' }}">
+        <i class="bi bi-pen"></i> {{ path.notations.all.0.subject }}
+      </button>
+      {% elif path.contracts.all|length %}
+      <button class="bg-transparent" data-bs-html="true" data-bs-toggle="popover" title="{% trans 'Contract Details' %}"
+        data-bs-content="<strong>{% trans 'Subject' %}: </strong><a href='{% url 'contract_view' path.contracts.all.0.id %}'>{{ path.contracts.all.0.name }}</a><br>{% trans 'Created by' %}: {{ path.contracts.all.0.created_by.username }}<br> {% trans 'Created At' %}: {{ path.contracts.all.0.created_at|date:'Y/m/d' }}">
+        <i class="fa fa-file-text-o" aria-hidden="true"></i> {{ path.contracts.all.0.name }}
+      </button>
+        <a href="{% url 'contract_view' path.contracts.all.0.id %}">
+          <i class="fa fa-file-text-o" aria-hidden="true"></i> {{ path.contracts.all.0.name }}
+        </a>
+      {% endif %}
+    </div>
+
+{% endif %}
+ </td>
+    {% endif %}
+      <td class="pt-2 pb-2">{{ path.documents.all|length }}</td>
+      <td class="pt-2 pb-2">
+            <button class="btn btn-sm qi-primary" data-path-id="{{ path.id }}" id="upload-files"><i class="bi bi-file-earmark-arrow-up"></i></i>
+  </button>
+        {% if user.is_manager or user.is_superuser %}
+          <button class="btn btn-sm btn-danger delete-path" data-path-id="{{ path.id }}"><i
+            class="bi bi-trash3-fill"></i></button>
+        {% endif %}
+      </td>
+    </tr>
+    {% if path.children.all|length %}
+      {% include 'includes/_paths_subloop.html' with paths=path.children.all %}
+      {% endif %}
+    {% for doc in path.documents.all %}
+      <tr class="collapse qi-light" id="parent_case_{{ path.id }}">
+        <td class="bg-gray-200"></td>
+        {% if not obj_id %}<td class="pt-2 pb-2 bg-gray-200">{{ forloop.counter }}</td>{% endif %}
+        <td class="pt-2 pb-2 bg-gray-200"><a class="btn btn-primary btn-sm" href="{{ doc.attachment.url }}" target="_blank"
+                                 data-bs-toggle="tooltip" data-bs-placement="top" title="{{ doc.name }}"><i
+          class="bi {{ doc.attachment.url|file_icon }}"></i> {{ doc.name|truncatechars:35 }} </a></td>
+        <td class="pt-2 pb-2 bg-gray-200">{{ doc.created_at|date:"Y-m-d" }}</td>
+      {% if not obj_id %}
+      {% endif %}
+        <td class="pt-2 pb-2 bg-gray-200">
+          {% if user.is_manager or user.is_superuser %}
+            <button class="btn btn-sm btn-danger delete-task" data-task-id="{{ doc.id }}"><i
+              class="bi bi-trash3-fill"></i></button>
+
+          {% endif %}
+        </td>
+
+      </tr>
+
+    {% endfor %}
+    {% endif %}
+  {% empty %}
+    <tr>
+      <td class="p-3 text-center bg-gray-200" colspan="13"><i
+        class="bi bi-inbox-fill"></i> {% trans 'No data available in table' %}</td>
+    </tr>
+
+  {% endfor %}

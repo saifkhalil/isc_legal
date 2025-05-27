@@ -81,41 +81,58 @@
               <div class="card-body shadow-sm">
                 <p class="mb-4">{% trans 'Status Overview' %}</p>
                 <p class="mb-1" style="font-size: .77rem;"><i class="bi bi-briefcase"></i> {% trans 'Cases' %} ({{ cases.count_all }})</p>
-                <div class="progress-stacked">
+                <div class="progress-stacked border border-white">
                   <div class="progress" role="progressbar" aria-label="Segment New" aria-valuenow="{{ cases.count_new }}" aria-valuemin="0" aria-valuemax="{{ cases.count_all }}" style="width: {{ cases.count_new_per }}%">
-                    <div class="progress-bar">{{ cases.count_new }}</div>
+                    <div class="progress-bar bg-success">{{ cases.count_new }}</div>
                   </div>
                   <div class="progress" role="progressbar" aria-label="Segment Progress" aria-valuenow="{{ cases.count_progress }}" aria-valuemin="0" aria-valuemax="{{ cases.count_all }}" style="width: {{ cases.count_progress_per }}%">
                     <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning">{{ cases.count_progress }}</div>
                   </div>
                   <div class="progress" role="progressbar" aria-label="Segment Done" aria-valuenow="{{ cases.count_done }}" aria-valuemin="0" aria-valuemax="{{ cases.count_all }}" style="width: {{ cases.count_done_per }}%">
-                    <div class="progress-bar bg-success">{{ cases.count_done }}</div>
+                    <div class="progress-bar bg-secondary">{{ cases.count_done }}</div>
                   </div>
                 </div>
                 <p class="mt-4 mb-1" style="font-size: .77rem;"><i class="bi bi-list-task"></i> {% trans 'Tasks' %} ({{ tasks.count_all }})</p>
-                <div class="progress-stacked">
+                <div class="progress-stacked border border-white">
                   <div class="progress" role="progressbar" aria-label="Segment New" aria-valuenow="{{ tasks.count_new }}" aria-valuemin="0" aria-valuemax="{{ tasks.count_all }}" style="width: {{ tasks.count_new_per }}%">
-                    <div class="progress-bar">{{ tasks.count_new }}</div>
+                    <div class="progress-bar bg-success">{{ tasks.count_new }}</div>
                   </div>
                   <div class="progress" role="progressbar" aria-label="Segment Progress" aria-valuenow="{{ tasks.count_progress }}" aria-valuemin="0" aria-valuemax="{{ tasks.count_all }}" style="width: {{ tasks.count_progress_per }}%">
                     <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning">{{ tasks.count_progress }}</div>
                   </div>
                   <div class="progress" role="progressbar" aria-label="Segment Done" aria-valuenow="{{ tasks.count_done }}" aria-valuemin="0" aria-valuemax="{{ tasks.count_all }}" style="width: {{ tasks.count_done_per }}%">
-                    <div class="progress-bar bg-success">{{ tasks.count_done }}</div>
+                    <div class="progress-bar bg-secondary">{{ tasks.count_done }}</div>
                   </div>
                 </div>
                 <p class="mt-4 mb-1" style="font-size: .77rem;"><i class="bi bi-list-task"></i> {% trans 'Hearings' %} ({{ hearings.count_all }})</p>
-                <div class="progress-stacked">
+                <div class="progress-stacked border border-white">
                   <div class="progress" role="progressbar" aria-label="Segment New" aria-valuenow="{{ hearings.count_new }}" aria-valuemin="0" aria-valuemax="{{ hearings.count_all }}" style="width: {{ hearings.count_new_per }}%">
-                    <div class="progress-bar">{{ hearings.count_new }}</div>
+                    <div class="progress-bar bg-success">{{ hearings.count_new }}</div>
                   </div>
                   <div class="progress" role="progressbar" aria-label="Segment Progress" aria-valuenow="{{ hearings.count_progress }}" aria-valuemin="0" aria-valuemax="{{ hearings.count_all }}" style="width: {{ hearings.count_progress_per }}%">
                     <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning">{{ hearings.count_progress }}</div>
                   </div>
                   <div class="progress" role="progressbar" aria-label="Segment Done" aria-valuenow="{{ hearings.count_done }}" aria-valuemin="0" aria-valuemax="{{ hearings.count_all }}" style="width: {{ hearings.count_done_per }}%">
-                    <div class="progress-bar bg-success">{{ hearings.count_done }}</div>
+                    <div class="progress-bar bg-secondary">{{ hearings.count_done }}</div>
                   </div>
                 </div>
+                <div class="row mt-5">
+              <div class="col">
+                <div class="progress-bar bg-success p-1 fs-8 mb-0 fw-normal rounded-pill  border border-white">
+                <span>{% trans 'New' %}</span>
+              </div>
+            </div>
+            <div class="col">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning p-1 fs-8 mb-0 fw-normal rounded-pill border border-white">
+                  <span>{% trans 'In Progress' %}</span>
+                </div>
+            </div>
+              <div class="col">
+                <div class="progress-bar bg-secondary p-1 fs-8 mb-0 fw-normal rounded-pill border border-white">
+                  <span>{% trans 'Resolved' %}</span>
+                </div>
+              </div>
+            </div>
               </div>
           </div>
       </div>
@@ -123,4 +140,5 @@
   </div>
 </section>
   {% endwith %}
+
 {% endblock %}

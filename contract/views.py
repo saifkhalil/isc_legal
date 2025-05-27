@@ -1,7 +1,7 @@
 import json
 from datetime import timedelta, datetime
 from urllib.parse import urlencode
-
+from auditlog.models import LogEntry
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
@@ -20,6 +20,8 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
 
 from accounts.models import User
+from cases.forms import AdministrativeInvestigationForm
+from cases.models import AdministrativeInvestigation
 from cases.permissions import Manager_SuperUser, MyPermission
 from core.classes import StandardResultsSetPagination
 from core.classes import dict_item, GetUniqueDictionaries
@@ -427,43 +429,45 @@ def contracts_list(request):
             ],
         },
     ]
-    obj_create = {'name': _('New Contract'), 'url': 'administrative_investigation_create'}
+    obj_create = {'name': _('New Contract'), 'url': 'contract_create'}
     context = {
         'fields_to_show': fields_to_show,
         'headers': headers,
         'objs': page_obj,
         'objs_count': objs_count,
-        'obj_view': 'administrative_investigation_view',
-        'obj_edit': 'administrative_investigation_edit',
+        'obj_view': 'contract_view',
+        'obj_edit': 'contract_edit',
         'obj_delete': 'delete_AdministrativeInvestigation',
+        'new_ImportantDevelopment': 'new_notation_ImportantDevelopment',
         'obj_create': obj_create,
         'page_range': page_range,
         'session': json.dumps(session_info),
         'filter_fields': filter_fields,
         'filter_query': filter_query,  # New variable for pagination links.
+
     }
     return render(request, 'objs_list.html', context)
 
 
-def AdministrativeInvestigations_view(request, administrative_investigation_id=None, mode='view'):
+def contract_view(request, contract_id=None, mode='view'):
     log = {}
     field_translations = {}
     OPERATION_TRANSLATIONS = {}
-    if administrative_investigation_id:
-        instance = get_object_or_404(AdministrativeInvestigation, pk=administrative_investigation_id)
+    if contract_id:
+        instance = get_object_or_404(Contract, pk=contract_id)
         if request.method == 'POST':
             if mode == 'edit':  # Allow editing only if mode is 'edit'
-                form = AdministrativeInvestigationForm(request.POST, instance=instance, mode=mode)
+                form = ContractForm(request.POST, instance=instance, mode=mode)
                 if form.is_valid():
                     instance = form.save(commit=False)  # Don't save yet, update fields first
                     instance.modified_by = request.user  # ✅ Correctly update modified_by
                     instance.modified_at = timezone.now()  # ✅ Correctly update modified_at
                     instance.save()  # Now save the instance with updated fields
-                    return redirect('administrative_investigations_list')
+                    return redirect('contracts_list')
             else:
-                form = AdministrativeInvestigationForm(instance=instance, mode=mode)  # Read-only form
+                form = ContractForm(instance=instance, mode=mode)  # Read-only form
         else:
-            form = AdministrativeInvestigationForm(instance=instance, mode=mode)
+            form = ContractForm(instance=instance, mode=mode)
             if mode == 'view':
                 OPERATION_TRANSLATIONS = {
                     'add': _('Add'),
@@ -471,40 +475,55 @@ def AdministrativeInvestigations_view(request, administrative_investigation_id=N
                 }
                 field_translations = {
                     field.name: _(field.verbose_name)
-                    for field in AdministrativeInvestigation._meta.fields
+                    for field in Contract._meta.fields
                 }
                 field_translations.update({
                     field.name: _(field.verbose_name)
-                    for field in AdministrativeInvestigation._meta.many_to_many
+                    for field in Contract._meta.many_to_many
                 })
-                log = LogEntry.objects.filter(content_type__model='AdministrativeInvestigation', object_id=instance.pk)
+                log = LogEntry.objects.filter(content_type__model='contract', object_id=instance.pk)
                 for field in form.fields:
                     form.fields[field].widget.attrs['disabled'] = True  # Disable all fields
 
     else:
         mode = 'create'  # If no `case_id`, it's a new case
-        instance = AdministrativeInvestigation()
-        form = AdministrativeInvestigationForm(request.POST or None, instance=instance, mode=mode)
+        instance = Contract()
+        form = ContractForm(request.POST or None, instance=instance, mode=mode)
         if request.method == 'POST' and form.is_valid():
             instance = form.save(commit=False)  # ✅ Correct way to update before saving
             instance.created_by = request.user  # ✅ Correctly update created_by
             instance.created_at = timezone.now()  # ✅ Correctly update created_at
             instance.save()  # ✅ Now save the instance
-            return redirect('administrative_investigations_list')
+            return redirect('contracts_list')
     context = {
         'form': form,
         'obj': instance,
         'mode': mode,
         'logs': log,
-        'obj_edit': 'administrative_investigation_edit',
-        'objs_list': 'administrative_investigations_list',
+        'obj_edit': 'contract_edit',
+        'objs_list': 'contracts_list',
         'new_path': 'new_administrative_investigation_path',
-        'new_ImportantDevelopment': 'new_AdministrativeInvestigation_ImportantDevelopment',
+        'new_ImportantDevelopment': 'new_contract_ImportantDevelopment',
+        'obj_new_comment': 'new_contract_comment',
         'field_translations': field_translations,
         'operation_translations': OPERATION_TRANSLATIONS,
     }
     return render(request, 'obj.html', context)
 
+
+@require_POST
+def new_contract_ImportantDevelopment(request, notation_id=None):
+    url = request.POST.get('url')
+    instance = get_object_or_404(Contract, pk=notation_id)
+    instance.ImportantDevelopment.create(title=request.POST.get('content'), created_by=request.user,
+                                         created_at=timezone.now())
+    return redirect(url)
+
+@require_POST
+def new_contract_comment(request, hearing_id=None):
+    instance = get_object_or_404(Contract, pk=hearing_id)
+    instance.comments.create(comment=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
+    return redirect('contract_view',hearing_id=hearing_id)
 
 @require_POST
 def delete_contract(request, pk=None):

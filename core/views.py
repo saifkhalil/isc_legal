@@ -1252,8 +1252,7 @@ def Paths_list(request):
         if cached_data:
             Paths_qs = cached_data
         else:
-            Paths_qs = Path.objects.filter(is_deleted=False).exclude(id=24).exclude(parent=24).order_by(
-                '-created_by')
+            Paths_qs = Path.objects.filter(is_deleted=False).exclude(Q(id__in=[1, 24]) | Q(parent=24)).order_by('-created_by')
             cache.set(cache_key, Paths_qs, timeout=None)
         Paths_qs = Paths_qs.filter(query)
         # Retrieve filter dropdown data from cache or compute if not cached.

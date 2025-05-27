@@ -13,7 +13,7 @@ class TaskForm(ModelForm):
             'shared_with': SelectMultiple(attrs={'class': 'form-select select2'}),
             'task_status': Select(attrs={'class': 'form-check', 'disabled': True}),
         }
-        fields = ('title', 'description', 'task_category', 'assignee','task_status','assign_date','due_date','comments')
+        fields = ('title', 'description', 'task_category', 'assignee','task_status','assign_date','due_date')
 
     def __init__(self, *args, **kwargs):
         mode = kwargs.pop("mode",'create')

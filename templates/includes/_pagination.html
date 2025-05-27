@@ -4,37 +4,37 @@
       <ul class="pagination justify-content-center flex-wrap">
         {% if objs.has_previous %}
           <li class="page-item">
-            <a class="btn btn-light"
+            <a class="btn btn-light btn-sm mx-1 border border-secondary"
                href="?{{ filter_query }}&page={{ objs.previous_page_number }}">{% trans 'Previous' %}</a>
           </li>
         {% else %}
           <li class="page-item disabled">
-            <button class="btn btn-light " disabled aria-disabled="true">{% trans 'Previous' %}</button>
+            <button class="btn btn-light btn-sm mx-1" disabled aria-disabled="true">{% trans 'Previous' %}</button>
           </li>
         {% endif %}
         {% for i in page_range %}
           {% if objs.number == i %}
             <li class="page-item active">
-              <span class="btn btn-secondary">{{ i }} <span class="visually-hidden">{% trans 'current' %}</span></span>
+              <span class="btn btn-warning btn-sm mx-1 border border-secondary">{{ i }} <span class="visually-hidden">{% trans 'current' %}</span></span>
             </li>
           {% else %}
             {% if i == objs.paginator.ELLIPSIS %}
-              <button class="page-item disabled" aria-disabled="true"><span class="btn btn-light">{{ i }}</span>
-              </button>
+              <li class="page-item disabled " aria-disabled="true"><span class="btn btn-light btn-sm mx-1">{{ i }}</span>
+              </li>
             {% else %}
               <li class="page-item">
-                <a class="btn btn-light" href="?{{ filter_query }}&page={{ i }}">{{ i }}</a>
+                <a class="btn btn-light btn-sm mx-1 border border-secondary" href="?{{ filter_query }}&page={{ i }}">{{ i }}</a>
               </li>
             {% endif %}
           {% endif %}
         {% endfor %}
         {% if objs.has_next %}
           <li class="page-item">
-            <a class="btn btn-light" href="?{{ filter_query }}&page={{ objs.next_page_number }}">{% trans 'Next' %}</a>
+            <a class="btn btn-light btn-sm mx-1 border border-secondary" href="?{{ filter_query }}&page={{ objs.next_page_number }}">{% trans 'Next' %}</a>
           </li>
         {% else %}
           <li class="page-item disabled">
-            <button class="btn btn-light " disabled aria-disabled="true">{% trans 'Next' %}</button>
+            <button class="btn btn-light btn-sm mx-1 border border-secondary" disabled aria-disabled="true">{% trans 'Next' %}</button>
           </li>
         {% endif %}
       </ul>

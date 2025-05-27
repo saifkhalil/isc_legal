@@ -14,6 +14,12 @@ $(document).ready(function() {
                 console.log("Notification permission:", result);
             });
         }
+        const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl)
+})
     });
      var socket = new WebSocket("ws://" + window.location.host + "/ws/notifications/");
              var translations = document.getElementById("translations");
