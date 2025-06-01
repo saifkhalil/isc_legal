@@ -5,7 +5,7 @@
 {% endif %}
 {% if obj.ImportantDevelopment %}
 <button class="btn btn-sm border border-success text-success " data-bs-toggle="popover" title="{% trans 'Latest important development' %}"
-        data-bs-content="<strong>{{ obj.ImportantDevelopment.last|default:'لا يوجد' }}</strong>{% if obj.ImportantDevelopment.last %}<br> {% trans 'Created by' %}: {{ obj.ImportantDevelopment.last.created_by.username }}<br> {% trans 'Created At' %}: {{ obj.ImportantDevelopment.last.created_at|date:'Y:m:d' }}{% endif %}">
+        data-bs-content="<strong>{{ obj.ImportantDevelopment.last|default:'لا يوجد' }}</strong>{% if obj.ImportantDevelopment.last %}<br> {% trans 'Created by' %}: {{ obj.ImportantDevelopment.last.created_by.username }}<br> {% trans 'Created At' %}: {{ obj.ImportantDevelopment.last.created_at|date:'Y/m/d' }}{% endif %}">
   <i class="bi bi-card-list"></i>
 </button>
 {% endif %}

@@ -160,6 +160,7 @@ class LitigationCases(BaseModel):
 
     """
     id = models.AutoField(primary_key=True, help_text='Litigation cases Id')
+    parent = models.OneToOneField('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='child')
     name = models.CharField(
         max_length=500,
         blank=False,
@@ -207,6 +208,7 @@ class LitigationCases(BaseModel):
     comments = models.ManyToManyField(comments, verbose_name="Comments", blank=True)
     start_time = models.DateTimeField(null=True, blank=True,verbose_name=_('Start time'))
     end_time = models.DateTimeField(null=True, blank=True,verbose_name=_('End time'))
+    is_archived = models.BooleanField(default=False,verbose_name=_('Is Archived'))
     is_deleted = models.BooleanField(default=False, verbose_name=_("Is Deleted"))
     created_at = models.DateTimeField(editable=False,verbose_name=_('Created At'))
     modified_at = models.DateTimeField(auto_now=True, editable=False, verbose_name=_('Modified at'))
@@ -233,9 +235,26 @@ class LitigationCases(BaseModel):
         url = reverse('case_view', args=(self.id,))
         return url
 
+    def get_children(self):
+        children: list = []
+        child = getattr(self, 'child', None)
+        while child is not None:
+            children.append(child)
+            child = getattr(child, 'child', None)
+        return children[::-1]
+
 
 @receiver(post_save, sender=LitigationCases)
 def LitigationCases_send_email(sender, instance, created, *args, **kwargs):
+
+    """
+    Synchronize paths from parent to child on LitigationCases creation.
+    """
+    if created and instance.parent:
+        # Inherit paths from the parent case
+        parent_paths = instance.parent.paths.all()
+        instance.paths.set(parent_paths)  # Copy paths from the parent
+        instance.save()  # Save the instance with updated paths
     # request = current_request()
     current_case = instance
     case = LitigationCases.objects.get(id=current_case.id)
@@ -262,6 +281,7 @@ def LitigationCases_send_email(sender, instance, created, *args, **kwargs):
                     send_html_mail(email_subject, email_body, [case.assignee.email])
 
 
+
 @receiver(m2m_changed, sender=LitigationCases.shared_with.through)
 def LitigationCases_sharedwith_send_email(sender, instance, action, reverse, pk_set, *args, **kwargs):
     # request = current_request()
@@ -279,6 +299,49 @@ def LitigationCases_sharedwith_send_email(sender, instance, action, reverse, pk_
                     'msgtype': _('You have been shared with you below case details')
                 })
                 send_html_mail(email_subject, email_body, [cuser.email])
+
+
+def family_tree(case) -> set:
+    """
+    Collect all connected LitigationCases (parents, the current case, and children).
+    """
+    connected_cases = set()
+
+    # Collect parent cases recursively
+    current: LitigationCases = case
+    while current.parent is not None:
+        connected_cases.add(current.parent)
+        current = current.parent
+
+    # Collect child cases recursively
+    def collect_children(case):
+        child = getattr(case, 'children', None)  # Get the single child case
+        if child:  # Check if a child exists
+            connected_cases.add(child)  # Add the child to the set
+            collect_children(child)  # Recursively collect further descendants
+
+    collect_children(case)
+
+    # Include the current case
+    connected_cases.add(case)
+
+    # Return the family tree as a list sorted by ID or any other attribute
+    return sorted(connected_cases, key=lambda x: x.id)
+
+
+@receiver(m2m_changed, sender=LitigationCases.paths.through)
+def sync_paths_across_connected_cases(sender, instance, action, **kwargs):
+    """
+    Synchronize paths field across LitigationCases connected via parent-child relationship.
+    """
+    if action in ["post_add", "post_remove", "post_clear"]:
+        # Collect all connected cases (parent and children recursively)
+        connected_cases = family_tree(instance)
+
+        # Update paths for all connected cases
+        for case in connected_cases:
+            case.paths.set(instance.paths.all())  # Synchronize paths
+            case.save()
 
 
 class Folder(models.Model):
@@ -483,7 +546,7 @@ auditlog.register(
     m2m_fields={
         "paths", "documents", "shared_with", "hearing", "tasks", "ImportantDevelopment", "comments"
     },
-    exclude_fields=['modified_by', 'created_by']
+    exclude_fields=['modified_by', 'created_by','created_at','modified_at']
 )
 auditlog.register(
     Notation,

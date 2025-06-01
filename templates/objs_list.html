@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static file_filters %}
 
 {% load static i18n file_filters %}
 {% block content %}
 {% include "includes/_render_filter_form.html" with filters=filter_fields session=session %}
 {% include "includes/_create_count.html" with obj_create=obj_create objs_count=objs_count %}
+
 {% include "includes/_render_table.html" with objs=objs headers=headers fields_to_show=fields_to_show filter_query=filter_query page_range=page_range %}
 {% include 'includes/_pagination.html' with objs=objs filter_query=filter_query %}
 

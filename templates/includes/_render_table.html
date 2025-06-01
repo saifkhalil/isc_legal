@@ -5,8 +5,9 @@
 <table class="table table-hover shadow-sm" {% if user.enable_transition %}data-aos="zoom-in"{% endif %}>
   <thead>
     <tr class="bg-gray-100 fw-bold">
+    <td class="pt-3 pb-3 text-bold qi-light"></td>
       {% for header in headers %}
-        <td class="pt-3 pb-3 text-bold qi-light">{{ header }}</td>
+        <td class="pt-3 pb-3 text-bold qi-light">{% if not forloop.last %}<a href="{% with field_name=fields_to_show|index:forloop.counter0  %}{{ request.get_full_path|set_orderby:field_name }}{% endwith %}">{% with field_name=fields_to_show|index:forloop.counter0  %}{% with check_order=request.get_full_path|same_order:field_name %} {%  if check_order == 'same' %}<i class="fa fa-long-arrow-up" aria-hidden="true"></i><i class="fa fa-long-arrow-down opacity-50" aria-hidden="true"></i>{% elif check_order == 'reverse' %}<i class="fa fa-long-arrow-up opacity-50" aria-hidden="true"></i><i class="fa fa-long-arrow-down" aria-hidden="true"></i>{% else %}<i class="fa fa-long-arrow-up opacity-50" aria-hidden="true"></i><i class="fa fa-long-arrow-down opacity-50" aria-hidden="true"></i>{% endif %} {% endwith %}{% endwith %}{{ header }}</a>{% else %}{{ header }}{% endif %}</td>
       {% endfor %}
     </tr>
   </thead>
@@ -19,63 +20,7 @@
       </tr>
     {% else %}
       {% for obj in objs %}
-        <tr class="table-row bg-white" {% if user.enable_transition %}data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00"{% endif %}>
-          {% for field in fields_to_show %}
-  <td class="pt-2 pb-2">
-    {% with value=obj|attr:field %}
-      {% if field == 'name' or field == 'subject' or field == 'title' %}
-        <a {% if value|length > 30 %} data-bs-toggle="tooltip" data-bs-placement="left" title="{{ value }}" {% endif %} href="{% url obj_view obj.id %}">{{ value|truncatechars:30 }}</a>
-      {% elif field == 'created_at' or field == 'start_date' or field == 'end_date' or field == 'end_time' %}
-        {{ value|date:"Y-m-d" }}
-      {% elif field == 'case_category' %}
-        {% if value == "Public" %}
-          <div class="alert alert-light p-1 fs-8 mb-0 fw-normal rounded-pill border-success text-success">
-          <i class="bi bi-globe"></i><span> {% trans value %}</span>
-          </div>
-        {% elif value == "Private" %}
-          <div class="alert alert-light p-1 fs-8 mb-0 fw-normal rounded-pill border-danger text-danger">
-          <i class="bi bi-lock"></i><span> {% trans value %}</span>
-          </div>
-        {% endif %}
-      {% elif field == 'cases' %}
-        {% if value.all %}
-          {% for case in value.all %}
-                <a href="{% url 'case_view' case.id %}">{{ case|truncatechars:40 }}</a>
-        {% endfor %}
-          {% endif %}
-      {% elif field == 'assignee' %}
-        {% if value.all %}
-           <div class="flex">
-          {% for assignee in value.all %}
-            {% include 'includes/_alert_user.html' with value=assignee %}
-        {% endfor %}
-           </div>
-        {% else %}
-          {% if value %}
-        {% include 'includes/_alert_user.html' with value=value %}
-            {% endif %}
-          {% endif %}
-      {% elif field == 'case_status' or field == 'hearing_status' or field == 'task_status' %}
-        {% if value %}
-          {% include 'includes/_status_with_icon.html' with value=value %}
-        {% endif %}
-      {% elif field == 'priority' %}
-        {% if value %}
-          {% include 'includes/_priority_with_icon.html' with value=value %}
-        {% endif %}
-        {% elif field == 'auto_renewal' %}
-                  {% if value == False %}<i class="bi bi-x-circle-fill text-danger"></i>{% else %}<i class="bi bi-check-circle-fill text-success"></i>{% endif %}
-      {% else %}
-        {{ value|default:"" }}
-      {% endif %}
-
-    {% endwith %}
-  </td>
-{% endfor %}
-          <td class="pt-2 pb-2">
-          {% include "includes/_action_buttons.html" with obj_edit=obj_edit obj=obj user=user %}
-          </td>
-        </tr>
+        {% include 'includes/_obj_record.html' with obj_edit=obj_edit obj=obj user=user %}
       {% endfor %}
     {% endif %}
   </tbody>

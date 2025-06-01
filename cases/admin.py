@@ -6,7 +6,7 @@ from .models import *
 
 class LitigationCasesAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ('id', 'name', 'description', 'is_deleted', 'assignee')
-    fields = ('name', 'description', 'case_category', 'judge', 'tasks', 'hearing', 'comments', 'detective', 'ImportantDevelopment',
+    fields = ('parent', 'name', 'description', 'case_category', 'judge', 'tasks', 'hearing', 'comments', 'detective', 'ImportantDevelopment',
               'case_type', 'case_status', 'Stage', 'characteristic', 'court', 'documents', 'paths', 'client_position', 'opponent_position', 'assignee', 'case_close_status', 'case_close_comment',
               'shared_with', 'priority', 'end_time', 'start_time', 'is_deleted', 'created_by', 'created_at',
               'modified_by', 'modified_at')

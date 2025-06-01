@@ -347,7 +347,6 @@ class taskViewSet(viewsets.ModelViewSet):
         cached_queryset = cache.get(cache_key)
         if cached_queryset:
             data = cached_queryset
-            print('cached_queryset')
         else:
             tasks = self.get_queryset()
             cases: list = []
@@ -644,7 +643,6 @@ class hearingViewSet(viewsets.ModelViewSet):
         cached_queryset = cache.get(cache_key)
         if cached_queryset:
             queryset = cached_queryset
-            print('cached_queryset')
         else:
             queryset = hearing.objects.all().order_by('-id').filter(is_deleted=False)
             cache.set(cache_key, queryset, None)
@@ -690,7 +688,6 @@ class hearingViewSet(viewsets.ModelViewSet):
         cached_queryset = cache.get(cache_key)
         if cached_queryset:
             data = cached_queryset
-            print('cached_queryset')
         else:
             hearings = self.get_queryset()
             cases: list = []
@@ -718,13 +715,13 @@ class hearingViewSet(viewsets.ModelViewSet):
 @login_required
 def tasks_list(request):
     number_of_records = 10
-    keywords = task_category = assignee = task_status = task_case = None
+    keywords = task_category = assignee = task_status = task_case = orderby = None
     task_category_set = assignee_set = task_status_set = cases_set = task_cases_set =  None
 
     if request.method == 'GET':
         # Clear filters and redirect if needed.
         if request.GET.get('clear'):
-            for key in ['keywords', 'task_category', 'assignee', 'task_status', 'task_case', 'number_of_records']:
+            for key in ['keywords', 'task_category', 'assignee', 'task_status', 'task_case', 'orderby', 'number_of_records']:
                 request.session.pop(key, None)
             return redirect(request.path)
 
@@ -734,6 +731,7 @@ def tasks_list(request):
             request.session['keywords'] = keywords  # Update session even if empty
         else:
             keywords = request.session.get('keywords', '')
+        orderby = request.GET.get('orderby' ,'-modified_at') or request.session.get('orderby', '-modified_at')
         task_category = request.GET.get('task_category') or request.session.get('task_category',0)
         assignee = request.GET.get('assignee') or request.session.get('assignee',0)
         task_status = request.GET.get('task_status') or request.session.get('task_status',0)
@@ -795,7 +793,6 @@ def tasks_list(request):
                     for cassignee in ctask.assignee.all():
                         assignees.append(dict_item(cassignee.id, cassignee.username))
                 if ctask.case_id:
-                    print(f'{ctask.case_id=}')
                     try:
                         case = LitigationCases.objects.get(pk=ctask.case_id)
                     except LitigationCases.DoesNotExist:
@@ -815,8 +812,8 @@ def tasks_list(request):
         # Apply filters.
         tasks_qs = tasks_qs.filter(query)
     else:
-        tasks_qs = task.objects.filter(is_deleted=False).order_by('-created_by')
-
+        tasks_qs = task.objects.filter(is_deleted=False)
+    tasks_qs = tasks_qs.order_by(orderby)
     # Set up pagination.
     paginator = Paginator(tasks_qs, number_of_records)
     page_number = request.GET.get('page', 1)
@@ -836,7 +833,7 @@ def tasks_list(request):
     # Build a filter query string to be used in pagination links.
     # Only include filter keys (exclude 'page').
     filter_params = {}
-    for key in ['keywords', 'task_category', 'assignee', 'task_status', 'task_case', 'number_of_records']:
+    for key in ['keywords', 'task_category', 'assignee', 'task_status', 'orderby', 'task_case', 'number_of_records']:
         value = request.session.get(key)
         if value:
             filter_params[key] = value
@@ -964,7 +961,6 @@ def new_task_path(request, task_id=None):
 
 @require_POST
 def delete_task(request, pk=None):
-    print('delete_task',pk)
     instance = task.objects.get(pk=pk)
     if not (request.user.is_manager or request.user.is_superuser):
         return JsonResponse({'success': False, 'message':"You do not have permission to perform this action."},status=401)
@@ -979,7 +975,7 @@ def delete_task(request, pk=None):
 @login_required
 def hearings_list(request):
     number_of_records = 10
-    keywords = court = assignee = hearing_status = hearing_case = None
+    keywords = court = assignee = hearing_status = hearing_case = orderby = None
     hearing_court_set = assignee_set = hearing_status_set = cases_set = None
     if request.method == 'GET':
         # Clear filters and redirect if needed.
@@ -995,6 +991,7 @@ def hearings_list(request):
         else:
             keywords = request.session.get('keywords', '')
         court = request.GET.get('court') or request.session.get('court',0)
+        orderby = request.GET.get('orderby', '-modified_at')
         assignee = request.GET.get('assignee') or request.session.get('assignee',0)
         hearing_status = request.GET.get('hearing_status') or request.session.get('hearing_status',0)
         hearing_case = request.GET.get('hearing_case') or request.session.get('hearing_case',0)
@@ -1070,8 +1067,8 @@ def hearings_list(request):
         # Apply filters.
         hearings_qs = hearings_qs.filter(query)
     else:
-        hearings_qs = task.objects.filter(is_deleted=False).order_by('-created_by')
-
+        hearings_qs = task.objects.filter(is_deleted=False)
+    hearings_qs = hearings_qs.order_by(orderby)
     # Set up pagination.
     paginator = Paginator(hearings_qs, number_of_records)
     page_number = request.GET.get('page', 1)

@@ -71,13 +71,13 @@ def get_stages_for_case_type(request):
 @login_required
 def cases_list(request):
     number_of_records = 10
-    keywords = stage = assignee = case_type = status = None
+    keywords = stage = assignee = case_type = status = orderby = None
     assignees_set = court_set = case_type_set = stage_set = case_status_set = None
     objs_count: int = 0
     if request.method == 'GET':
         # Clear filters and redirect if needed.
         if request.GET.get('clear'):
-            for key in ['keywords', 'stage', 'assignee', 'type', 'status', 'number_of_records']:
+            for key in ['keywords', 'stage', 'assignee', 'type', 'status', 'orderby', 'number_of_records']:
                 request.session.pop(key, None)
             return redirect(request.path)
 
@@ -88,6 +88,7 @@ def cases_list(request):
         else:
             keywords = request.session.get('keywords', '')
         stage = request.GET.get('stage') or request.session.get('stage', 0)
+        orderby = request.GET.get('orderby' ,'-modified_at') or request.session.get('orderby', '-modified_at')
         assignee = request.GET.get('assignee') or request.session.get('assignee', 0)
         case_type = request.GET.get('type') or request.session.get('type', 0)
         status = request.GET.get('status') or request.session.get('status', 0)
@@ -126,11 +127,12 @@ def cases_list(request):
         if status and status != '0':
             query &= Q(case_status_id=status)
 
+
         cases_list_cache_key = "all_litigation_cases_objects"
         cases_qs = cache.get(cases_list_cache_key)
         # Get base queryset.
         if cases_qs is None:
-            cases_qs = LitigationCases.objects.filter(is_deleted=False).order_by('-created_by')
+            cases_qs = LitigationCases.objects.filter(is_deleted=False,parent=None,is_archived=False)
             cache.set(cases_list_cache_key, cases_qs, timeout=None)
         # Retrieve filter dropdown data from cache or compute if not cached.
         cache_key = "litigation_cases_objects"
@@ -175,8 +177,11 @@ def cases_list(request):
         # Apply filters.
         cases_qs = cases_qs.filter(query)
     else:
-        cases_qs = LitigationCases.objects.filter(is_deleted=False).order_by('-created_by')
+        cases_qs = LitigationCases.objects.filter(is_deleted=False,parent=None,is_archived=False)
     objs_count = cases_qs.count()
+
+    cases_qs = cases_qs.order_by(orderby)
+
     # Set up pagination.
     paginator = Paginator(cases_qs, number_of_records)
     page_number = request.GET.get('page', 1)
@@ -196,7 +201,7 @@ def cases_list(request):
     # Build a filter query string to be used in pagination links.
     # Only include filter keys (exclude 'page').
     filter_params = {}
-    for key in ['keywords', 'stage', 'assignee', 'type', 'status', 'number_of_records']:
+    for key in ['keywords', 'stage', 'assignee', 'type', 'status', 'orderby', 'number_of_records']:
         value = request.session.get(key)
         if value:
             filter_params[key] = value
@@ -333,7 +338,6 @@ def case_view(request, case_id=None, mode='view'):
 
 @require_POST
 def delete_case(request, pk=None):
-    print('delete_case', pk)
     instance = LitigationCases.objects.get(pk=pk)
     if not (request.user.is_manager or request.user.is_superuser):
         return JsonResponse({'success': False, 'message': "You do not have permission to perform this action."},
@@ -373,7 +377,7 @@ def new_case_comment(request, case_id=None):
 @login_required
 def notations_list(request):
     number_of_records = 10
-    keywords = court = priority = assignee = None
+    keywords = court = priority = assignee = orderby = None
     assignees_set = court_set = priorities_set = None
 
     if request.method == 'GET':
@@ -392,6 +396,7 @@ def notations_list(request):
         court = request.GET.get('court') or request.session.get('court', 0)
         assignee = request.GET.get('assignee') or request.session.get('assignee', 0)
         priority = request.GET.get('priority') or request.session.get('priority', 0)
+        orderby = request.GET.get('orderby' ,'-modified_at') or request.session.get('orderby', '-modified_at')
 
         # Save parameters to session if provided.
         for key, value in (('keywords', keywords), ('court', court),
@@ -425,7 +430,7 @@ def notations_list(request):
             query &= Q(assignee_id=assignee)
 
         # Get base queryset.
-        notations_qs = Notation.objects.filter(is_deleted=False).order_by('-created_by')
+        notations_qs = Notation.objects.filter(is_deleted=False)
 
         # Retrieve filter dropdown data from cache or compute if not cached.
         cache_key = "notations_objects"
@@ -459,7 +464,9 @@ def notations_list(request):
         # Apply filters.
         notations_qs = notations_qs.filter(query)
     else:
-        notations_qs = Notation.objects.filter(is_deleted=False).order_by('-created_by')
+        notations_qs = Notation.objects.filter(is_deleted=False)
+
+    notations_qs = notations_qs.order_by(orderby)
     objs_count = notations_qs.count()
     # Set up pagination.
     paginator = Paginator(notations_qs, number_of_records)
@@ -644,7 +651,7 @@ def delete_notation(request, pk=None):
 @login_required
 def AdministrativeInvestigations_list(request):
     number_of_records = 10
-    keywords = priority = None
+    keywords = priority = orderby = None
     priorities_set = None
 
     if request.method == 'GET':
@@ -676,6 +683,7 @@ def AdministrativeInvestigations_list(request):
             request.session['number_of_records'] = number_of_records
         else:
             number_of_records = request.session.get('number_of_records', 10)
+        orderby = request.GET.get('orderby' ,'-modified_at') or request.session.get('orderby', '-modified_at')
 
         # Build search query using Q objects.
         query = Q()
@@ -688,8 +696,7 @@ def AdministrativeInvestigations_list(request):
             query &= Q(priority_id=priority)
 
         # Get base queryset.
-        AdministrativeInvestigations_qs = AdministrativeInvestigation.objects.filter(is_deleted=False).order_by(
-            '-created_by')
+        AdministrativeInvestigations_qs = AdministrativeInvestigation.objects.filter(is_deleted=False)
 
         # Retrieve filter dropdown data from cache or compute if not cached.
         cache_key = "AdministrativeInvestigations_objects"
@@ -711,9 +718,8 @@ def AdministrativeInvestigations_list(request):
         # Apply filters.
         AdministrativeInvestigations_qs = AdministrativeInvestigations_qs.filter(query)
     else:
-        AdministrativeInvestigations_qs = AdministrativeInvestigation.objects.filter(is_deleted=False).order_by(
-            '-created_by')
-
+        AdministrativeInvestigations_qs = AdministrativeInvestigation.objects.filter(is_deleted=False)
+    AdministrativeInvestigations_qs = AdministrativeInvestigations_qs.order_by(orderby)
     # Set up pagination.
     paginator = Paginator(AdministrativeInvestigations_qs, number_of_records)
     page_number = request.GET.get('page', 1)
@@ -1120,7 +1126,7 @@ class LitigationCasesViewSet(CSVRendererMixin2, viewsets.ModelViewSet):
         return Response(data={"detail": "تم مسح الدعوى بنجاح"}, status=status.HTTP_200_OK)
 
     def get_queryset(self):
-        print('start LitigationCasesViewSet - get_queryset')
+
         internal_ref_number = self.request.query_params.get(
             'internal_ref_number')
         start_time = self.request.query_params.get('start_time', None)
@@ -1163,11 +1169,9 @@ class LitigationCasesViewSet(CSVRendererMixin2, viewsets.ModelViewSet):
             filter_query = Q(shared_with__id__exact=current_user_id) | Q(created_by__id__exact=current_user_id) | Q(
                 assignee__id__exact=current_user_id)
             queryset = queryset.filter(filter_query).distinct()
-        print('end LitigationCasesViewSet - get_queryset')
         return queryset
 
     def get_queryset_3(self):
-        print("Start LitigationCasesViewSet - get_queryset")
         current_user = self.request.user
         # Retrieve query parameters
         params = self.request.query_params
@@ -1219,7 +1223,6 @@ class LitigationCasesViewSet(CSVRendererMixin2, viewsets.ModelViewSet):
         # Optimize performance with prefetching related fields
         queryset = queryset.select_related("created_by", "assignee").prefetch_related("shared_with")
 
-        print("End LitigationCasesViewSet - get_queryset")
         return queryset
 
     def perform_update(self, serializer):
@@ -1245,7 +1248,6 @@ class LitigationCasesViewSet(CSVRendererMixin2, viewsets.ModelViewSet):
         cached_queryset = cache.get(cache_key)
         if cached_queryset:
             data = cached_queryset
-            print('cached_queryset')
         else:
             cases = self.get_queryset()
             Stage: list = []
@@ -1498,7 +1500,7 @@ class NotationViewSet(CSVRendererMixin, viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         notation = serializer.instance
-        print('notation: ', serializer)
+
         notification_users: list = []
         managers_notifications = User.objects.filter(is_manager=True, )
         managers_users = [manager for manager in managers_notifications]

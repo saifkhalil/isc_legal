@@ -3,7 +3,7 @@ import os
 from django import template
 from django.urls import NoReverseMatch, reverse
 from django.core.cache import cache
-
+from urllib.parse import urlparse, parse_qs, urlencode
 register = template.Library()
 
 FILE_ICONS = {
@@ -60,3 +60,42 @@ def model_name(value):
 @register.filter
 def is_user_online(user_id):
     return cache.get(f"user_online_{user_id}",False)
+
+@register.filter
+def index(indexable, i):
+    return indexable[i]
+
+@register.filter
+def set_orderby(url: str, field: str):
+    parsed_url = urlparse(url)
+    query_params = parse_qs(parsed_url.query)
+
+    current_orderby = query_params.get('orderby', ['modified_by'])
+    if current_orderby:
+        current_orderby = current_orderby[0]
+    if current_orderby == field:
+        query_params['orderby'] = [f'-{field}']
+    elif current_orderby == f'-{field}':
+        query_params['orderby'] = [field]
+    else:
+        query_params['orderby'] = [field]
+    new_query_string = urlencode(query_params, doseq=True)
+    new_url = parsed_url._replace(query=new_query_string).geturl()
+    return new_url
+
+@register.filter
+def same_order(url: str, field: str):
+    parsed_url = urlparse(url)
+    query_params = parse_qs(parsed_url.query)
+    current_orderby = query_params.get('orderby')
+    if current_orderby:
+        current_orderby = current_orderby[0]
+    reverse_field = f'-{field}'
+    if current_orderby == field:
+        result = 'same'
+    elif current_orderby == reverse_field:
+        result = 'reverse'
+    else:
+        result = 'nothing'
+
+    return result

@@ -1,0 +1,66 @@
+{% load i18n file_filters %}
+<tr id="parent_case_{{ sub_obj.parent.id }}" class="collapse table-row bg-secondary" {% if user.enable_transition %}data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00"{% endif %}>
+      <td class="pt-2 pb-2">
+      <div style="margin-right: {% widthratio forloop.counter 1 14 %}px !important;">
+        <button data-bs-toggle="collapse" data-bs-target="#parent_case_{{ sub_obj.id }}" aria-expanded="false"
+            aria-controls="parent_case_{{ sub_obj.id }}" style="cursor: pointer;" class="fs-6 bg-transparent"><i class="{% if sub_obj.child %}fa fa-plus-circle text-warning{% endif %}"
+id="folder-icon-{{ sub_obj.id }}" aria-hidden="true"></i></button>
+      </div>
+
+  </td>
+  {% for field in fields_to_show %}
+  <td class="pt-2 pb-2 bg-transparent">
+  {% with value=sub_obj|attr:field %}
+  {% if field == 'name' or field == 'subject' or field == 'title' %}
+  <a {% if value|length > 30 %} data-bs-toggle="tooltip" data-bs-placement="left" title="{{ value }}" {% endif %} href="#">{{ value|truncatechars:30 }}</a>
+  {% elif field == 'created_at' or field == 'start_date' or field == 'end_date' or field == 'end_time' %}
+  {{ value|date:"Y-m-d" }}
+  {% elif field == 'case_category' %}
+  {% if value == "Public" %}
+    <div class="alert alert-light p-1 fs-8 mb-0 fw-normal rounded-pill border-success text-success">
+    <i class="bi bi-globe"></i><span> {% trans value %}</span>
+    </div>
+  {% elif value == "Private" %}
+    <div class="alert alert-light p-1 fs-8 mb-0 fw-normal rounded-pill border-danger text-danger">
+    <i class="bi bi-lock"></i><span> {% trans value %}</span>
+    </div>
+  {% endif %}
+  {% elif field == 'cases' %}
+  {% if value.all %}
+    {% for case in value.all %}
+          <a href="{% url 'case_view' case.id %}">{{ case|truncatechars:40 }}</a>
+  {% endfor %}
+    {% endif %}
+  {% elif field == 'assignee' %}
+  {% if value.all %}
+     <div class="flex">
+    {% for assignee in value.all %}
+      {% include 'includes/_alert_user.html' with value=assignee %}
+  {% endfor %}
+     </div>
+  {% else %}
+    {% if value %}
+  {% include 'includes/_alert_user.html' with value=value %}
+      {% endif %}
+    {% endif %}
+  {% elif field == 'case_status' or field == 'hearing_status' or field == 'task_status' %}
+  {% if value %}
+    {% include 'includes/_status_with_icon.html' with value=value %}
+  {% endif %}
+  {% elif field == 'priority' %}
+  {% if value %}
+    {% include 'includes/_priority_with_icon.html' with value=value %}
+  {% endif %}
+  {% elif field == 'auto_renewal' %}
+            {% if value == False %}<i class="bi bi-x-circle-fill text-danger"></i>{% else %}<i class="bi bi-check-circle-fill text-success"></i>{% endif %}
+  {% else %}
+  {{ value|default:"" }}
+  {% endif %}
+
+  {% endwith %}
+  </td>
+{% endfor %}
+  <td class="pt-2 pb-2 bg-transparent">
+  {% include "includes/_action_buttons.html" with obj_edit=obj_edit obj_id=sub_obj.id obj=sub_obj user=user %}
+  </td>
+</tr>

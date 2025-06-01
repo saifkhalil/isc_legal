@@ -247,7 +247,7 @@ class TypeViewSet(viewsets.ModelViewSet):
 @login_required
 def contracts_list(request):
     number_of_records = 10
-    keywords = type = assignee = out_side_iraq = auto_renewal = company = None
+    keywords = type = assignee = out_side_iraq = auto_renewal = company  = orderby= None
     type_set = assignee_set = company_set =  None
 
     if request.method == 'GET':
@@ -264,6 +264,7 @@ def contracts_list(request):
         else:
             keywords = request.session.get('keywords', '')
         type = request.GET.get('type') or request.session.get('type',0)
+        orderby = request.GET.get('orderby', '-modified_at')
         assignee = request.GET.get('assignee') or request.session.get('assignee',0)
         out_side_iraq = request.GET.get('out_side_iraq') or request.session.get('out_side_iraq',0)
         auto_renewal = request.GET.get('auto_renewal') or request.session.get('auto_renewal',0)
@@ -345,8 +346,8 @@ def contracts_list(request):
         # Apply filters.
         hearings_qs = contracts_qs.filter(query)
     else:
-        hearings_qs = Contract.objects.filter(is_deleted=False).order_by('-created_by')
-
+        hearings_qs = Contract.objects.filter(is_deleted=False)
+    hearings_qs = hearings_qs.order_by(orderby)
     # Set up pagination.
     paginator = Paginator(hearings_qs, number_of_records)
     page_number = request.GET.get('page', 1)

@@ -1,10 +1,10 @@
 {% load i18n static %}
-<footer class="footer py-3 qi-nav fixed-bottom justify-content-center align-items-center border-top">
+<footer class="footer mt-auto py-3 qi-nav justify-content-center align-items-center border-top">
   <div class="container">
     <div class="justify-content-center d-flex align-items-center">
       <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'images/qilogo.svg' %}" width="30"
                                                            height="30" alt="alternative"> </a>
-      <span class="mb-3 mb-md-0 text-white px-2">{% trans 'ISC ©' %} {% now "Y" %}</span>
+      <span class="mb-md-0 text-white px-2">{% trans 'ISC ©' %} {% now "Y" %}</span>
     </div>
   </div>
 </footer>

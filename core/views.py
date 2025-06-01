@@ -153,7 +153,6 @@ def set_theme_color(request):
 def set_animation(request):
     if request.method == "POST":
         animation = True if request.POST.get("animation") == 'on' else False
-        print(f'{request.POST}')
         if request.user.is_authenticated:
             request.user.enable_transition = animation
             request.user.save()
@@ -176,7 +175,6 @@ def set_language(request):
 
             # Get current request URL
             old_url = request.META.get("HTTP_REFERER", "/")
-            print(f'old_url: {old_url}')
 
             # Try using translate_url first
             new_url = translate_url(old_url, language)
@@ -542,7 +540,6 @@ class documentsViewSet(viewsets.ModelViewSet):
             Hearing = get_object_or_404(hearing, pk=req_hearing_id)
             Hearing.documents.add(document)
         serializer = self.get_serializer(document)
-        print(req_task_id)
         cache.delete("documents_queryset")
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -1077,7 +1074,6 @@ class NotificationViewSet(viewsets.ModelViewSet):
     #     paginator = LimitOffsetPagination()
     #     paginator_response = paginator.paginate_queryset(serializer.data,request)
     #     # count = paginator_response.get_count
-    #     print('count',count)
     #     response_data = OrderedDict([
     #             # ('count', count),
     #             ('results', paginator_response),
@@ -1332,12 +1328,9 @@ def Paths_list(request):
 @require_POST
 def new_path_docs(request, path_id=None):
     instance = get_object_or_404(Path, pk=path_id)
-    print(f'{request.FILES.items()=}')
-    print(f'{request.POST=}')
     files = request.FILES.getlist('attachments')
     url = request.POST.get('url')
     for uploaded_file in files:
-        print(f'{uploaded_file=}')
         doc = documents.objects.create(
             name=uploaded_file.name,
             attachment=uploaded_file,

@@ -14,7 +14,7 @@
 
   {% block content %}{% endblock %}
   </div>
-{% include 'includes/_base_footer.html' %}
+
 <!-- Hidden div to store translated texts -->
 <div id="translations"
      data-created="{% trans 'create' %}"
@@ -30,6 +30,7 @@
      data-path="{% trans 'Path' %}"
 >
 </div>
+{% include 'includes/_base_footer.html' %}
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'js/tinymce/tinymce.min.js' %}"></script>
     <script src="{% static 'js/custom.js' %}?v=1.1"></script>
@@ -43,6 +44,7 @@
     <script src="{% static 'js/owl.carousel.min.js' %}"></script>
     <script src="{% static 'js/isotope.min.js' %}"></script>
     <script src="{% static 'js/aos.js' %}"></script>
+
 <script>
   {% include 'js/base.js' %}
 </script>
@@ -57,6 +59,7 @@
   // Load saved theme on page load
 
 </script>
+
 </body>
 </html>
 {% endwith %}
