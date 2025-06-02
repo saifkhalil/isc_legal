@@ -13,7 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
@@ -1237,10 +1237,6 @@ def Paths_list(request):
         else:
             number_of_records = request.session.get('number_of_records', 10)
 
-        # Build search query using Q objects.
-        query = Q()
-        if keywords:
-            query |= Q(name__icontains=keywords)
 
         # Get base queryset.
         cache_key = "Paths_objects"
@@ -1250,7 +1246,28 @@ def Paths_list(request):
         else:
             Paths_qs = Path.objects.filter(is_deleted=False).exclude(Q(id__in=[1, 24]) | Q(parent=24)).order_by('-created_by')
             cache.set(cache_key, Paths_qs, timeout=None)
-        Paths_qs = Paths_qs.filter(query)
+        query = Q()
+        if keywords:
+            # Filter the related documents first
+            doc_filter = Q(extracted_text__icontains=keywords)
+
+            # Create a filtered prefetch object
+            doc_prefetch = Prefetch(
+                'documents',
+                queryset=documents.objects.filter(doc_filter),
+                to_attr='filtered_documents'  # This will be a list on each Path
+            )
+
+            Paths_qs = Paths_qs.filter(
+                Q(name__icontains=keywords) |
+                Q(documents__extracted_text__icontains=keywords)
+            ).prefetch_related(doc_prefetch).distinct()
+        else:
+            # When no filter, prefetch all documents
+            doc_prefetch = Prefetch('documents', to_attr='filtered_documents')
+            Paths_qs = Paths_qs.prefetch_related(doc_prefetch)
+
+        Paths_qs = Paths_qs.filter(query).distinct()
         # Retrieve filter dropdown data from cache or compute if not cached.
         if user.is_manager or user.is_superuser:
             Paths_qs = Paths_qs
@@ -1338,6 +1355,7 @@ def new_path_docs(request, path_id=None):
             created_at=timezone.now(),
         )
         instance.documents.add(doc)
+        doc.process_document()
     return redirect(url)
 
 @require_POST

@@ -6,6 +6,7 @@ from channels.layers import get_channel_layer
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from django.core.files.base import ContentFile
 from django.core.validators import FileExtensionValidator
 from django.db import connection, models, transaction
 from django.utils.translation import gettext_lazy as _
@@ -18,6 +19,14 @@ from .events import (
     event_path_deleted, event_path_document_added, event_path_document_removed
 )
 from .model_mixins import ExtraDataModelMixin, HooksModelMixin
+import fitz
+from PIL import Image
+import tempfile
+import subprocess
+import os
+from io import BytesIO
+
+from .utils import extract_text_from_image
 
 
 class priorities(models.Model):
@@ -151,7 +160,8 @@ class contracts(models.Model):
     modified_by = models.ForeignKey(
         User, related_name='%(class)s_modifiedby', null=True, blank=True, on_delete=models.CASCADE, editable=False)
 
-
+def get_upload_path(instance, filename):
+    return os.path.join('documents', str(instance.id), filename)
 
 class documents(ExtraDataModelMixin, HooksModelMixin, models.Model):
     id = models.AutoField(primary_key=True, )
@@ -159,6 +169,7 @@ class documents(ExtraDataModelMixin, HooksModelMixin, models.Model):
                             null=False, verbose_name=_('Name'))
     attachment = models.FileField(upload_to='documents/%Y/%m/%d/', verbose_name=_('Attachment'), validators=[
         FileExtensionValidator(['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'git'])])
+    extracted_text = models.TextField(blank=True, null=True, verbose_name=_("Extracted OCR Text"))
     case_id = models.IntegerField(
         blank=True, null=True, verbose_name=_('Litigation Case'))
     path_id = models.IntegerField(
@@ -184,6 +195,84 @@ class documents(ExtraDataModelMixin, HooksModelMixin, models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def process_document(self):
+        file_path = self.attachment.path
+        file_ext = os.path.splitext(file_path)[-1].lower()
+
+        images = []
+
+        if file_ext in ['.jpg', '.jpeg', '.png']:
+            images = [Image.open(file_path)]
+        elif file_ext == '.pdf':
+            try:
+                pdf = fitz.open(file_path)
+                for page in pdf:
+                    pix = page.get_pixmap()
+                    img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
+                    images.append(img)
+            except:
+                pass
+        elif file_ext in ['.doc', '.docx']:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                output_dir = os.path.join(tmpdir, "images")
+                os.makedirs(output_dir, exist_ok=True)
+                subprocess.run([
+                    'libreoffice', '--headless', '--convert-to', 'pdf', '--outdir', tmpdir, file_path
+                ], check=True)
+                pdf_file = os.path.join(tmpdir, os.path.basename(file_path).replace(file_ext, '.pdf'))
+                try:
+                    pdf = fitz.open(pdf_file)
+                    for page in pdf:
+                        pix = page.get_pixmap()
+                        img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
+                        images.append(img)
+                except:
+                    pass
+
+        # Save each image and extract text
+        extracted_text = ''
+        for index, img in enumerate(images):
+            text = extract_text_from_image(img)
+            extracted_text += f'\n--- Page {index + 1} ---\n{text}'
+
+            # Save page image to DocumentImage
+            buffer = BytesIO()
+            img.save(buffer, format='PNG')
+            buffer.seek(0)
+
+            documentImage.objects.create(
+                document=self,
+                image=ContentFile(buffer.read(), name=f"{self.pk}_page_{index + 1}.png")
+            )
+
+        self.extracted_text = extracted_text
+        self.save()
+
+    def get_preview_image(self):
+        return [image.image.url for image in self.images.all()]
+
+class documentImage(models.Model):
+    document = models.ForeignKey(documents, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='documents/pages/')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Page of {self.document.name}"
+
+
+class documentPage(models.Model):
+    document = models.ForeignKey(documents, on_delete=models.CASCADE, related_name='pages')
+    page_number = models.PositiveIntegerField()
+    image = models.ImageField(upload_to='documents/%Y/%m/%d/pages/')
+    text = models.TextField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ('document', 'page_number')
+        ordering = ['page_number']
+
+    def __str__(self):
+        return f"{self.document.name} - Page {self.page_number}"
 
 class Path(MPTTModel):
     name = models.CharField(max_length=100,)

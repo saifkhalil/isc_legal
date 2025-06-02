@@ -5,7 +5,7 @@
     <tr {% if user.enable_transition %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
       <td class="pt-2 pb-2">
         <button data-bs-toggle="collapse" data-bs-target="#parent_case_{{ path.id }}" aria-expanded="false"
-                aria-controls="parent_path_{{ path.id }}" style="cursor: pointer" class="fs-6 bg-transparent"><i class="fa {% if path.documents.all|length == 0 %}fa-folder text-secondary{% else %}fa-folder text-warning{% endif %}"
+                aria-controls="parent_path_{{ path.id }}" style="cursor: pointer" class="fs-6 bg-transparent"><i class="fa {% if path.filtered_documents|length == 0 %}fa-folder text-secondary{% else %}fa-folder text-warning{% endif %}"
   id="folder-icon-{{ path.id }}" aria-hidden="true"></i></button>
       </td>
       <td class="pt-2 pb-2 text-bold"><p {% if path.name|length > 20 %} data-bs-toggle="tooltip" data-bs-placement="left" title="{{ path.name }}" {% endif %}>{{ path.name|truncatechars:20 }}</p></td>
@@ -42,7 +42,7 @@
 {% endif %}
  </td>
     {% endif %}
-      <td class="pt-2 pb-2">{{ path.documents.all|length }}</td>
+      <td class="pt-2 pb-2">{{ path.filtered_documents|length }}</td>
       <td class="pt-2 pb-2">
             <button class="btn btn-sm qi-primary" data-path-id="{{ path.id }}" id="upload-files"><i class="bi bi-file-earmark-arrow-up"></i></i>
   </button>
@@ -55,7 +55,7 @@
     {% if path.children.all|length %}
       {% include 'includes/_paths_subloop.html' with paths=path.children.all %}
       {% endif %}
-    {% for doc in path.documents.all %}
+    {% for doc in path.filtered_documents %}
       <tr class="collapse qi-light" id="parent_case_{{ path.id }}">
         <td class="bg-gray-200"></td>
         {% if not obj_id %}<td class="pt-2 pb-2 bg-gray-200">{{ forloop.counter }}</td>{% endif %}

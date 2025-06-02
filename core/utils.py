@@ -3,7 +3,14 @@
 from django.core.cache import cache
 from django.db.models import Model
 from django.shortcuts import get_object_or_404
+import os
+import subprocess
+from pdf2image import convert_from_path
+from PIL import Image
+import pytesseract
 
+import cv2
+import numpy as np
 
 # def cache_key_func(view_instance, view_method, request, args, kwargs):
 #     path = request.build_absolute_uri()
@@ -78,3 +85,25 @@ class LegalCache:
         self.clear_objects_cache()
         if self.obj_id:
             self.clear_object_cache()
+
+def convert_office_to_pdf(input_path, output_dir):
+    subprocess.run([
+        'libreoffice', '--headless', '--convert-to', 'pdf',
+        input_path, '--outdir', output_dir
+    ])
+    base = os.path.splitext(os.path.basename(input_path))[0]
+    return os.path.join(output_dir, f'{base}.pdf')
+
+def extract_images_from_pdf(pdf_path):
+    return convert_from_path(pdf_path)
+
+def preprocess_image_for_ocr(pil_image):
+    # Convert PIL image to OpenCV format
+    img_array = np.array(pil_image.convert('L'))  # Grayscale
+    _, thresh = cv2.threshold(img_array, 150, 255, cv2.THRESH_BINARY)
+    return Image.fromarray(thresh)
+
+def extract_text_from_image(image):
+    image = preprocess_image_for_ocr(image)
+    return pytesseract.image_to_string(image, lang='ara+eng')
+

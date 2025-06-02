@@ -1,5 +1,6 @@
 from celery import shared_task
 from celery.utils.log import get_task_logger
+from .models import documents
 
 logger = get_task_logger(__name__)
 from cases.models import Notation
@@ -17,3 +18,13 @@ def get_employees_zoho():
     print('task run')
     logger.info("Executing Task")
 
+
+@shared_task
+def process_all_documents():
+    documents_list = documents.objects.all()
+    for doc in documents_list:
+        try:
+            doc.process_document()
+        except Exception as e:
+            # Log error or handle as needed
+            print(f"Error processing document {doc.id}: {e}")
