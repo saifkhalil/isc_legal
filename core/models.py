@@ -11,6 +11,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import connection, models, transaction
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
+from django.core.files import File
 
 from accounts.models import User
 from .classes import EventManagerMethodAfter
@@ -169,6 +170,7 @@ class documents(ExtraDataModelMixin, HooksModelMixin, models.Model):
                             null=False, verbose_name=_('Name'))
     attachment = models.FileField(upload_to='documents/%Y/%m/%d/', verbose_name=_('Attachment'), validators=[
         FileExtensionValidator(['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'git'])])
+    pdf_file = models.FileField(upload_to='documents/%Y/%m/%d/', verbose_name=_('PDF'),null=True,blank=True)
     extracted_text = models.TextField(blank=True, null=True, verbose_name=_("Extracted OCR Text"))
     case_id = models.IntegerField(
         blank=True, null=True, verbose_name=_('Litigation Case'))
@@ -199,7 +201,7 @@ class documents(ExtraDataModelMixin, HooksModelMixin, models.Model):
     def process_document(self):
         file_path = self.attachment.path
         file_ext = os.path.splitext(file_path)[-1].lower()
-
+        pdf_file = self.pdf_file
         images = []
 
         if file_ext in ['.jpg', '.jpeg', '.png']:
@@ -213,7 +215,7 @@ class documents(ExtraDataModelMixin, HooksModelMixin, models.Model):
                     images.append(img)
             except:
                 pass
-        elif file_ext in ['.doc', '.docx']:
+        elif file_ext in ['.doc', '.docx','.xlsx' ,'.xlx','.pptx','.ppt','.txt']:
             with tempfile.TemporaryDirectory() as tmpdir:
                 output_dir = os.path.join(tmpdir, "images")
                 os.makedirs(output_dir, exist_ok=True)
@@ -221,6 +223,9 @@ class documents(ExtraDataModelMixin, HooksModelMixin, models.Model):
                     'libreoffice', '--headless', '--convert-to', 'pdf', '--outdir', tmpdir, file_path
                 ], check=True)
                 pdf_file = os.path.join(tmpdir, os.path.basename(file_path).replace(file_ext, '.pdf'))
+                if os.path.exists(pdf_file):
+                    with open(pdf_file, 'rb') as f:
+                        self.pdf_file.save(os.path.basename(pdf_file), File(f), save=False)
                 try:
                     pdf = fitz.open(pdf_file)
                     for page in pdf:
@@ -231,6 +236,7 @@ class documents(ExtraDataModelMixin, HooksModelMixin, models.Model):
                     pass
 
         # Save each image and extract text
+
         extracted_text = ''
         for index, img in enumerate(images):
             text = extract_text_from_image(img)
@@ -249,8 +255,11 @@ class documents(ExtraDataModelMixin, HooksModelMixin, models.Model):
         self.extracted_text = extracted_text
         self.save()
 
-    def get_preview_image(self):
-        return [image.image.url for image in self.images.all()]
+    def images_list(self):
+        return [image.image for image in self.images.all()]
+
+    def first_image(self):
+        return self.images.first().image if self.images.all() else None
 
 class documentImage(models.Model):
     document = models.ForeignKey(documents, related_name='images', on_delete=models.CASCADE)

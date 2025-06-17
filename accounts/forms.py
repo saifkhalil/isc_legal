@@ -1,10 +1,10 @@
 from django import forms
 from django.contrib.auth import authenticate
+# from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget, PhoneNumberPrefixWidget
+from django.contrib.auth import get_user_model
 # from phonenumber_field.formfields import PhoneNumberField
 from django.utils.translation import gettext_lazy as _
 
-# from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget, PhoneNumberPrefixWidget
-from django.contrib.auth import get_user_model
 User = get_user_model()
 
 # class RegistrationForm(UserCreationForm):

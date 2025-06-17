@@ -4,7 +4,7 @@
 <div class="row mx-0">
   <div class="card shadow-sm p-3 mb-3" {% if user.enable_transition %} data-aos="zoom-in" {% endif %}>
 {% include 'includes/_paths_upload_title.html' %}
-{% include 'includes/_paths_table.html' with paths=paths %}
+{% include 'includes/_paths_table.html' with paths=paths count=False %}
   </div>
 </div>
 

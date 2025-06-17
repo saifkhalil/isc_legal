@@ -1,12 +1,8 @@
 {% load i18n file_filters %}
-<tr id="parent_case_{{ sub_obj.parent.id }}" class="collapse table-row bg-secondary" {% if user.enable_transition %}data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00"{% endif %}>
-      <td class="pt-2 pb-2">
-      <div style="margin-right: {% widthratio forloop.counter 1 14 %}px !important;">
-        <button data-bs-toggle="collapse" data-bs-target="#parent_case_{{ sub_obj.id }}" aria-expanded="false"
-            aria-controls="parent_case_{{ sub_obj.id }}" style="cursor: pointer;" class="fs-6 bg-transparent"><i class="{% if sub_obj.child %}fa fa-plus-circle text-warning{% endif %}"
-id="folder-icon-{{ sub_obj.id }}" aria-hidden="true"></i></button>
-      </div>
-
+<tr id="parent_case_{{ parent_id }}" class="collapse table-row bg-warning bg-opacity-25 {% if obj.get_children|length == 1 %}shadow-up-down{% elif forloop.first %} shadow-down {% elif forloop.last %} shadow-up {% endif %}" {% if user.enable_transition %}data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00"{% endif %} >
+      <td class="pt-2 pb-2 bg-transparent text-center text-danger fs-7">
+        {% if forloop.last %}<i class="fa fa-asterisk fa-spin"></i>
+<span class="sr-only">Loading...</span>{% endif %}
   </td>
   {% for field in fields_to_show %}
   <td class="pt-2 pb-2 bg-transparent">

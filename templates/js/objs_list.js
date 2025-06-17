@@ -1,8 +1,14 @@
 {% load i18n %}
 window.addEventListener("load", function() {
+  // function formatText (option) {
+  //   return $('<span class="bg-' + $(option.element).data('color') + '"><span class="' + $(option.element).data('icon') + '"> </span><span>' + option.text + '</span></span>');}
            $(".select2").each(function () {
              $(this).select2({
+               width: '100%',
                theme: "bootstrap-5",
+               allowHtml: true,
+               // templateSelection: formatText,
+               // templateResult: formatText
              });
            });
       const sessionData = JSON.parse('{{ session | escapejs }}');
@@ -51,4 +57,22 @@ window.addEventListener("load", function() {
           }
         });
       });
+
+      document.querySelectorAll(".collapse").forEach(function (collapseEl) {
+      let objId = collapseEl.id.split("_").pop();
+      let icon = document.getElementById("circle-" + objId);
+      collapseEl.addEventListener("show.bs.collapse", function () {
+        if (icon) {
+          icon.classList.remove("fa-plus-circle");
+          icon.classList.add("fa-minus-circle");
+        }
+      });
+      collapseEl.addEventListener("hide.bs.collapse", function () {
+        if (icon) {
+          icon.classList.remove("fa-minus-circle");
+          icon.classList.add("fa-plus-circle");
+        }
+      });
+    });
+
       });

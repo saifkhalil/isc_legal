@@ -9,6 +9,41 @@
   </a>
 {% endif %}
 </div>
-<div class="px-5 pb-2 text-dark">
-  <p>{% trans 'Count' %}: {{ objs_count|default:0 }}</p>
+<div class="px-5 pb-2 text-dark row">
+  <p class="col-auto">{% trans 'Count' %}: {{ objs_count|default:0 }}</p>
+  {% if path_actions %}
+  <div class="col-auto ms-auto">
+  <div class="btn-group btn-group-sm" role="group" aria-label="View Switcher">
+  <button type="button" class="btn btn-outline-warning {% if user.is_grid %}active{% endif %}" id="gridViewBtn" onclick="setView('grid')">
+    <i class="bi bi-grid-3x3-gap-fill"></i>
+  </button>
+  <button type="button" class="btn btn-outline-warning {% if not user.is_grid %}active{% endif %}" id="listViewBtn" onclick="setView('list')">
+    <i class="bi bi-list-ul"></i>
+  </button>
+</div>
+    </div>
+    <script>
+function setView(viewType) {
+  fetch("{% url 'set_grid_view' %}", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "X-CSRFToken": "{{ csrf_token }}"
+    },
+    body: new URLSearchParams({
+      'view': viewType
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'success') {
+      location.reload();
+    } else {
+      alert('Failed to switch view.');
+    }
+  })
+  .catch(error => console.error('Error:', error));
+}
+</script>
+{% endif %}
 </div>

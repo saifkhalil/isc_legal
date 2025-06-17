@@ -28,3 +28,11 @@ def process_all_documents():
         except Exception as e:
             # Log error or handle as needed
             print(f"Error processing document {doc.id}: {e}")
+
+@shared_task
+def process_document_task(doc_id):
+    try:
+        doc = documents.objects.get(pk=doc_id)
+        doc.process_document()
+    except documents.DoesNotExist:
+        pass

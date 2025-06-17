@@ -2,8 +2,8 @@
 <tr class="table-row bg-white" {% if user.enable_transition %}data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00"{% endif %}>
     <td class="pt-2 pb-2">
     <button data-bs-toggle="collapse" data-bs-target="#parent_case_{{ obj.id }}" aria-expanded="false"
-            aria-controls="parent_case_{{ obj.id }}" style="cursor: pointer" class="fs-6 bg-transparent"><i class="{% if obj.child %}fa fa-plus-circle text-warning{% endif %}"
-id="folder-icon-{{ obj.id }}" aria-hidden="true"></i></button>
+            aria-controls="parent_case_{{ obj.id }}" style="cursor: pointer" class="fs-6 bg-transparent"><i class="{% if obj.child %}fa fa-plus-circle icon-transition text-warning{% endif %}"
+id="circle-{{ obj.id }}" aria-hidden="true"></i></button>
   </td>
   {% for field in fields_to_show %}
   <td class="pt-2 pb-2">
@@ -63,5 +63,5 @@ id="folder-icon-{{ obj.id }}" aria-hidden="true"></i></button>
 </tr>
 
 {% for child in obj.get_children|dictsort:"id" %}
-{% include 'includes/_obj_sub_record.html' with obj_view=obj_view obj_edit=obj_edit sub_obj=child user=user  %}
+{% include 'includes/_obj_sub_record.html' with obj_view=obj_view obj_edit=obj_edit sub_obj=child user=user parent_id=obj.id  %}
 {% endfor %}

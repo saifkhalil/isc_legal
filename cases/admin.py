@@ -5,10 +5,10 @@ from .models import *
 
 
 class LitigationCasesAdmin(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('id', 'name', 'description', 'is_deleted', 'assignee')
+    list_display = ('id', 'name', 'description', 'parent', 'is_deleted', 'assignee')
     fields = ('parent', 'name', 'description', 'case_category', 'judge', 'tasks', 'hearing', 'comments', 'detective', 'ImportantDevelopment',
               'case_type', 'case_status', 'Stage', 'characteristic', 'court', 'documents', 'paths', 'client_position', 'opponent_position', 'assignee', 'case_close_status', 'case_close_comment',
-              'shared_with', 'priority', 'end_time', 'start_time', 'is_deleted', 'created_by', 'created_at',
+              'shared_with', 'priority', 'end_time', 'start_time', 'is_deleted', 'is_archived', 'created_by', 'created_at',
               'modified_by', 'modified_at')
     readonly_fields = ('created_by', 'created_at', 'modified_by', 'modified_at')
     list_filter = ['assignee', 'Stage', 'case_status']

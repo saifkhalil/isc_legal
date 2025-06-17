@@ -25,7 +25,7 @@
                         onchange="this.form.submit()">
                   <option value="0">{% trans 'All' %}</option>
                   {% for option in field.options %}
-                    <option value="{{ option.id }}"
+                    <option value="{{ option.id }}" data-icon="{{ option.icon }}" data-color="{{ option.color }}"
                       {% if option.id|stringformat:"s" == field.value|stringformat:"s" %}selected{% endif %}>
                       {{ option.name }}
                     </option>

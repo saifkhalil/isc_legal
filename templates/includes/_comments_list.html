@@ -6,7 +6,7 @@
 <p class="pb-3"><i class="bi bi-chat-left-text"></i> {% trans 'Comments' %}</p>
   <div class="edits-list overflow-auto develop-scroll mb-3" style="height:25vh;">
           {% for comment in comments %}
-          <div data-show="true"  class="alert alert-secondary alert-no-icon" role="alert" style="margin-bottom: 10px;">
+          <div data-show="true" class="alert alert-secondary alert-no-icon" role="alert" style="margin-bottom: 10px;">
             <div class="alert-content">
               <div class="alert-message">
               <div class="w-full mb-2">
@@ -14,13 +14,14 @@
                 <div class="flex items-start justify-between">
                   <div class="items-center gap-1 flex-wrap" style="flex: 5 1 0%;">
                     <h4 class="mb-3">{{ comment.comment }}</h4>
-                    <h6 class="text-muted fs-8" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ comment.created_at|date:"Y-m-d h:i:s a" }}">{% include 'includes/_user_with_photo.html' with value=comment.created_by %} - {{ comment.created_at|naturaltime }}</h6>
+                    <h6 class="text-muted fs-8" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ comment.created_at|date:"Y-m-d h:i:s a" }}">{% include 'includes/_user_with_photo.html' with value=comment.created_by %} - {{ comment.created_at|naturaltime }}  <button class="underline cursor-pointer text-xs text-green-600 bg-transparent" data-bs-toggle="collapse" data-bs-target="#parent_comment_{{ comment.id }}"> {% trans 'Replies...' %}</button></h6>
                   </div>
                 </div>
               </div>
               </div>
+              <div class="collapse reply-section" id="parent_comment_{{ comment.id }}">
                 {% for reply in comment.replies.all %}
-                  <div class="reply-section pb-1">
+                  <div class="pb-1" >
                   <div data-show="true" class="alert alert-light " role="alert">
                   <div class="alert-content">
               <div class="alert-message">
@@ -31,7 +32,7 @@
                   </div>
                   </div>
                   {% endfor %}
-              <div class="reply-section" id="comment_{{ comment.id }}">
+              <div id="comment_{{ comment.id }}">
                  <form method="post" action="{% url 'new_comment_reply' comment_id=comment.id %}">
                    <input type="hidden" id="url" name="url" value="">
                           {% csrf_token %}
@@ -42,6 +43,7 @@
                     </form>
               </div>
             </div>
+              </div>
             </div>
           </div>
             {% empty %}

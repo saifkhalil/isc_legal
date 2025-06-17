@@ -1,6 +1,9 @@
 import calendar
 import json
+import os
+import random
 import re
+import urllib
 from datetime import date
 from datetime import datetime, timedelta
 from urllib.parse import urlencode
@@ -14,7 +17,7 @@ from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.db.models import Q, Prefetch
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseNotFound, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import translate_url
@@ -33,7 +36,8 @@ from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-
+from urllib.parse import quote
+from django.utils.encoding import uri_to_iri
 from accounts.models import User
 from activities.models import task, hearing
 from cases.models import LitigationCases, Folder, AdministrativeInvestigation, Notation
@@ -158,6 +162,16 @@ def set_animation(request):
             request.user.save()
 
     return redirect(request.META.get("HTTP_REFERER", "/"))
+
+@login_required
+def set_grid_view(request):
+    if request.method == "POST":
+        is_grid = True if request.POST.get("view") == 'grid' else False
+        if request.user.is_authenticated:
+            request.user.is_grid = is_grid
+            request.user.save()
+            return JsonResponse({'status': 'success', 'view': is_grid})
+    return JsonResponse({'status': 'error'}, status=400)
 
 @login_required
 def set_language(request):
@@ -1375,6 +1389,48 @@ def delete_document(request, doc_id=None):
     instance.modified_at = timezone.now()
     instance.save()
     return JsonResponse({'success': True, 'message': _('Document has been deleted successfully.')}, status=200)
+
+def doc_images(request,doc_id=None):
+    instance = get_object_or_404(documents, pk=doc_id)
+    context = {
+    'images':instance.images_list,
+    'doc':instance
+    }
+    return render(request, 'includes/_images_view.html', context)
+
+def open_document(request, filename):
+
+    file = urllib.parse.unquote(filename).replace('/media/','')
+    file_path = os.path.join(settings.MEDIA_ROOT,file)
+    print(f'{file_path=}')
+    print(f'{filename=}')
+    if not os.path.exists(file_path):
+        return HttpResponseNotFound("File not found")
+
+    file_url = request.build_absolute_uri(
+        settings.MEDIA_URL + urllib.parse.quote(file)
+    )
+    file_url = f'http://172.18.228.59:8090/media/{file}'
+    print(f'{file_url=}')
+    ext = os.path.splitext(filename)[1][1:].lower()
+    print(f'{ext=}')
+    if ext in ['doc', 'docx', 'odt', 'rtf', 'txt', 'pdf']:
+        document_type = 'word'
+    elif ext in ['xls', 'xlsx', 'ods']:
+        document_type = 'cell'
+    elif ext in ['ppt', 'pptx', 'odp']:
+        document_type = 'slide'
+    else:
+        return HttpResponseBadRequest("Unsupported file type")
+
+    context = {
+        'filename': filename,
+        'file_type': ext,
+        'document_type': document_type,
+        'document_url': file_url,
+        'key':random.random
+    }
+    return render(request, "includes/editor.html", context)
 
 @require_POST
 def new_case_comment_reply(request, case_id=None, comment_id=None):

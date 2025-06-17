@@ -68,9 +68,9 @@ class documentsAdmin(admin.ModelAdmin):
     actions = [process_selected_documents]
 
     def preview_link(self, obj):
-        urls = obj.get_preview_image()
+        urls = obj.images_list()
         if urls:
-            return format_html('<a href="{}" target="_blank">Preview First Page</a>', urls[0])
+            return format_html('<a href="{}" target="_blank">Preview First Page</a>', urls[0].url)
         return "-"
     preview_link.short_description = "Preview"
     list_display += ['preview_link']

@@ -28,12 +28,11 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.forms import UserAuthenticationForm,UserUpdateForm
+from accounts.forms import UserAuthenticationForm
 from accounts.models import User, Employees
 from accounts.serializers import EmployeesSerializer, EmpSerializer
-from activities.models import task_categories, task, hearing
+from activities.models import task, hearing
 from cases.models import LitigationCases
-from contract.models import Contract
 
 
 def get_user_queryset(user=None):

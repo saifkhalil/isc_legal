@@ -99,3 +99,9 @@ def same_order(url: str, field: str):
         result = 'nothing'
 
     return result
+
+@register.filter
+def preferred_documents(path):
+    if hasattr(path, 'filtered_documents') and path.filtered_documents:
+        return path.filtered_documents
+    return path.documents.all()

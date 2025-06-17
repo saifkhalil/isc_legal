@@ -43,7 +43,7 @@ from .consumers import NotificationConsumer
 from .views import (
     APIPathListView, APIPathView, myhome, about, load_more_notifications, read_all_notifications, read_notification,
     delete_all_notifications, delete_notification, new_path_docs, new_case_comment_reply,
-    new_comment_reply, delete_path,Paths_list
+    new_comment_reply, delete_path, Paths_list, doc_images, open_document
 )
 from activities.views import ContactWizard,show_message_form_condition
 
@@ -107,6 +107,7 @@ urlpatterns += i18n_patterns(
     path('set-language/',views.set_language, name='set_language'),
     path('set-theme-color/',views.set_theme_color, name='set_theme_color'),
     path('set-animation/',views.set_animation, name='set_animation'),
+    path('is-grid/',views.set_grid_view, name='set_grid_view'),
     path("select2/", include("django_select2.urls")),
     path('',myhome,name='home'),
     path('myprofile/',login_required(account_view),name='my_profile'),
@@ -160,6 +161,8 @@ urlpatterns += i18n_patterns(
          name='new_contract_ImportantDevelopment'),
     path('contracts/<int:contract_id>/new_comment', login_required(new_contract_comment), name='new_contract_comment'),
     path('paths/', login_required(Paths_list), name='paths_list'),
+    path('docs/<int:doc_id>/images', login_required(doc_images), name='doc_images'),
+    path('open/<path:filename>/', open_document, name='open_document'),
     path('contracts/<int:pk>/', login_required(delete_contract), name='delete_contract'),
     path("load-more-notifications/", load_more_notifications, name="load_more_notifications"),
     path("notifications/read_all", read_all_notifications, name="read_all_notifications"),

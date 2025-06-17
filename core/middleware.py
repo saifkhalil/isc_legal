@@ -20,6 +20,7 @@ from urllib import parse
 class LanguageMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
+
         if request.user.is_authenticated:
             user_language = request.user.language
             cur_language = get_language()

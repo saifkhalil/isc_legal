@@ -2,9 +2,9 @@
 {% load static i18n file_filters %}
 {% block content %}
 {% include "includes/_render_filter_form.html" with filters=filter_fields session=session %}
-{% include "includes/_create_count.html" with objs_count=objs_count %}
+{% include "includes/_create_count.html" with objs_count=objs_count path_actions=True %}
   <div class="table-responsive mx-5">
-{% include "includes/_paths_table.html" with new_path=new_path paths=objs user=user %}
+{% include "includes/_paths_table.html" with count=True new_path=new_path paths=objs user=user %}
   </div>
   {% include 'includes/_pagination.html' with objs=objs filter_query=filter_query %}
 <div class="modal fade modal-lg" id="NewDocs" tabindex="-1" aria-labelledby="New Docs" aria-hidden="true">

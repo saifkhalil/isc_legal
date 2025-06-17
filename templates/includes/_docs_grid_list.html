@@ -1,0 +1,21 @@
+{% load i18n static file_filters %}
+<tr {% if path_id %} class="collapse qi-light" id="parent_path_{{ path_id }}" {% endif %} {% if user.enable_transition %} data-aos="zoom-in" data-aos-delay="100" {% endif %}>
+<td class="pt-2 pb-2" colspan="{{ colspan }}">
+  <div class="row">
+  {% for doc in docs %}
+        {% if not doc.is_deleted %}
+          <div class="col-auto">
+          <a href="{{ doc.attachment.url }}" target="_blank" {% if doc.first_image %} data-bs-toggle="tooltip" data-bs-html="true" title="<img src='{{ doc.first_image.url }}' style='max-width: 300px; max-height: 300px;' alt='{{ doc.name }}'>" {% endif %}><img src='{% if doc.first_image %}{{ doc.first_image.url }}{% else %}{% static 'images/file.png' %}{% endif %}' style="max-width: 60px; max-height: 60px;" alt='{{ doc.name }}'>
+          <p class="fs-8">{{ doc.name|truncatechars:20 }}</p></a>
+
+        </div>
+        {% endif %}
+      {% empty %}
+  {% if not path_id %}
+          <td class="p-3 text-center" colspan="13"><i
+            class="bi bi-inbox-fill"></i> {% trans 'No data available in table' %}</td>
+  {% endif %}
+      {% endfor %}
+</div>
+</td>
+</tr>

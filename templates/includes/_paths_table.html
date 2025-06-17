@@ -13,7 +13,7 @@
   </tr>
   </thead>
   <tbody>
-  {% include 'includes/_paths_loop.html' with paths=paths %}
+  {% include 'includes/_paths_loop.html' with paths=paths count=count %}
   </tbody>
 </table>
 
@@ -68,17 +68,25 @@ document.querySelectorAll('.delete-path').forEach(function(button) {
 document.querySelectorAll(".collapse").forEach(function (collapseEl) {
       let pathId = collapseEl.id.split("_").pop();
       let icon = document.getElementById("folder-icon-" + pathId);
+
+      function fadeSwapIcon(icon, removeClass, addClass) {
+    if (!icon) return;
+
+    icon.classList.add("fade-out"); // Start fade out
+
+    setTimeout(() => {
+      icon.classList.remove(removeClass);
+      icon.classList.add(addClass);
+      icon.classList.remove("fade-out"); // Fade back in
+    }, 150); // Wait half the transition time before switching
+  }
+
+
       collapseEl.addEventListener("show.bs.collapse", function () {
-        if (icon) {
-          icon.classList.remove("fa-folder");
-          icon.classList.add("fa-folder-open");
-        }
+        fadeSwapIcon(icon, "fa-folder", "fa-folder-open");
       });
       collapseEl.addEventListener("hide.bs.collapse", function () {
-        if (icon) {
-          icon.classList.remove("fa-folder-open");
-          icon.classList.add("fa-folder");
-        }
+         fadeSwapIcon(icon, "fa-folder-open", "fa-folder");
       });
     });
 

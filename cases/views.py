@@ -96,7 +96,7 @@ def cases_list(request):
         # Save parameters to session if provided.
         for key, value in (('keywords', keywords), ('stage', stage),
                            ('assignee', assignee), ('type', case_type),
-                           ('status', status)):
+                           ('status', status),('orderby', orderby)):
             if value is not None:
                 request.session[key] = value
 
@@ -159,7 +159,7 @@ def cases_list(request):
                 if case.assignee:
                     assignees.append(dict_item(case.assignee.id, case.assignee.username))
                 if case.case_status:
-                    case_status.append(dict_item(case.case_status.id, case.case_status.status))
+                    case_status.append({'id':case.case_status.id,'name': case.case_status.status,'icon':case.case_status.icon,'color':case.case_status.color})
             stage_set = GetUniqueDictionaries(stages)
             court_set = GetUniqueDictionaries(courts)
             case_type_set = GetUniqueDictionaries(case_types)

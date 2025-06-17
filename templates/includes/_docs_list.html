@@ -1,26 +1,28 @@
 {% load i18n file_filters %}
 {% for doc in docs %}
         {% if not doc.is_deleted %}
-        <tr {% if path_id %} id="parent_path_{{ path_id }}" {% endif %} {% if user.enable_transition %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
-          {% if path_id %}<td></td>{% endif %}
-          <td class="pt-2 pb-2">{{ forloop.counter }}</td>
-          <td class="pt-2 pb-2"><a class="btn btn-primary btn-sm" href="{{ doc.attachment.url }}" target="_blank"
-                                   data-bs-toggle="tooltip" data-bs-placement="top" title="{{ doc.name }}"><i
+        <tr {% if path_id %} class="collapse bg-warning bg-opacity-25 {% if docs|length == 1 %}shadow-up-down{% elif forloop.first %} shadow-down {% elif forloop.last %} shadow-up {% endif %}" id="parent_path_{{ path_id }}" {% endif %} {% if user.enable_transition %} data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00" {% endif %}>
+          {% if path_id %}<td class="bg-transparent"></td>{% endif %}
+          {% if count %}<td class="pt-2 pb-2 bg-transparent">{{ forloop.counter }}</td>{% endif %}
+          <td class="pt-2 pb-2 bg-transparent"><a class="btn btn-primary btn-sm" href="{% if doc.pdf_file %}{{ doc.pdf_file.url }}{% else %}{{ doc.attachment.url }}{% endif %}" target="_blank"
+                                   data-bs-toggle="tooltip" data-bs-placement="top"  data-bs-html="true" title="{{ doc.name }}{% if doc.first_image %}</hr><img src='{{ doc.first_image.url }}' class='img-thumbnail'>">{% endif %}<i
             class="bi {{ doc.attachment.url|file_icon }}"></i> {{ doc.name|truncatechars:35 }} </a></td>
-          <td class="pt-2 pb-2">{{ doc.created_at|date:"Y-m-d" }}</td>
-          <td class="pt-2 pb-2">
+          <td class="pt-2 pb-2 bg-transparent">{{ doc.created_at|date:"Y-m-d" }}</td>
+          <td class="pt-2 pb-2 bg-transparent">
             {% if user.is_manager or user.is_superuser %}
               <button class="btn btn-sm btn-danger delete-task" data-task-id="{{ doc.id }}"><i
                 class="bi bi-trash3-fill"></i></button>
             {% else %}
-              <button class="btn btn-sm btn-danger" disabled>{% trans 'Delete' %}</button>
+              <button class="btn btn-sm btn-danger" disabled><i class="bi bi-trash3-fill"></i></button>
             {% endif %}
           </td>
         </tr>
         {% endif %}
       {% empty %}
+  {% if not path_id %}
         <tr>
           <td class="p-3 text-center" colspan="13"><i
             class="bi bi-inbox-fill"></i> {% trans 'No data available in table' %}</td>
         </tr>
+  {% endif %}
       {% endfor %}
