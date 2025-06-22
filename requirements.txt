@@ -13,7 +13,7 @@ django-dbbackup
 django-extensions
 django-filter
 django-forestadmin
-django-furl
+#django-furl
 django-import-export
 django-ipware
 django-jazzmin
@@ -26,7 +26,7 @@ django-pgtrigger
 django-phonenumber-field
 django-rest-swagger
 django-rosetta
-django-tabular-permissions
+#django-tabular-permissions
 django-widget-tweaks
 djangochannelsrestframework
 djangorestframework
@@ -42,7 +42,7 @@ drf-tracking
 drf-yasg
 easy-thumbnails
 gunicorn
-import-export
+#import-export
 numpy
 pandas
 phonenumbers

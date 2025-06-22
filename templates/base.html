@@ -8,13 +8,31 @@
 <html lang="{{CURRENT_LANGUAGE}}" dir="{% if CURRENT_LANGUAGE == 'en' %}ltr{% else %}rtl{% endif %}">
 {% include 'includes/_base_header.html' %}
 <body class="d-flex flex-column h-100" data-bs-theme="{% if user.is_authenticated %}{{ user.theme_color }}{% else %}light{% endif %}">
+{% if user.is_authenticated %}
 {% include 'includes/_base_nav.html' %}
+{% endif %}
   <div class="my-50">
   {% bootstrap_messages %}
 
   {% block content %}{% endblock %}
   </div>
-
+<!-- Session Timeout Warning Modal -->
+<div class="modal fade" id="sessionTimeoutModal" tabindex="-1" aria-labelledby="sessionTimeoutLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center">
+      <div class="modal-header">
+        <h5 class="modal-title w-100" id="sessionTimeoutLabel">{% trans "Session Timeout" %}</h5>
+      </div>
+      <div class="modal-body">
+        <p>{% trans "Your session is about to expire due to inactivity." %}</p>
+        <p>{% blocktrans %}You will be logged out in <span id="countdown">60</span> seconds.{% endblocktrans %}</p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-primary" id="stayLoggedInBtn" data-bs-dismiss="modal">{% trans "Stay Logged In" %}</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Hidden div to store translated texts -->
 <div id="translations"
      data-created="{% trans 'create' %}"

@@ -126,6 +126,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_blocked = models.BooleanField(default=False,verbose_name=_('Is blocked'))
     enable_transition = models.BooleanField(default=True, verbose_name=_('Enable transition'))
     is_grid = models.BooleanField(default=False, verbose_name=_('Files grid View'))
+    is_filter_show = models.BooleanField(default=False, verbose_name=_('Already show filters'))
     email_notification = models.BooleanField(default=True,verbose_name=_('Email Notification'))
     i_agree = models.BooleanField(
         verbose_name=_("Please confirm that you read and agree to our terms & conditions"), default=False, blank=False, null=False)

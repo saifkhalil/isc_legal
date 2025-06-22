@@ -12,3 +12,8 @@ def users_json_context(request):
     return {
         'mention_users':users_list
     }
+
+def session_timeout(request):
+    return {
+        'session_timeout': getattr(request, 'session_timeout',1800)  # Fallback default 30 mins
+    }

@@ -5,6 +5,48 @@ $(document).ready(function() {
      var tab_url = window.location.pathname.replace(/^((?:[^\/]*\/){3}).*$/, "$1");
      var active_tab = document.querySelectorAll(`a[href='${tab_url}']`);
     active_tab[0].classList.add('active');
+
+  const sessionTimeout = {{ session_timeout }} * 1000;
+  const warningBefore = 60 * 1000;       // 1 minute before logout
+
+  let warningTimer, logoutTimer;
+  const timeoutModal = new bootstrap.Modal(document.getElementById('sessionTimeoutModal'));
+
+  function startTimers() {
+    clearTimeout(warningTimer);
+    clearTimeout(logoutTimer);
+
+    warningTimer = setTimeout(() => {
+      timeoutModal.show();
+      startCountdown(60);
+    }, sessionTimeout - warningBefore);
+
+    logoutTimer = setTimeout(() => {
+      window.location.href = "{% url 'account_logout' %}";
+    }, sessionTimeout);
+  }
+
+  function startCountdown(seconds) {
+    const countdownElem = document.getElementById('countdown');
+    let remaining = seconds;
+    countdownElem.innerText = remaining;
+    const interval = setInterval(() => {
+      remaining--;
+      countdownElem.innerText = remaining;
+      if (remaining <= 0) clearInterval(interval);
+    }, 1000);
+  }
+
+  ['click', 'mousemove', 'keydown'].forEach(event =>
+    document.addEventListener(event, () => startTimers())
+  );
+
+  document.getElementById('stayLoggedInBtn').addEventListener('click', () => {
+    timeoutModal.hide();
+    startTimers();
+  });
+
+  startTimers();
   });
 
   document.addEventListener("DOMContentLoaded", function () {

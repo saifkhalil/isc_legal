@@ -5,7 +5,8 @@ from auditlog.context import set_actor
 from auditlog.middleware import AuditlogMiddleware as _AuditlogMiddleware
 from django.utils import timezone
 from django.utils.functional import SimpleLazyObject
-
+import time
+from django.conf import settings
 _thread_local = threading.local()
 from django.apps import apps
 from django.db.models.signals import m2m_changed
@@ -30,6 +31,22 @@ class LanguageMiddleware(MiddlewareMixin):
                 url = translate_url(path,user_language)
                 return redirect(url)
 
+class SessionTimeoutMiddleware(MiddlewareMixin):
+    def process_request(self, request):
+        if not request.user.is_authenticated:
+            return
+
+        request.session_timeout = settings.SESSION_COOKIE_AGE
+        current_time = int(time.time())
+        last_activity = request.session.get('last_activity')
+
+        if last_activity and (current_time - last_activity > settings.SESSION_COOKIE_AGE):
+            from django.contrib.auth import logout
+            logout(request)
+            return redirect('login')  # or any timeout page
+
+        request.session['last_activity'] = current_time
+
 
 class NotificationMiddleware(MiddlewareMixin):
     """Middleware to add unread notifications to request context"""
@@ -44,6 +61,8 @@ class NotificationMiddleware(MiddlewareMixin):
             request.notifications = []  # Empty for non-authenticated users
             request.not_read_notifications_count = 0
             request.not_deleted_notifications_count = 0
+
+
 
 class AuditlogMiddleware(_AuditlogMiddleware):
     def __call__(self, request):

@@ -66,6 +66,7 @@ class UserAdmin(admin.ModelAdmin):
                     "is_verified",
                     "enable_transition",
                     "is_grid",
+                    "is_filter_show",
                     "groups",
                     "user_permissions",
                 ),

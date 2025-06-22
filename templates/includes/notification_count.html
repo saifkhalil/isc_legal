@@ -1,0 +1,8 @@
+<span id="notificationCount"
+      hx-get="{% url 'notification_count' %}"
+      hx-trigger="every 5s"
+      hx-swap="outerHTML"
+      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+  {{ request.not_read_notifications_count }}{{ count }}</span>
+  <span class="visually-hidden">unread notifications</span>
+

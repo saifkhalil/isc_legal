@@ -1,0 +1,22 @@
+{% load i18n %}
+<ul aria-labelledby="notificationDropdown" id="notificationItems" hx-get="{% url 'notification_list' %}"
+    hx-trigger="every 5s"
+    hx-swap="innerHTML">
+{% for notification in notifications %}
+  <li class="{% if notification.is_read %}opacity-75{% endif %}">
+    <a class="dropdown-item notification-item" href="#" data-id="{{ notification.id }}">
+      <p class="{% if not notification.is_read %}fw-bolder text-dark{% else %}text-muted{% endif %}">
+        {% if notification.action == 'created' %}{% trans 'create' %}
+        {% elif notification.action == 'updated' %}{% trans 'update' %}
+        {% else %}{% trans 'delete' %}{% endif %}
+        {{ notification.content_type.name }} <i class="text-primary">({{ notification.object_name }})</i>
+      </p>
+      <small class="text-muted d-block">
+        <strong>{{ notification.action_by.username }}</strong> {{ notification.action_at|date:"Y-m-d H:i:s" }}
+      </small>
+    </a>
+  </li>
+{% empty %}
+  <li id="no_notifications" class="dropdown-item text-muted">No notifications</li>
+{% endfor %}
+</ul>

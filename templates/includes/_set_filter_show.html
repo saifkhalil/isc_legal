@@ -1,0 +1,22 @@
+{% load i18n %}
+<div class="position-relative">
+  <div class="position-absolute top-100 start-50 translate-middle">
+    <div class="row">
+      <div class="col-auto px-1">
+        <div class="filter_show">
+          <form action="{% url 'set_filter_show' %}" method="post" class="d-flex">
+            {% csrf_token %}
+            <div class="form-check form-switch btn btn-sm btn-light border border-secondary">
+            <input class="form-check-input" style="display: none" type="checkbox" role="switch" id="filter" name="filter" onchange="this.form.submit()" {% if user.is_filter_show %}checked{% endif %}>
+            <label class="form-check-label" for="filter">{% if user.is_filter_show %}<i class="bi bi-pin-angle-fill"></i>{% else %}<i class="bi bi-pin-angle"></i>{% endif %}</label>
+          </div>
+          </form>
+        </div>
+      </div>
+      <div class="col-auto px-1">
+          <button class="btn btn-sm btn-light border border-secondary" data-bs-toggle="collapse" data-bs-target="#filter_section" aria-expanded="false"
+              aria-controls="filter_section"><i class="bi bi-funnel"></i></button>
+        </div>
+    </div>
+  </div>
+</div>

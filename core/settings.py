@@ -132,6 +132,7 @@ MIDDLEWARE = [
     'django.contrib.admindocs.middleware.XViewMiddleware',
     'core.middleware.NotificationMiddleware',
     'core.middleware.LanguageMiddleware',
+    'core.middleware.SessionTimeoutMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
 
@@ -184,7 +185,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'core.context_processors.users_json_context'
+                'core.context_processors.users_json_context',
+                'core.context_processors.session_timeout',
             ],
         },
     },
@@ -360,6 +362,15 @@ JAZZMIN_UI_TWEAKS = {
     "theme": "flatly",
     "dark_mode_theme": "darkly",
 }
+
+# Timeout in seconds (e.g., 30 minutes)
+SESSION_COOKIE_AGE = 1800
+JS_SESSION_TIMEOUT = SESSION_COOKIE_AGE * 1000
+# Expire session when the browser is closed (optional)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# Don't save session if it hasn't changed (optional, good for performance)
+SESSION_SAVE_EVERY_REQUEST = False
 
 TABULAR_PERMISSIONS_CONFIG = {
     'template': 'tabular_permissions/admin/tabular_permissions.html',

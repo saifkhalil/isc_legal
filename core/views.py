@@ -20,6 +20,7 @@ from django.db.models import Q, Prefetch
 from django.http import JsonResponse, HttpResponse, HttpResponseNotFound, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
+from django.template.loader import render_to_string
 from django.urls import translate_url
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -159,6 +160,17 @@ def set_animation(request):
         animation = True if request.POST.get("animation") == 'on' else False
         if request.user.is_authenticated:
             request.user.enable_transition = animation
+            request.user.save()
+
+    return redirect(request.META.get("HTTP_REFERER", "/"))
+
+@login_required
+def set_filter_show(request):
+    if request.method == "POST":
+        print(f'{request.POST=}')
+        animation = True if request.POST.get("filter") == 'on' else False
+        if request.user.is_authenticated:
+            request.user.is_filter_show = animation
             request.user.save()
 
     return redirect(request.META.get("HTTP_REFERER", "/"))
@@ -1444,3 +1456,17 @@ def new_comment_reply(request, comment_id=None):
     instance = get_object_or_404(comments, pk=comment_id)
     instance.replies.create(reply=request.POST.get('content'),created_by=request.user,created_at=timezone.now())
     return redirect(url)
+
+@login_required
+def notification_count_view(request):
+    count = Notification.objects.filter(user=request.user, is_read=False, is_deleted=False).count()
+    html = render_to_string("includes/notification_count.html", {"count": count})
+    return HttpResponse(html)
+
+
+@login_required
+def notification_list_view(request):
+    notifications = Notification.objects.filter(user=request.user, is_deleted=False).order_by("-action_at")[:10]
+    context = {"notifications": notifications}
+    html = render_to_string("includes/notification_list.html", context)
+    return HttpResponse(html)
