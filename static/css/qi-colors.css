@@ -1,0 +1,95 @@
+/* change the colors */
+
+:root {
+    --qi-primary: #4F758B;
+    --qi-secondary: #FFDD00;
+    --qi-danger: #FF0000FF;
+    --qi-success: #008000FF;
+    --qi-text: #fff;
+}
+.qi-text-primary {
+    color: var(--qi-primary) !important;
+}
+
+.qi-border {
+    border-color: var(--qi-secondary) !important;
+}
+
+
+.qi-light {
+    background-color: var(--qi-primary) !important;
+    color: var(--qi-text) !important;
+}
+.qi-nav {
+    background-color: #1d4c67b5 !important;
+    color: var(--qi-text) !important;
+    backdrop-filter: blur(2px);
+}
+.nav-link {
+    color: var(--qi-text) !important;
+}
+
+a.nav-link.active {
+    background-color: var(--qi-secondary) !important;
+    color: var(--qi-primary) !important;
+    border-radius: 5px;
+}
+
+.qi-primary-outline {
+    background-color: transparent !important;
+    color: var(--qi-text) !important;
+    border-color: var(--qi-secondary) !important;
+}
+
+.qi-primary-outline:hover {
+    background-color: var(--qi-secondary) !important;
+    color: var(--qi-primary) !important;
+    border-color: var(--qi-primary) !important;
+}
+
+.btn-primary {
+    background-color: var(--qi-secondary) !important;
+    color: var(--qi-primary) !important;
+    border-color: var(--qi-secondary) !important;
+}
+
+.btn-success {
+    background-color: var(--qi-success) !important;
+    color: var(--qi-text) !important;
+    border-color: var(--qi-success) !important;
+}
+
+.qi-primary {
+    background-color: var(--qi-secondary) !important;
+    color: var(--qi-primary) !important;
+    border-color: var(--qi-secondary) !important;
+}
+
+.qi-primary:hover {
+    background-color: var(--qi-primary) !important;
+    color: var(--qi-secondary) !important;
+    border-color: var(--qi-primary) !important;
+}
+
+
+.navbar-toggler {
+    background-color: var(--qi-secondary) !important;
+    color: var(--qi-text) !important;
+    border-color: var(--qi-primary) !important;
+}
+
+.navbar-brand {
+    color: var(--qi-text) !important;
+}
+
+.qi-enav {
+    border-top-left-radius: 30px !important;
+    border-bottom-left-radius: 30px !important;
+    margin-left: 30px !important;
+}
+
+.qi-anav {
+    border-top-right-radius: 30px !important;
+    border-bottom-right-radius: 30px !important;
+    margin-right: 30px !important;
+}
